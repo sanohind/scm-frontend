@@ -7,7 +7,6 @@ import SignIn from './pages/Authentication/SignIn';
 // import AdminDashboard from './pages/Dashboard/AdminDashboard';
 // import UserDashboard from './pages/Dashboard/UserDashboard';
 import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 import DefaultLayout from './layout/DefaultLayout';
 import ECommerce from './pages/Dashboard/ECommerce';
 import Dashboard from './pages/Dashboard/Dashboard';

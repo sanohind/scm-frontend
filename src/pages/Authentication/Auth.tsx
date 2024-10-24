@@ -117,15 +117,15 @@ export default async function logout() {
     } else {
       // Jika API logout gagal, tampilkan pesan error
       // showNotification('Logout failed: ' + (result.message || 'Unknown error'), 'error');
-      // clearLocalStorage(); // Tetap hapus data sesi
-      // window.location.href = '/auth/signin'; // Redirect ke halaman login
+      clearLocalStorage(); // Tetap hapus data sesi
+      window.location.href = '/auth/signin'; // Redirect ke halaman login
     }
   } catch (error) {
     // Tangani error jika terjadi masalah saat logout
     console.error('Error during logout:', error);
     // showNotification('Logout failed: Server error.', 'error');
-    // clearLocalStorage(); // Tetap hapus data sesi
-    // window.location.href = '/auth/signin'; // Redirect ke halaman login
+    clearLocalStorage(); // Tetap hapus data sesi
+    window.location.href = '/auth/signin'; // Redirect ke halaman login
   }
 };
 
