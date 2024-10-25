@@ -3,18 +3,20 @@ import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import Swal from 'sweetalert2';
 import UserLogo from '../../images/user/user-01.png';
-import logout from '../../pages/Authentication/Auth';
+import { useAuth } from '../../pages/Authentication/AuthContext';
+
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [name, setName] = useState('');
   const [supplierName, setSupplierName] = useState('');
   const [supplierImage, setSupplierImage] = useState('');
+  const { logout } = useAuth();
 
   // Ambil data dari localStorage pada saat komponen dimuat
   useEffect(() => {
     const storedName = localStorage.getItem('name');
-    const storedSupplierName = localStorage.getItem('bpCode');
+    const storedSupplierName = localStorage.getItem('bp_code');
 
     if (storedName) {
       setName(storedName);
@@ -56,7 +58,7 @@ const DropdownUser = () => {
             {name || 'User Testing'} {/* Menampilkan nama dari localStorage */}
           </span>
           <span className="block text-xs">
-            {supplierName || 'Supplier Testing'} {/* Menampilkan pekerjaan dari localStorage */}
+            {supplierName || 'Pengguna Testing'} {/* Menampilkan pekerjaan dari localStorage */}
           </span>
         </span>
 

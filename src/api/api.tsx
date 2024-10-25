@@ -1,16 +1,13 @@
-export const API = 'https://api.edutrashgo.com/api';
+const API = 'https://api.edutrashgo.com/api';
+const userRole = localStorage.getItem('role');
 
-export const APIlogin = `${API}/login`;
+let rolePath = userRole ? `/${userRole}` : '';
 
-// Function to save logout API endpoint
-export const saveLogout = () => {
-  const userRole = localStorage.getItem('userRole');
-  let rolePath = `/${userRole}`;
-  localStorage.setItem('APIlogout', API + rolePath + '/logout');
-};
+// login API endpoint
+export const APIlogin = API + '/login';
 
-// Additional API endpoints can be added here as needed
-
+// logout API endpoint
+export const APIlogout = API + rolePath + '/logout';
 
 // API Test No Auth
 export const APIreadfile = API + '/listingreporttest/file/';

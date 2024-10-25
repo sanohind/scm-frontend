@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CardDataStats from '../../components/CardDataStats';
+import CardDataStats from '../components/CardDataStats';
 
 // Pastikan Anda mengimpor URL API yang benar
-import { API_dashboardSupplier } from '../../api/api';
+import { API_dashboardSupplier } from '../api/api';
 
 const Dashboard: React.FC = () => {
   // State untuk menyimpan data dashboard
@@ -16,12 +16,12 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-          // Jika tidak ada token, redirect ke halaman login
-          window.location.href = '/auth/signin';
-          return;
-        }
+        const token = localStorage.getItem('access_token');
+        // if (!token) {
+        //   // Jika tidak ada token, redirect ke halaman login
+        //   window.location.href = '/auth/signin';
+        //   return;
+        // }
 
         const response = await fetch(API_dashboardSupplier, {
           method: 'GET',

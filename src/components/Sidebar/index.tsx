@@ -8,7 +8,7 @@ interface SidebarProps {
   role: string | null;
 }
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
+const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role }) => {
   const location = useLocation();
   const { pathname } = location;
   
@@ -19,6 +19,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
   const [sidebarExpanded] = useState(
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
   );
+
+  if (!role) {
+    return null; // Jangan render jika user role belum ada
+  }
 
   // close on click outside
   useEffect(() => {
@@ -96,7 +100,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
         {/* <!-- Sidebar Menu --> */}
         <nav className="mt-2 py-4 px-4 lg:mt-2 lg:px-6">
           {/* <!-- Menu Group Berdasarkan Peran --> */}
-          {role === 'admin' ? (
+          {role === '4' ? (
             <div>
               <div>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-black-2  dark:text-bodydark2">
@@ -106,7 +110,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
                   {/* <!-- Menu Item Dashboard --> */}            
                   <li>
                     <NavLink
-                      to="/"
+                      to="/dashboard"
                       className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
                           isActive
@@ -177,7 +181,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
                 </ul>
               </div>
             </div>
-          ) : role === 'purchasing' ? (
+          ) : role === '2' ? (
             <div>
               <div>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-black-2  dark:text-bodydark2">
@@ -376,7 +380,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
               </div>
             </div>
 
-          ) : role === 'warehouse' ? (
+          ) : role === '3' ? (
             <div>
               <div>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-black-2  dark:text-bodydark2">
@@ -525,7 +529,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, role }: SidebarProps) => {
               
             </div>
 
-          ) : role === 'supplier' ? (
+          ) : role === '1' ? (
             <div>
               <div>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-black-2  dark:text-bodydark2">
