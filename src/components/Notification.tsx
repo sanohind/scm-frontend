@@ -1,4 +1,20 @@
-const Notification = ({ message, type = 'success', onClose }) => {
+import { useEffect } from 'react';
+
+interface NotificationProps {
+  message: string;
+  type?: 'success' | 'error' | 'warning';
+  onClose: () => void;
+}
+
+const Notification = ({ message, type = 'success', onClose }: NotificationProps) => {
+  useEffect(() => {
+    // Set timer untuk auto-close setelah 3 detik
+    const timer = setTimeout(onClose, 3000);
+
+    // Bersihkan timer ketika komponen di-unmount
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
   return (
     <div className="fixed top-4 right-4 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-md border border-gray-300">
       <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">

@@ -31,6 +31,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUserRole(null);
     }
     setIsLoading(false); // Set isLoading ke false setelah pengecekan selesai
+
+    const checkTokenExpiration = () => {
+      const expirationTime = localStorage.getItem('token_expiration');
+      if (!expirationTime) {
+        localStorage.clear();
+        setIsAuthenticated(false);
+        setUserRole(null);
+        return;
+      }
+      if (expirationTime && new Date().getTime() > parseInt(expirationTime)) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('token_expiration');
+        setIsAuthenticated(false);
+        setUserRole(null);
+      } 
+    };
+
+    const interval = setInterval(checkTokenExpiration, 60000); // Cek setiap 1 menit
+    return () => clearInterval(interval);
   }, []);
 
   const login = (role: Role, token: string) => {
@@ -38,6 +57,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(role);
     localStorage.setItem('access_token', token);
     localStorage.setItem('userRole', role);
+    
+    const expirationTime = new Date().getTime() + 3600 * 1000;
+    localStorage.setItem('token_expiration', expirationTime.toString()); // 1 jam
+
   };
 
   const logout = async () => {    
@@ -45,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (token) {
       try {
-        const response = await fetch(APIlogout, {
+        await fetch(APIlogout, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -53,10 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           },
           body: JSON.stringify({ access_token: token }),
         });
+        
         localStorage.clear();
         setIsAuthenticated(false);
         setUserRole(null);
-      } catch (error) {
+      } catch (error : any) {
         localStorage.clear();
         setIsAuthenticated(false);
         setUserRole(null);
