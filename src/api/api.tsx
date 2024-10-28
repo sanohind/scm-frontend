@@ -6,8 +6,12 @@ let rolePath = userRole ? `/${userRole}` : '';
 // login API endpoint
 export const APIlogin = API + '/login';
 
-// logout API endpoint
-export const APIlogout = API + rolePath + '/logout';
+// logout API endpoint is now a function
+export const APIlogout = () => {
+    const userRole = localStorage.getItem('role');
+    const rolePath = userRole ? `/${userRole}` : '';
+    return API + rolePath + '/logout';
+};
 
 // API Test No Auth
 export const APIreadfile = API + '/listingreporttest/file/';
@@ -60,3 +64,5 @@ export const API_indexDNDetailUpdateSupplier = API + `/updatedndetail1`;
 export const API_poViewSupplier = API + `/pohview1/`;
 export const API_dnViewSupplier = API + `/dnhview1/`;
 export const API_labelViewSupplier = API + `/lbview1/`;
+export const API_IndexForecastSupplier = API + `/supplier/forecast/index`;
+export const API_GetForecastFileSupplier = API + `/supplier/forecast/get/file/`;

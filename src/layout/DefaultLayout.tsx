@@ -11,7 +11,7 @@ const DefaultLayout: React.FC = () => {
 
   useEffect(() => {
     // Simulasi pengambilan user role dari localStorage atau API
-    const role = localStorage.getItem('userRole');
+    const role = localStorage.getItem('role');
     setUserRole(role);
     setIsLoading(false);
   }, []);

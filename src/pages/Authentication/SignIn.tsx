@@ -34,17 +34,14 @@ const SignIn: React.FC = () => {
       localStorage.setItem('name', name);
       localStorage.setItem('bp_code', bp_code);
 
-      // Panggil login di AuthContext
-      login(role, access_token);
-     
       switch (role) {
         case '1':
           localStorage.setItem("role", "supplier");          
           break;
-        case '2':
+        case '3':
           localStorage.setItem("role", "purchasing");
           break;
-        case '3':
+        case '2':
           localStorage.setItem("role", "warehouse");          
           break;
         case '4':
@@ -57,9 +54,13 @@ const SignIn: React.FC = () => {
           setNotification({ message: 'Role tidak dikenali!', type: 'error' });
           break;
       }
+      
+      // Panggil login di AuthContext
+      login(role, access_token);
+     
 
       // Arahkan ke dashboard setelah berhasil login
-      navigate('/dashboard');
+      navigate('/');
 
 
     } catch (error) {
@@ -101,6 +102,7 @@ const SignIn: React.FC = () => {
                   <input
                     type="text"
                     id="username"
+                    autoFocus
                     placeholder="Enter Username"
                     className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] shadow-[0px_4px_8px_rgba(70,95,241,0.1)] text-sm text-zinc-400"
                     value={username}
@@ -115,7 +117,7 @@ const SignIn: React.FC = () => {
                 <button
                   id="login-button"
                   type="submit"
-                  className="gap-2 self-stretch px-5 py-3 mt-7 text-base text-white whitespace-nowrap rounded-lg bg-blue-950 min-h-[48px] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+                  className="gap-2 self-stretch px-5 py-3 mt-7 text-base text-white whitespace-nowrap rounded-lg bg-blue-900 min-h-[48px] hover:bg-blue-950 focus:ring-4 focus:ring-blue-300"
                   disabled={loading}
                 >
                   {loading ? (

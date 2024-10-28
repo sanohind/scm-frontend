@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./pages/Authentication/AuthContext";
 import SignIn from "./pages/Authentication/SignIn";
 import ProtectedRoute from "./pages/Authentication/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
 import ManageUser from "./pages/ManageUser/ManageUser";
 import AddUser from "./pages/ManageUser/AddUser";
 import EditUser from "./pages/ManageUser/EditUser";
@@ -20,7 +19,8 @@ import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
 import NotFound from "./pages/404";
 import Unauthorized from "./pages/Authentication/Unauthorized";
-
+import Dashboard from "./pages/Dashboard/Dashboard";
+import TesPages from "./pages/TesPages";
 
 
 const App: React.FC = () => {
@@ -37,7 +37,7 @@ const App: React.FC = () => {
             <Route
               path="/"
               element={
-                <ProtectedRoute allowedRoles={['4', '2', '3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -47,7 +47,7 @@ const App: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['4', '2', '3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -118,7 +118,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/forecast"
+              path="/forecast-report"
               element={
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="Forecast | PT SANOH INDONESIA" />
@@ -193,6 +193,16 @@ const App: React.FC = () => {
               <>
                 <PageTitle title="Unauthorized | PT SANOH INDONESIA" />
                 <Unauthorized /> 
+              </>
+            }
+          />
+          {/* Page Tes */}
+          <Route
+            path="/tes"
+            element={
+              <>
+                <PageTitle title="Page Tes | PT SANOH INDONESIA" />
+                <TesPages /> 
               </>
             }
           />

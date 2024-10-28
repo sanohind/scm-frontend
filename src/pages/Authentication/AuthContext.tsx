@@ -24,27 +24,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const role = localStorage.getItem('userRole') as Role;
 
     if (token && role) {
-      setIsAuthenticated(true);
       setUserRole(role);
+      setIsAuthenticated(true);
     } else {
-      setIsAuthenticated(false);
       setUserRole(null);
+      setIsAuthenticated(false);
     }
     setIsLoading(false); // Set isLoading ke false setelah pengecekan selesai
 
     const checkTokenExpiration = () => {
       const expirationTime = localStorage.getItem('token_expiration');
       if (!expirationTime) {
-        localStorage.clear();
-        setIsAuthenticated(false);
         setUserRole(null);
+        setIsAuthenticated(false);
+        localStorage.clear();
         return;
       }
       if (expirationTime && new Date().getTime() > parseInt(expirationTime)) {
+        setUserRole(null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('token_expiration');
         setIsAuthenticated(false);
-        setUserRole(null);
       } 
     };
 
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (token) {
       try {
-        await fetch(APIlogout, {
+        await fetch(APIlogout(), {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -77,19 +77,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ access_token: token }),
         });
         
+        setUserRole(null);
         localStorage.clear();
         setIsAuthenticated(false);
-        setUserRole(null);
       } catch (error : any) {
+        setUserRole(null);
         localStorage.clear();
         setIsAuthenticated(false);
-        setUserRole(null);
         console.error('Error:', error.response ? error.response.data : error.message);
       }
     } else {
+      setUserRole(null);
       localStorage.clear();
       setIsAuthenticated(false);
-      setUserRole(null);
       console.error('Error: Token not found');
     }
   };
