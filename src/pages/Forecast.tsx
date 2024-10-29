@@ -13,7 +13,7 @@ const Forecast = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'periode', direction: 'desc' });
@@ -153,7 +153,7 @@ const Forecast = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Forecast" />
+      <Breadcrumb pageName="Forecast Report" />
       <div className="font-poppins bg-white">
         <div className="flex flex-col p-6">
           <div className="flex justify-between items-center">

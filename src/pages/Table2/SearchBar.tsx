@@ -2,8 +2,8 @@ import { FaSearch } from 'react-icons/fa'; // Pastikan sudah menginstall react-i
 
 const SearchBar = ({ placeholder, onSearchChange }) => {
   return (
-    <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1 w-full md:w-1/2 lg:w-1/3">
-      <FaSearch className="text-gray-600 mr-2" />
+    <div className="flex items-center shadow border border-gray-300 rounded-lg px-2 py-1 w-full md:w-1/3 lg:w-1/4">
+      <FaSearch className="text-gray-600 mr-1 ml-2" />
       <input
         type="text"
         className="w-full px-2 py-1 outline-none"

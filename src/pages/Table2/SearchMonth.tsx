@@ -1,7 +1,7 @@
 
 const SearchMonth = ({ selectedMonth, setSelectedMonth }) => {
   return (
-    <div className="items-center mt-4">
+    <div className="items-center shadow mt-4">
       <div className="flex items-center">
         <input
           type="month"

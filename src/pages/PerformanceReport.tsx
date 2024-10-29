@@ -167,7 +167,7 @@ const PerformanceReport = () => {
                   <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-12"> No
                   </th>
                   <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40"
+                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-50"
                     onClick={() => handleSort('periode')}
                   >
                     <span className="flex items-center justify-center">
@@ -186,10 +186,10 @@ const PerformanceReport = () => {
                   <th
                     className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-100">File Name
                   </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">Attached File
+                  <th className="py-3 text-center border-b border-b-gray-400 w-40">Attached File
                   </th>
                   <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-50"
+                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-55"
                     onClick={() => handleSort('upload_at')}
                   >
                     <span className="flex items-center justify-center">

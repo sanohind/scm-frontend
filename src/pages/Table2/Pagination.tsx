@@ -7,7 +7,7 @@ const Pagination = ({ totalRows, rowsPerPage, currentPage, onPageChange }) => {
     <div className="flex justify-end mt-6">
       <div className="flex gap-2 items-center pagination">
         <button
-          className="px-3 py-3 text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
+          className="px-3 py-3 text-gray-900 bg-gray-200 rounded-md hover:bg-blue-800 hover:text-white"
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
         >
@@ -18,14 +18,14 @@ const Pagination = ({ totalRows, rowsPerPage, currentPage, onPageChange }) => {
         {pageNumbers.map((number) => (
           <button
             key={number}
-            className={`px-4 py-2 ${number === currentPage ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-900'} rounded-md hover:bg-gray-300`}
+            className={`px-4 py-2 ${number === currentPage ? 'bg-blue-900 text-white' : 'bg-gray-200 text-gray-900'} rounded-md hover:bg-blue-800 hover:text-white`}
             onClick={() => onPageChange(number)}
           >
             {number}
           </button>
         ))}
         <button
-          className="px-3 py-3 text-gray-900 bg-gray-200 rounded-md hover:bg-gray-300"
+          className="px-3 py-3 text-gray-900 bg-gray-200 rounded-md hover:bg-blue-800 hover:text-white"
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(currentPage + 1)}
         >
