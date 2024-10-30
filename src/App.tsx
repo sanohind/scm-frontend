@@ -21,6 +21,7 @@ import NotFound from "./pages/404";
 import Unauthorized from "./pages/Authentication/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import TesPages from "./pages/TesPages";
+import HistoryPurchaseOrderDetail from "./pages/HistoryPurchaseOrder/HistoryPurchaseOrderDetail";
 
 
 const App: React.FC = () => {
@@ -105,6 +106,15 @@ const App: React.FC = () => {
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
                   <HistoryPurchaseOrder />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/history-purchase-order-detail"
+              element={
+                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                  <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
+                  <HistoryPurchaseOrderDetail />
                 </ProtectedRoute>
               }
             />
