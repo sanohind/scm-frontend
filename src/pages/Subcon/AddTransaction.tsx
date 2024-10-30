@@ -1,6 +1,6 @@
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 
-const StockItems = () => {
+const AddTransaction = () => {
     return (
       <>
         <Breadcrumb pageName="Stock Item" />
@@ -9,4 +9,4 @@ const StockItems = () => {
     );
   };
   
-  export default StockItems;
+  export default AddTransaction;

@@ -5,7 +5,6 @@ import ProtectedRoute from "./pages/Authentication/ProtectedRoute";
 import ManageUser from "./pages/ManageUser/ManageUser";
 import AddUser from "./pages/ManageUser/AddUser";
 import EditUser from "./pages/ManageUser/EditUser";
-import PurchaseOrder from "./pages/PurchaseOrder/PurchaseOrder";
 import PurchaseOrderDetail from "./pages/PurchaseOrder/PurchaseOrderDetail";
 import HistoryPurchaseOrder from "./pages/HistoryPurchaseOrder/HistoryPurchaseOrder";
 import PerformanceReport from "./pages/PerformanceReport";
@@ -13,7 +12,6 @@ import Forecast from "./pages/Forecast";
 import DeliveryNote from "./pages/DeliveryNote/DeliveryNote";
 import DeliveryNoteDetail from "./pages/DeliveryNote/DeliveryNoteDetail";
 import HistoryDeliveryNote from "./pages/HistoryDeliveryNote/HistoryDeliveryNote";
-import StockItem from "./pages/Subcon/StockItem";
 import Transaction from "./pages/Subcon/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
@@ -22,6 +20,10 @@ import Unauthorized from "./pages/Authentication/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import TesPages from "./pages/TesPages";
 import HistoryPurchaseOrderDetail from "./pages/HistoryPurchaseOrder/HistoryPurchaseOrderDetail";
+import HistoryDeliveryNoteDetail from "./pages/HistoryDeliveryNote/HistoryDeliveryNoteDetail";
+import StockItems from "./pages/Subcon/StockItem";
+import AddTransaction from "./pages/Subcon/AddTransaction";
+import IndexPurchaseOrder from "./pages/PurchaseOrder/IndexPurchaseOrder";
 
 
 const App: React.FC = () => {
@@ -85,16 +87,16 @@ const App: React.FC = () => {
             <Route
               path="/purchase-order"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="Purchase Order | PT SANOH INDONESIA" />
-                  <PurchaseOrder />
+                  <IndexPurchaseOrder />
                 </ProtectedRoute>
               }
             />
             <Route
               path="/purchase-order-detail"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="Purchase Order Detail | PT SANOH INDONESIA" />
                   <PurchaseOrderDetail />
                 </ProtectedRoute>
@@ -103,7 +105,7 @@ const App: React.FC = () => {
             <Route
               path="/history-purchase-order"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
                   <HistoryPurchaseOrder />
                 </ProtectedRoute>
@@ -112,7 +114,7 @@ const App: React.FC = () => {
             <Route
               path="/history-purchase-order-detail"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
                   <HistoryPurchaseOrderDetail />
                 </ProtectedRoute>
@@ -121,7 +123,7 @@ const App: React.FC = () => {
             <Route
               path="/performance-report"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="Performance Report | PT SANOH INDONESIA" />
                   <PerformanceReport />
                 </ProtectedRoute>
@@ -130,7 +132,7 @@ const App: React.FC = () => {
             <Route
               path="/forecast-report"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="Forecast | PT SANOH INDONESIA" />
                   <Forecast />
                 </ProtectedRoute>
@@ -140,7 +142,7 @@ const App: React.FC = () => {
             <Route
               path="/delivery-note"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="Delivery Note | PT SANOH INDONESIA" />
                   <DeliveryNote />
                 </ProtectedRoute>
@@ -149,7 +151,7 @@ const App: React.FC = () => {
             <Route
               path="/delivery-note-detail"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="Delivery Note Detail | PT SANOH INDONESIA" />
                   <DeliveryNoteDetail />
                 </ProtectedRoute>
@@ -158,28 +160,46 @@ const App: React.FC = () => {
             <Route
               path="/history-delivery-note"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
                   <HistoryDeliveryNote />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/history-delivery-note-detail"
+              element={
+                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                  <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
+                  <HistoryDeliveryNoteDetail />
+                </ProtectedRoute>
+              }
+            />
             {/* Subcon Routes */}
             <Route
-              path="/stock-item"
+              path="/stock-items"
               element={
                 <ProtectedRoute allowedRoles={['5']}>
                   <PageTitle title="Stock Item | PT SANOH INDONESIA" />
-                  <StockItem />
+                  <StockItems />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/transaksi-subcon"
+              path="/transaction"
               element={
                 <ProtectedRoute allowedRoles={['5']}>
                   <PageTitle title="Transaksi Subcon | PT SANOH INDONESIA" />
                   <Transaction />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add-transaction"
+              element={
+                <ProtectedRoute allowedRoles={['5']}>
+                  <PageTitle title="Transaksi Subcon | PT SANOH INDONESIA" />
+                  <AddTransaction />
                 </ProtectedRoute>
               }
             />

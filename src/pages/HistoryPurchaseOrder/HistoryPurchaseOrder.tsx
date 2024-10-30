@@ -6,11 +6,13 @@ import Pagination from '../Table2/Pagination';
 import { API_indexPOHistorySupplier } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
+import SearchMonth from '../Table2/SearchMonth';
 
 const HistoryPurchaseOrder = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -57,6 +59,10 @@ const HistoryPurchaseOrder = () => {
 
   useEffect(() => {
     let filtered = [...data];
+    
+    if (selectedMonth) {
+      filtered = filtered.filter((row) => row.poDate.startsWith(selectedMonth));
+    }
 
     // Apply search filter
     if (searchQuery) {
@@ -82,7 +88,7 @@ const HistoryPurchaseOrder = () => {
     }
 
     setFilteredData(filtered);
-  }, [searchQuery, sortConfig, data]);
+  }, [searchQuery, sortConfig, data, selectedMonth]);
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -106,8 +112,9 @@ const HistoryPurchaseOrder = () => {
   return (
     <>
       <Breadcrumb pageName="History Purchase Order" />
-      <div className="font-poppins bg-white text-black p-6 w-230">
-        <div className="flex justify-end mb-4">
+      <div className="font-poppins bg-white text-black p-6 sm:w-150 md:w-180 xl:w-230 ">
+        <div className="flex justify-between mb-4">
+          <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           <SearchBar
             placeholder="Search no purchase order here..."
             onSearchChange={setSearchQuery}

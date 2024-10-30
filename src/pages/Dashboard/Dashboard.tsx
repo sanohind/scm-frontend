@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import DashboardSupplier from './DashboardSupplier';
 import DashboardPurchasingWarehouse from './DashboardPurchasingWarehouse';
-import DashboardSubcon from './DashboardSubcon';
 import DashboardAdmin from './DashboardAdmin';
 
 
@@ -19,10 +18,8 @@ const Dashboard: React.FC = () => {
     return <DashboardAdmin />;
   } else if (userRole === 'purchasing' || userRole === 'warehouse') {
     return <DashboardPurchasingWarehouse />;
-  } else if (userRole === 'supplier') {
+  } else if (userRole === 'supplier' || userRole === 'subcon') {
     return <DashboardSupplier />;
-  } else if (userRole === 'subcon') {
-    return <DashboardSubcon />;
   } else {
     return <div>No dashboard available for your role.</div>;
   }

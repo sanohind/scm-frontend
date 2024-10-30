@@ -1117,7 +1117,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                   {/* <!-- Menu Item Transaction --> */}
                   <li>
                     <NavLink
-                      to="/trasnsaction"
+                      to="/transaction"
                       end
                       className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
