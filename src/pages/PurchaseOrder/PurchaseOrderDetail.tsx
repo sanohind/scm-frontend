@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
-import { API_indexPOSupplier } from '../../api/api';
+import { API_indexPOSupplier, APIindexpoheader3 } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaPrint } from 'react-icons/fa';
 
@@ -28,9 +28,24 @@ const PurchaseOrderDetail = () => {
   const fetchPurchaseOrderDetails = async () => {
     const token = localStorage.getItem('access_token');
     const bpCode = localStorage.getItem('bp_code');
+    const selectedBpCode = localStorage.getItem('selected_bp_code')
+    const role = localStorage.getItem('role'); 
+
+    // Tentukan API berdasarkan role
+    let apiEndpoint;
+    if (role === 'supplier') {
+      apiEndpoint = `${API_indexPOSupplier}/${bpCode}`;
+    } else if (role === 'purchasing') {
+      apiEndpoint = `${APIindexpoheader3}/${selectedBpCode}`;
+    } else if (role === 'subcon') {
+      // apiEndpoint = `${API_indexPOSubcon}${bpCode}`;
+    } else {
+      Swal.fire('Error', 'Invalid role specified.', 'error');
+      return;
+    }
 
     try {
-      const response = await fetch(`${API_indexPOSupplier}${bpCode}`, {
+      const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -4,9 +4,9 @@ import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaExclamationTriangle } from 'react-icons/fa';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
-
 import Select from 'react-select';
 import { APIindexpoheader3, APIpartner3 } from '../../api/api';
+import { useNavigate } from 'react-router-dom';
 
 const PurchasingPurchaseOrder = () => {
   const [data, setData] = useState([]);
@@ -17,6 +17,7 @@ const PurchasingPurchaseOrder = () => {
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
+  const navigate = useNavigate();
 
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
@@ -54,24 +55,40 @@ const PurchasingPurchaseOrder = () => {
         },
       });
 
-      if (!response.ok) throw new Error('Failed to fetch purchase orders');
+      // if (!response.ok) throw new Error('Failed to fetch purchase orders');
+
+      if (!response.ok) {
+        console.error('Failed to fetch purchase orders:', response.status);
+        setFilteredData([]);
+        setData([]);
+        return;
+      }
 
       const result = await response.json();
-      const purchaseOrders = result.data.map(po => ({
-        noPO: po.po_no || '-',
-        poDate: po.po_date || '-',
-        planDelivery: po.planned_receipt_date || '-',
-        poRevision: po.po_revision_no ? `Rev ${po.po_revision_no.toString().padStart(2, '0')}` : '-',
-        note: po.note || '-',
-        status: po.po_status || '-',
-        response: po.response || '',
-        reason: po.reason || '',
-      }));
+      if (result.status && Array.isArray(result.data) && result.data.length > 0) {
+        const purchaseOrder = result.data.map(po => ({
+          noPO: po.po_no || 'N/A',
+          poDate: po.po_date || '-',
+          planDelivery: po.planned_receipt_date || '-',
+          poRevision: po.po_revision_no || '-',
+          note: po.note || '-',
+          status: po.po_status || '-',
+          response: po.response || 'No Action',
+          reason: po.reason || '',
+        }));
 
-      setData(purchaseOrders);
-      setFilteredData(purchaseOrders);
+        setData(purchaseOrder);
+        setFilteredData(purchaseOrder);
+      } else {
+        setData([]);
+        setFilteredData([]);
+        Swal.fire('No PO data found', result.message, 'info');
+      }
     } catch (error) {
       console.error('Error fetching purchase orders:', error);
+      Swal.fire('Error', 'Failed to fetch purchase orders. Please try again later.', 'error');
+      setData([]);
+      setFilteredData([]);
     }
   };
 
@@ -124,7 +141,27 @@ const PurchasingPurchaseOrder = () => {
 
   const handleSupplierChange = (selectedOption) => {
     setSelectedSupplier(selectedOption);
-    fetchPurchaseOrders(selectedOption.value);
+    if (selectedOption) {
+      fetchPurchaseOrders(selectedOption.value);
+      localStorage.setItem('selected_bp_code', selectedOption.value);
+    } else {
+      setData([]);
+      setFilteredData([]);
+    }
+  };
+
+  const handleShowReason = (reason) => {
+    Swal.fire({
+      title: 'Reason for Decline',
+      html: `<p style="border: 1px solid #ccc; padding: 10px; font-size: 12px; text-align: left;">${reason}</p>`,
+      icon: 'info',
+      confirmButtonColor: '#1D4ED8',
+      confirmButtonText: 'OK',
+    });
+  };
+
+  const handlePONavigate = (noPO) => {
+    navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
   return (
@@ -189,13 +226,32 @@ const PurchasingPurchaseOrder = () => {
                 {paginatedData.length > 0 ? (
                   paginatedData.map((row, index) => (
                     <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center text-blue-600 underline">{row.noPO}</td>
+                      <td className="px-2 py-4 text-center">
+                        <button
+                          onClick={() => handlePONavigate(row.noPO)}
+                          className="text-blue-600 underline"
+                        >
+                          {row.noPO}
+                        </button>
+                      </td>
                       <td className="px-2 py-4 text-center">{row.poDate}</td>
                       <td className="px-2 py-4 text-center">{row.planDelivery}</td>
                       <td className="px-2 py-4 text-center">{row.poRevision}</td>
                       <td className="px-2 py-4 text-center">{row.note}</td>
                       <td className="px-2 py-4 text-center">{row.status}</td>
-                      <td className="px-2 py-4 text-center">{row.response}</td>
+                      <td className={`text-center ${row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-500' : ''}`}>
+                        {row.response === 'Declined' ? (
+                          <div className="flex items-center justify-center">
+                            <FaExclamationTriangle
+                              className="text-white mr-2 cursor-pointer"
+                              onClick={() => handleShowReason(row.reason)}
+                            />
+                            <span className="text-white">{row.response}</span>
+                          </div>
+                        ) : (
+                          <span>{row.response}</span>
+                        )}
+                      </td>
                     </tr>
                   ))
                 ) : (
