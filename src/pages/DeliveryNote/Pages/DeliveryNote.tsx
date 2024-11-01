@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../Table2/SearchBar';
-import Pagination from '../Table2/Pagination';
-import { API_DN_Supplier } from '../../api/api';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../Table2/Pagination';
+import { API_DN_Supplier } from '../../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import SearchMonth from '../Table2/SearchMonth';
+import SearchMonth from '../../Table2/SearchMonth';
 
 const DeliveryNote = () => {
   const [data, setData] = useState([]);

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
-import { API_DN_Detail, API_Update_DN_Supplier } from '../../api/api';
+import { API_DN_Detail, API_Update_DN_Supplier } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
 
 const DeliveryNoteDetailEdit = () => {

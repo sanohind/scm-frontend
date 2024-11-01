@@ -1,30 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../Table2/SearchBar';
-import Pagination from '../Table2/Pagination';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../Table2/Pagination';
 import Swal from 'sweetalert2';
-import { API_DN_History_Supplier } from '../../api/api';
+import { API_DN_Detail } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
 
-const HistoryDeliveryNoteDetail = () => {
+const DeliveryNoteDetail = () => {
   const [details, setDetails] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(6);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
   const location = useLocation();
   const navigate = useNavigate();
   const noDN = new URLSearchParams(location.search).get('noDN');
   const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '' });
 
   // Fetch Delivery Note Details from API
-  const fetchHistoryDeliveryNoteDetails = async () => {
+  const fetchDeliveryNoteDetails = async () => {
     const token = localStorage.getItem('access_token');
-    const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_DN_History_Supplier()}${bpCode}`, {
+      const response = await fetch(`${API_DN_Detail()}${noDN}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -36,30 +36,29 @@ const HistoryDeliveryNoteDetail = () => {
 
       const result = await response.json();
 
-      if (result.data) {
-        const dn = result.data.find((dn) => dn.dn_number === noDN);
-        if (dn) {
-          const detailsData = dn.detail.map((detail, index) => ({
+      if (result.data && result.data) {
+
+        const dn = result.data;
+
+        setDNDetails({
+            noDN: dn.no_dn || '-',
+            noPO: dn.po_no || '-',
+            planDelivery: dn.plan_delivery_date || '-',
+        });
+        
+          const details = dn.detail.map((detail, index) => ({
             no: (index + 1).toString(),
-            partNumber: detail.internal_part_number || 'No Part Number',
-            partName: detail.part_name || 'No Part Name',
-            QTY: detail.total_quantity || '0',
-            qtyLabel: detail.pcs_per_kamban || '0',
-            qtyDelivered: detail.total_quantity || '0',
-            qtyReceived: detail.total_quantity || '0',
+            partNumber: detail.part_no || '-',
+            partName: detail.item_desc_a || '-',
+            QTY: detail.dn_qty || '0',
+            qtyLabel: detail.dn_snp || '0',
+            qtyDelivered: detail.receipt_qty || '0',
+            qtyReceived: detail.receipt_qty || '0',
           }));
 
-          setDNDetails({
-            noDN: dn.dn_number || 'No DN Number',
-            noPO: dn.po_number || 'No PO Number',
-            planDelivery: dn.send_date || 'Unknown Plan Delivery Date',
-          });
-
-          setDetails(detailsData);
-          setFilteredData(detailsData);
-        } else {
-          Swal.fire('Error', 'No details found for this delivery note.', 'error');
-        }
+          setDetails(details);
+          setFilteredData(details);
+        
       } else {
         Swal.fire('Error', 'No delivery note details found.', 'error');
       }
@@ -71,7 +70,7 @@ const HistoryDeliveryNoteDetail = () => {
 
   useEffect(() => {
     if (noDN) {
-      fetchHistoryDeliveryNoteDetails();
+      fetchDeliveryNoteDetails();
     }
   }, [noDN]);
 
@@ -87,8 +86,31 @@ const HistoryDeliveryNoteDetail = () => {
       );
     }
 
+    // Apply sorting
+    if (sortConfig.key) {
+        filtered.sort((a, b) => {
+          let aValue = a[sortConfig.key];
+          let bValue = b[sortConfig.key];
+  
+          if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+          if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+  
+          if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+          return 0;
+        });
+      }
+
     setFilteredData(filtered);
-  }, [searchQuery, details]);
+
+    if (searchQuery) {
+        filtered = filtered.filter((row) =>
+          row.partNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          row.partName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }
+
+  }, [searchQuery, details, sortConfig]);
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -97,7 +119,6 @@ const HistoryDeliveryNoteDetail = () => {
 
   const handlePageChange = (page) => setCurrentPage(page);
 
-  const handleSearch = (query) => setSearchQuery(query);
 
   return (
     <>
@@ -194,4 +215,4 @@ const HistoryDeliveryNoteDetail = () => {
   );
 };
 
-export default HistoryDeliveryNoteDetail;
+export default DeliveryNoteDetail;

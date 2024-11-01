@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
-import Pagination from './Table2/Pagination';
-import { API_Performance_Report_Supplier, API_Download_Performance_Report_Supplier, API_Tes_Download_Performance_Report_Supplier } from '../api/api';
-import SearchMonth from './Table2/SearchMonth';
+import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import Pagination from '../Table2/Pagination';
+import { API_Performance_Report_Supplier, API_Tes_Download_Performance_Report_Supplier } from '../../api/api';
+import SearchMonth from '../Table2/SearchMonth';
 
-import iconPdf from '../images/icon_pdf.svg';
-import iconDoc from '../images/icon_doc.svg';
-import iconDocx from '../images/icon_docx.svg';
-import iconJpg from '../images/icon_jpg.svg';
-import iconPng from '../images/icon_png.svg';
-import iconExcel from '../images/icon_excel.svg';
-import iconFile from '../images/icon_file.svg';
-import SearchBar from './Table2/SearchBar';
+import iconPdf from '../../images/icon_pdf.svg';
+import iconDoc from '../../images/icon_doc.svg';
+import iconDocx from '../../images/icon_docx.svg';
+import iconJpg from '../../images/icon_jpg.svg';
+import iconPng from '../../images/icon_png.svg';
+import iconExcel from '../../images/icon_excel.svg';
+import iconFile from '../../images/icon_file.svg';
+import SearchBar from '../Table2/SearchBar';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 
 const PerformanceReport = () => {

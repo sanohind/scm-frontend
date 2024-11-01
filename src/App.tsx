@@ -1,30 +1,27 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./pages/Authentication/AuthContext";
-import SignIn from "./pages/Authentication/SignIn";
 import ProtectedRoute from "./pages/Authentication/ProtectedRoute";
-import ManageUser from "./pages/ManageUser/ManageUser";
-import AddUser from "./pages/ManageUser/AddUser";
-import EditUser from "./pages/ManageUser/EditUser";
-import PurchaseOrderDetail from "./pages/PurchaseOrder/PurchaseOrderDetail";
-import HistoryPurchaseOrder from "./pages/PurchaseOrder/HistoryPurchaseOrder";
-import PerformanceReport from "./pages/PerformanceReport";
-import Forecast from "./pages/Forecast";
-import DeliveryNote from "./pages/DeliveryNote/DeliveryNote";
-import DeliveryNoteDetail from "./pages/DeliveryNote/DeliveryNoteDetail";
-import HistoryDeliveryNote from "./pages/DeliveryNote/HistoryDeliveryNote";
-import Transaction from "./pages/Subcon/Transaction";
+import ManageUser from "./pages/ManageUser/Pages/ManageUser";
+import AddUser from "./pages/ManageUser/Pages/AddUser";
+import EditUser from "./pages/ManageUser/Pages/EditUser";
+import PurchaseOrderDetail from "./pages/PurchaseOrder/Pages/PurchaseOrderDetail";
+import HistoryPurchaseOrder from "./pages/PurchaseOrder/Pages/HistoryPurchaseOrder";
+import PerformanceReport from "./pages/PerformanceReport/PerformanceReport";
+import DeliveryNote from "./pages/DeliveryNote/Pages/DeliveryNote";
+import DeliveryNoteDetail from "./pages/DeliveryNote/Pages/DeliveryNoteDetail";
+import HistoryDeliveryNote from "./pages/DeliveryNote/Pages/HistoryDeliveryNote";
+import Transaction from "./pages/Subcon/Pages/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
 import NotFound from "./pages/404";
 import Unauthorized from "./pages/Authentication/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import TesPages from "./pages/TesPages";
-import HistoryPurchaseOrderDetail from "./pages/HistoryPurchaseOrder/HistoryPurchaseOrderDetail";
-import HistoryDeliveryNoteDetail from "./pages/HistoryDeliveryNote/HistoryDeliveryNoteDetail";
-import StockItems from "./pages/Subcon/StockItem";
-import AddTransaction from "./pages/Subcon/AddTransaction";
+import StockItems from "./pages/Subcon/Pages/StockItem";
+import AddTransaction from "./pages/Subcon/Pages/AddTransaction";
 import IndexPurchaseOrder from "./pages/PurchaseOrder/IndexPurchaseOrder";
-import DeliveryNoteDetailEdit from "./pages/DeliveryNote/DeliveryNoteDetailEdit";
+import DeliveryNoteDetailEdit from "./pages/DeliveryNote/Pages/DeliveryNoteDetailEdit";
+import SignIn from "./pages/Authentication/Pages/SignIn";
+import Forecast from "./pages/ForecastReport/Forecast";
 
 
 const App: React.FC = () => {
@@ -109,15 +106,6 @@ const App: React.FC = () => {
                 <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
                   <HistoryPurchaseOrder />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/history-purchase-order-detail"
-              element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
-                  <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
-                  <HistoryPurchaseOrderDetail />
                 </ProtectedRoute>
               }
             />
@@ -227,16 +215,7 @@ const App: React.FC = () => {
               </>
             }
           />
-          {/* Page Tes */}
-          <Route
-            path="/tes"
-            element={
-              <>
-                <PageTitle title="Page Tes | PT SANOH INDONESIA" />
-                <TesPages /> 
-              </>
-            }
-          />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

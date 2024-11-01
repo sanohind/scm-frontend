@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../Table2/SearchBar';
-import Pagination from '../Table2/Pagination';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../Table2/Pagination';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import { API_DN_History_Supplier } from '../../api/api';
-import SearchMonth from '../Table2/SearchMonth';
+import { API_DN_History_Supplier } from '../../../api/api';
+import SearchMonth from '../../Table2/SearchMonth';
 
 const HistoryDeliveryNote = () => {
   const [data, setData] = useState([]);

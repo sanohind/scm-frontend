@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
-import Pagination from './Table2/Pagination';
-import { API_Download_Forecast_Report_Supplier, API_Forecast_Report_Supplier } from '../api/api';
-import SearchMonth from './Table2/SearchMonth';
-import SearchBar from './Table2/SearchBar';
+import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import Pagination from '../Table2/Pagination';
+import { API_Download_Forecast_Report_Supplier, API_Forecast_Report_Supplier } from '../../api/api';
+import SearchMonth from '../Table2/SearchMonth';
+import SearchBar from '../Table2/SearchBar';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 
-import iconPdf from '../images/icon_pdf.svg';
-import iconFile from '../images/icon_file.svg';
+import iconPdf from '../../images/icon_pdf.svg';
+import iconFile from '../../images/icon_file.svg';
 
 const Forecast = () => {
   const [data, setData] = useState([]);

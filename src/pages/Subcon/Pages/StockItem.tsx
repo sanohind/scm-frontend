@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
-import SearchBar from '../Table2/SearchBar';
-import Pagination from '../Table2/Pagination';
+import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
+import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../Table2/Pagination';
 // import { API_getStockItems } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import DeliveryNote from "./DeliveryNote";
-import WarehouseDeliveryNote from "./WarehouseDeliveryNote";
+import DeliveryNote from "./Pages/DeliveryNote";
+import WarehouseDeliveryNote from "./Pages/WarehouseDeliveryNote";
 
 const IndexDeliveryNote: React.FC = () => {
     const [userRole, setUserRole] = useState<string>('');

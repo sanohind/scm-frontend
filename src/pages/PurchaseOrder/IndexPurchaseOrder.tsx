@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import PurchaseOrder from "./PurchaseOrder";
-import PurchasingPurchaseOrder from "./PurchasingPurchaseOrder";
+import PurchaseOrder from "./Pages/PurchaseOrder";
+import PurchasingPurchaseOrder from "./Pages/PurchasingPurchaseOrder";
 
 const IndexPurchaseOrder: React.FC = () => {
     const [userRole, setUserRole] = useState<string>('');

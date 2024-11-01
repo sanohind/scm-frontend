@@ -1,12 +1,12 @@
-import FotoSanoh from '../../images/cover/foto-sanoh-2.png';
-import Logo from '../../images/logo-sanoh.png'
-import PasswordInput from '../../components/PasswordInput';
-import Notification from '../../components/Notification';
-import { API_Login } from '../../api/api';
+import FotoSanoh from '../../../images/cover/foto-sanoh-2.png';
+import Logo from '../../../images/logo-sanoh.png'
+import PasswordInput from '../../../components/PasswordInput';
+import Notification from '../../../components/Notification';
+import { API_Login } from '../../../api/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../AuthContext';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>('');

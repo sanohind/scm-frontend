@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { API_Dashboard } from '../../api/api';
-import CardDataStats from '../../components/CardDataStats';
+import { API_Dashboard } from '../../../api/api';
+import CardDataStats from '../../../components/CardDataStats';
 
 
-const DashboardSubcon: React.FC = () => {
+const DashboardSupplier: React.FC = () => {
   // State untuk menyimpan data dashboard
   const [dashboardData, setDashboardData] = useState({
     po_active: 0,
@@ -142,4 +142,4 @@ const DashboardSubcon: React.FC = () => {
   );
 };
 
-export default DashboardSubcon;
+export default DashboardSupplier;

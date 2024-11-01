@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_Sync } from '../../api/api';
+import { API_Sync } from '../../../api/api';
 
 const DashboardPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');

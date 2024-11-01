@@ -1,9 +1,9 @@
 // Dashboard.tsx
 
 import React, { useEffect, useState } from 'react';
-import DashboardSupplier from './DashboardSupplier';
-import DashboardPurchasingWarehouse from './DashboardPurchasingWarehouse';
-import DashboardAdmin from './DashboardAdmin';
+import DashboardSupplier from './Pages/DashboardSupplier';
+import DashboardPurchasingWarehouse from './Pages/DashboardPurchasingWarehouse';
+import DashboardAdmin from './Pages/DashboardAdmin';
 
 
 const Dashboard: React.FC = () => {
