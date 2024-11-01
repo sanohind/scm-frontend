@@ -43,7 +43,7 @@ export const API_Print_PO_Purchasing = () => API + getRolePath() + `/pohview3/`;
 
 export const API_Performance_Report_Purchasing = () => API + getRolePath() + `/performance-report/index/`;
 export const API_Download_Performance_Report_Purchasing = () => API + getRolePath() + `/performance-report/file/`;
-export const API_Create_Performance_Report_Purchasing = () => API + getRolePath() + `/createlistingreport3`;
+export const API_Create_Performance_Report_Purchasing = () => API + `/createlistingreport3`;
 
 export const API_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/index/`;
 export const API_Download_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/file/`;
@@ -54,7 +54,7 @@ export const API_Delete_Forecast_Report_Purchasing = () => API + getRolePath() +
 // warehouse
 export const API_Sync_Warehouse = () => API + getRolePath() + `/sync`;
 
-export const API_List_Partner_Warehouse = () => API + getRolePath() + `/partner/index`;
+export const API_List_Partner = () => API + getRolePath() + `/partner/index`;
 
 export const API_DN_Warehouse = () => API + getRolePath() + `/dn/index/`;
 export const API_DN_Detail_Warehouse = () => API + getRolePath() + `/dn/detail/`;
@@ -82,7 +82,7 @@ export const API_Print_DN_Supplier = () => API + getRolePath() + `/dn/print/`;
 export const API_Print_Label_Supplier = () => API + getRolePath() + `/label/print/`;
 
 export const API_Performance_Report_Supplier = () => API + getRolePath() + `/performance-report/index/`;
-export const API_Download_Performance_Report_Supplier = () => API + getRolePath() + `/performance-report/file/`;
+export const API_Download_Performance_Report= () => API + getRolePath() + `/performance-report/file/`;
 
 export const API_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/index`;
 export const API_Download_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/file/`;

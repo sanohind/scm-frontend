@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../Table2/Pagination';
-import { API_Download_Forecast_Report_Supplier, API_Forecast_Report_Supplier } from '../../api/api';
-import SearchMonth from '../Table2/SearchMonth';
-import SearchBar from '../Table2/SearchBar';
-import { FaSortDown, FaSortUp } from 'react-icons/fa';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import Pagination from '../../Table2/Pagination';
+import { API_Download_Forecast_Report_Supplier, API_Forecast_Report_Supplier } from '../../../api/api';
+import SearchMonth from '../../Table2/SearchMonth';
+import SearchBar from '../../Table2/SearchBar';
+import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from 'react-icons/fa';
 
-import iconPdf from '../../images/icon_pdf.svg';
-import iconFile from '../../images/icon_file.svg';
 
 const Forecast = () => {
   const [data, setData] = useState([]);
@@ -205,38 +203,52 @@ const Forecast = () => {
                       <td className="px-2 py-3 text-center">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                       <td className="px-2 py-3 text-center">{row.description}</td>
                       <td className="px-2 py-3 text-center">{row.filedata}</td>
-                      <td className="px-2 py-3 text-center flex items-center justify-center">
+                        <td className="px-2 py-3 text-center flex items-center justify-center">
                         <button
                           onClick={() => downloadFile(row.attachedFile)}
                           className="px-2 py-1 hover:scale-110"
                         >
-                          {getFileIcon(row.attachedFile)}
+                          {(() => {
+                          const extension = row.attachedFile.split('.').pop().toLowerCase();
+                          switch (extension) {
+                            case 'pdf':
+                            return <FaFilePdf className="w-6 h-6 text-red-600" />;
+                            case 'doc':
+                            case 'docx':
+                            return <FaFileWord className="w-6 h-6 text-blue-600" />;
+                            case 'xls':
+                            case 'xlsx':
+                            return <FaFileExcel className="w-6 h-6 text-green-600" />;
+                            default:
+                            return <FaFile className="w-6 h-6 text-gray-600" />;
+                          }
+                          })()}
                         </button>
+                        </td>
+                        <td className="px-2 py-3 text-center">{row.upload_at}</td>
+                      </tr>
+                      ))
+                    ) : (
+                      <tr>
+                      <td colSpan="5" className="text-center py-4">
+                        No data available for now
                       </td>
-                      <td className="px-2 py-3 text-center">{row.upload_at}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center py-4">
-                      No data available for now
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      </tr>
+                    )}
+                    </tbody>
+                  </table>
+                  </div>
 
-          <Pagination
-            totalRows={filteredData.length}
-            rowsPerPage={rowsPerPage}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      </div>
-    </>
-  );
-};
+                  <Pagination
+                  totalRows={filteredData.length}
+                  rowsPerPage={rowsPerPage}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  />
+                </div>
+                </div>
+              </>
+              );
+            };
 
 export default Forecast;

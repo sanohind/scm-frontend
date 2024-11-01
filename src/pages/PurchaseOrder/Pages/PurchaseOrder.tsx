@@ -152,6 +152,7 @@ const PurchaseOrder = () => {
       Swal.fire(result.message, '', result.status === 'success' ? 'success' : 'error');
     } catch (error) {
       console.error('Error updating response:', error);
+      Swal.fire('Failed to update response', '', 'error');
     } finally {
       // Refetch data regardless of success or failure
       fetchPurchaseOrders();

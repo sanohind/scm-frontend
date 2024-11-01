@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../Table2/Pagination';
-import { API_Performance_Report_Supplier, API_Tes_Download_Performance_Report_Supplier } from '../../api/api';
-import SearchMonth from '../Table2/SearchMonth';
+import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import Pagination from '../../Table2/Pagination';
+import { API_Download_Performance_Report, API_Performance_Report_Supplier } from '../../../api/api';
+import SearchMonth from '../../Table2/SearchMonth';
 
-import iconPdf from '../../images/icon_pdf.svg';
-import iconDoc from '../../images/icon_doc.svg';
-import iconDocx from '../../images/icon_docx.svg';
-import iconJpg from '../../images/icon_jpg.svg';
-import iconPng from '../../images/icon_png.svg';
-import iconExcel from '../../images/icon_excel.svg';
-import iconFile from '../../images/icon_file.svg';
-import SearchBar from '../Table2/SearchBar';
+import iconPdf from '../../../images/icon_pdf.svg';
+import iconDoc from '../../../images/icon_doc.svg';
+import iconDocx from '../../../images/icon_docx.svg';
+import iconJpg from '../../../images/icon_jpg.svg';
+import iconPng from '../../../images/icon_png.svg';
+import iconExcel from '../../../images/icon_excel.svg';
+import iconFile from '../../../images/icon_file.svg';
+import SearchBar from '../../Table2/SearchBar';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 const PerformanceReport = () => {
   const [data, setData] = useState([]);
@@ -144,6 +145,40 @@ const PerformanceReport = () => {
         return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
     }
   }
+
+  async function downloadFile(attachedFile) {
+    const token = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch(`${API_Download_Performance_Report()}${attachedFile}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download file.');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = attachedFile;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error while downloading file:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to download file.',
+      })
+    }
+  }
    
 
   return (
@@ -220,9 +255,12 @@ const PerformanceReport = () => {
                       </td>
                       <td className="px-1 py-3 text-center">{row.filedata}</td>
                       <td className="px-1 py-2 text-center flex items-center justify-center">
-                        <a href={`${API_Tes_Download_Performance_Report_Supplier()}${row.attachedFile}`} download>
+                        <button
+                          onClick={() => downloadFile(row.attachedFile)}
+                          className="px-2 py-1 hover:scale-110"
+                        >
                           {getFileIcon(row.attachedFile)}
-                        </a>
+                        </button>
                       </td>
                       <td className="px-2 py-3 text-center">{row.upload_at}</td>
                     </tr>

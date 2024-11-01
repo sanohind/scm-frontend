@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } 
     };
 
-    const interval = setInterval(checkTokenExpiration, 5000); // Cek setiap 1 menit
+    const interval = setInterval(checkTokenExpiration, 100); // Cek setiap 1 detik
     return () => clearInterval(interval);
   }, []);
 
