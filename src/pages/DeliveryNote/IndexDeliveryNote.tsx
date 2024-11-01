@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import PurchaseOrder from "./PurchaseOrder";
-import PurchasingPurchaseOrder from "./PurchasingPurchaseOrder";
+import DeliveryNote from "./DeliveryNote";
+import WarehouseDeliveryNote from "./WarehouseDeliveryNote";
 
-const IndexPurchaseOrder: React.FC = () => {
+const IndexDeliveryNote: React.FC = () => {
     const [userRole, setUserRole] = useState<string>('');
   
     useEffect(() => {
@@ -11,12 +11,12 @@ const IndexPurchaseOrder: React.FC = () => {
     }, []);
   
     if (userRole === 'supplier' || userRole === 'subcont') {
-      return <PurchaseOrder />;
-    } else if (userRole === 'purchasing') {
-      return <PurchasingPurchaseOrder />;
+      return <DeliveryNote />;
+    } else if (userRole === 'warehouse') {
+      return <WarehouseDeliveryNote />;
     } else {
       return <div>No dashboard available for your role.</div>;
     }
   };
   
-  export default IndexPurchaseOrder;
+  export default IndexDeliveryNote;

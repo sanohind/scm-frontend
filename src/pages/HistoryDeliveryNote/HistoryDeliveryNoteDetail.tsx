@@ -4,7 +4,7 @@ import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
 import Swal from 'sweetalert2';
-import { API_indexDNHistorySupplier } from '../../api/api';
+import { API_DN_History_Supplier } from '../../api/api';
 import { FaPrint } from 'react-icons/fa';
 
 const HistoryDeliveryNoteDetail = () => {
@@ -24,7 +24,7 @@ const HistoryDeliveryNoteDetail = () => {
     const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_indexDNHistorySupplier}${bpCode}`, {
+      const response = await fetch(`${API_DN_History_Supplier()}${bpCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

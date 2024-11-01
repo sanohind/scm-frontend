@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
+import { API_PO_History_Supplier } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import { API_indexDNHistorySupplier } from '../../api/api';
 import SearchMonth from '../Table2/SearchMonth';
 
-const HistoryDeliveryNote = () => {
+const HistoryPurchaseOrder = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,13 +18,12 @@ const HistoryDeliveryNote = () => {
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const navigate = useNavigate();
 
-  // Fetch Delivery Note History from API
-  const fetchHistoryDeliveryNotes = async () => {
+  const fetchHistoryPurchaseOrders = async () => {
     const token = localStorage.getItem('access_token');
     const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_indexDNHistorySupplier}${bpCode}`, {
+      const response = await fetch(`${API_PO_History_Supplier()}${bpCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -37,43 +36,39 @@ const HistoryDeliveryNote = () => {
       const result = await response.json();
 
       if (result.data) {
-        const deliveryNotes = result.data.map((dn) => ({
-          noDN: dn.dn_number || '-',
-          noPO: dn.po_number || '-',
-          statusDN: dn.dn_status || '-',
-          planDNDate: dn.send_date || '-',
-          receivedDNDate: dn.receive_date || '-',
-          noPackingSlip: dn.no_packing_slip || '-',
+        const historyPurchaseOrders = result.data.map((po) => ({
+          noPO: po.po_number || '-',
+          poDate: po.po_date || '-',
+          status: po.po_status || '-',
         }));
 
-        setData(deliveryNotes);
-        setFilteredData(deliveryNotes);
+        setData(historyPurchaseOrders);
+        setFilteredData(historyPurchaseOrders);
       } else {
-        Swal.fire('Error', 'No history delivery notes found.', 'error');
+        Swal.fire('Error', 'No history purchase orders found.', 'error');
       }
     } catch (error) {
-      console.error('Error fetching history delivery notes:', error);
-      Swal.fire('Error', 'Failed to fetch history delivery notes.', 'error');
+      console.error('Error fetching history purchase orders:', error);
+      Swal.fire('Error', 'Failed to fetch history purchase orders.', 'error');
     }
   };
 
   useEffect(() => {
-    fetchHistoryDeliveryNotes();
+    fetchHistoryPurchaseOrders();
   }, []);
 
   useEffect(() => {
     let filtered = [...data];
-
+    
     if (selectedMonth) {
-      filtered = filtered.filter((row) => row.receivedDNDate.startsWith(selectedMonth));
+      filtered = filtered.filter((row) => row.poDate.startsWith(selectedMonth));
     }
 
     // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter((row) =>
-        row.noDN.toLowerCase().includes(searchQuery.toLowerCase()) ||
         row.noPO.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.statusDN.toLowerCase().includes(searchQuery.toLowerCase())
+        row.status.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -110,35 +105,33 @@ const HistoryDeliveryNote = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleRowClick = (noDN) => {
-    navigate(`/history-delivery-note-detail?noDN=${noDN}`);
+  const handleRowClick = (noPO) => {
+    navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
   return (
     <>
-      <Breadcrumb pageName="History Delivery Note" />
-      <div className="font-poppins bg-white text-black p-6 sm:w-150 md:w-180 xl:w-230">
+      <Breadcrumb pageName="History Purchase Order" />
+      <div className="font-poppins bg-white text-black p-6 sm:w-150 md:w-180 xl:w-230 ">
         <div className="flex justify-between mb-4">
           <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           <SearchBar
-            placeholder="Search delivery note here..."
+            placeholder="Search no purchase order here..."
             onSearchChange={setSearchQuery}
           />
         </div>
 
         <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300">
-          <table className="w-full text-sm text-left text-gray-700">
+          <table className="w-full text-sm text-left text-gray-700 ">
             <thead className="text-base text-gray-700">
               <tr>
-                <th className="py-3 text-center border-b border-b-gray-400 w-40">
-                  No. DN
-                </th>
-                <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36">
-                  <span
-                    className="flex items-center justify-center"
-                    onClick={() => handleSort('noPO')}
-                  >
-                    {sortConfig.key === 'noPO' ? (
+                <th className="py-3 text-center border-b border-b-gray-400 w-40">No. PO</th>
+                <th
+                  className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
+                  onClick={() => handleSort('poDate')}
+                >
+                  <span className="flex items-center justify-center">
+                    {sortConfig.key === 'poDate' ? (
                       sortConfig.direction === 'asc' ? (
                         <FaSortUp className="mr-1" />
                       ) : (
@@ -147,15 +140,15 @@ const HistoryDeliveryNote = () => {
                     ) : (
                       <FaSortDown className="opacity-50 mr-1" />
                     )}
-                    No. PO
+                    PO Date
                   </span>
                 </th>
                 <th
                   className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                  onClick={() => handleSort('statusDN')}
+                  onClick={() => handleSort('status')}
                 >
                   <span className="flex items-center justify-center">
-                    {sortConfig.key === 'statusDN' ? (
+                    {sortConfig.key === 'status' ? (
                       sortConfig.direction === 'asc' ? (
                         <FaSortUp className="mr-1" />
                       ) : (
@@ -164,45 +157,8 @@ const HistoryDeliveryNote = () => {
                     ) : (
                       <FaSortDown className="opacity-50 mr-1" />
                     )}
-                    Status DN
+                    Status PO
                   </span>
-                </th>
-                <th
-                  className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                  onClick={() => handleSort('planDNDate')}
-                >
-                  <span className="flex items-center justify-center">
-                    {sortConfig.key === 'planDNDate' ? (
-                      sortConfig.direction === 'asc' ? (
-                        <FaSortUp className="mr-1" />
-                      ) : (
-                        <FaSortDown className="mr-1" />
-                      )
-                    ) : (
-                      <FaSortDown className="opacity-50 mr-1" />
-                    )}
-                    Delivery Date
-                  </span>
-                </th>
-                <th
-                  className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                  onClick={() => handleSort('receivedDNDate')}
-                >
-                  <span className="flex items-center justify-center">
-                    {sortConfig.key === 'receivedDNDate' ? (
-                      sortConfig.direction === 'asc' ? (
-                        <FaSortUp className="mr-1" />
-                      ) : (
-                        <FaSortDown className="mr-1" />
-                      )
-                    ) : (
-                      <FaSortDown className="opacity-50 mr-1" />
-                    )}
-                    Received Date
-                  </span>
-                </th>
-                <th className="py-3 text-center border-b border-b-gray-400 w-40">
-                  No Packing Slip
                 </th>
               </tr>
             </thead>
@@ -212,20 +168,17 @@ const HistoryDeliveryNote = () => {
                   <tr
                     key={index}
                     className="odd:bg-white even:bg-gray-50 border-b cursor-pointer"
-                    onClick={() => handleRowClick(row.noDN)}
+                    onClick={() => handleRowClick(row.noPO)}
                   >
-                    <td className="px-2 py-4 text-center text-blue-600 underline">{row.noDN}</td>
-                    <td className="px-2 py-4 text-center">{row.noPO}</td>
-                    <td className="px-2 py-4 text-center">{row.statusDN}</td>
-                    <td className="px-2 py-4 text-center">{row.planDNDate}</td>
-                    <td className="px-2 py-4 text-center">{row.receivedDNDate}</td>
-                    <td className="px-2 py-4 text-center">{row.noPackingSlip}</td>
+                    <td className="px-2 py-4 text-center text-blue-600 underline">{row.noPO}</td>
+                    <td className="px-2 py-4 text-center">{row.poDate}</td>
+                    <td className="px-2 py-4 text-center">{row.status}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-4">
-                    No history delivery notes available for now
+                  <td colSpan="3" className="text-center py-4">
+                    No history purchase orders available for now
                   </td>
                 </tr>
               )}
@@ -244,4 +197,4 @@ const HistoryDeliveryNote = () => {
   );
 };
 
-export default HistoryDeliveryNote;
+export default HistoryPurchaseOrder;

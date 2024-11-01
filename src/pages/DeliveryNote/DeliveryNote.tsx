@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
-import { API_indexDNSupplier } from '../../api/api';
+import { API_DN_Supplier } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchMonth from '../Table2/SearchMonth';
@@ -18,10 +18,9 @@ const DeliveryNote = () => {
 
   const fetchDeliveryNotes = async () => {
     const token = localStorage.getItem('access_token');
-    const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_indexDNSupplier}`, {
+      const response = await fetch(API_DN_Supplier(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -33,24 +32,20 @@ const DeliveryNote = () => {
 
       const result = await response.json();
 
-      if (result && result.data) {
-        const deliveryNotes = result.data.map((dn) => ({
-          noDN: dn.no_dn || '-',
-          noPO: dn.po_no || '-',
-          createdDate: dn.dn_created_date || '-',
-          planDNDate: dn.plan_delivery_date || '-',
-          statusDN: dn.status_desc || '-',
-          progress: dn.progress || '-',
-        }));
 
-        setData(deliveryNotes);
-        setFilteredData(deliveryNotes);
-      } else {
-        Swal.fire('Error', 'No delivery notes found.', 'error');
-      }
+      const deliveryNotes = result.data.map((dn) => ({
+        noDN: dn.no_dn || '-',
+        noPO: dn.po_no || '-',
+        createdDate: dn.dn_created_date || '-',
+        planDNDate: dn.plan_delivery_date || '-',
+        statusDN: dn.status_desc || '-',
+        progress: dn.progress || '-',
+      }));
+
+      setData(deliveryNotes);
+      setFilteredData(deliveryNotes);
     } catch (error) {
       console.error('Error fetching delivery notes:', error);
-      Swal.fire('Error', 'Failed to fetch delivery notes.', 'error');
     }
   };
 
@@ -173,7 +168,7 @@ const DeliveryNote = () => {
                 paginatedData.map((row, index) => (
                   <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
                     <td className="px-2 py-4 text-center">
-                      <a href={`/delivery-note-detail?noDN=${row.noDN}`} className="text-blue-600 underline">
+                      <a href={`/delivery-note-detail-edit?noDN=${row.noDN}`} className="text-blue-600 underline">
                         {row.noDN}
                       </a>
                     </td>

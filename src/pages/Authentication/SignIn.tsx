@@ -2,7 +2,7 @@ import FotoSanoh from '../../images/cover/foto-sanoh-2.png';
 import Logo from '../../images/logo-sanoh.png'
 import PasswordInput from '../../components/PasswordInput';
 import Notification from '../../components/Notification';
-import { APIlogin } from '../../api/api';
+import { API_Login } from '../../api/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -22,7 +22,7 @@ const SignIn: React.FC = () => {
     
     try {
       // Melakukan request ke endpoint login API
-      const response = await axios.post(APIlogin, {
+      const response = await axios.post(API_Login(), {
         username,
         password,
       });
@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
           localStorage.setItem("role", "admin");          
           break;
         case '5':
-          localStorage.setItem("role", "subcon");          
+          localStorage.setItem("role", "subcont");          
           break;
         default:
           setNotification({ message: 'Role tidak dikenali!', type: 'error' });

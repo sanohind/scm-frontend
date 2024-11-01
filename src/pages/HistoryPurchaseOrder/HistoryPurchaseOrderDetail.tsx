@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
-import { API_indexPOHistorySupplier } from '../../api/api';
+import { API_PO_History_Supplier } from '../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaPrint } from 'react-icons/fa';
 
@@ -26,7 +26,7 @@ const HistoryPurchaseOrderDetail = () => {
     const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_indexPOHistorySupplier}${bpCode}`, {
+      const response = await fetch(`${API_PO_History_Supplier()}${bpCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

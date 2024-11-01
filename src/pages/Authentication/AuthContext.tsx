@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { APIlogout } from '../../api/api';
+import { API_Logout } from '../../api/api';
 
 type Role = '1' | '2' | '3' | '4' | '5' | null;
 
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } 
     };
 
-    const interval = setInterval(checkTokenExpiration, 60000); // Cek setiap 1 menit
+    const interval = setInterval(checkTokenExpiration, 5000); // Cek setiap 1 menit
     return () => clearInterval(interval);
   }, []);
 
@@ -57,10 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(role);
     localStorage.setItem('access_token', token);
     localStorage.setItem('userRole', role);
-    
     const expirationTime = new Date().getTime() + 3540 * 1000;
     localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit
-
   };
 
   const logout = async () => {    
@@ -68,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (token) {
       try {
-        await fetch(APIlogout(), {
+        await fetch(API_Logout(), {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

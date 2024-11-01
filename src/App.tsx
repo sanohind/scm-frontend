@@ -6,12 +6,12 @@ import ManageUser from "./pages/ManageUser/ManageUser";
 import AddUser from "./pages/ManageUser/AddUser";
 import EditUser from "./pages/ManageUser/EditUser";
 import PurchaseOrderDetail from "./pages/PurchaseOrder/PurchaseOrderDetail";
-import HistoryPurchaseOrder from "./pages/HistoryPurchaseOrder/HistoryPurchaseOrder";
+import HistoryPurchaseOrder from "./pages/PurchaseOrder/HistoryPurchaseOrder";
 import PerformanceReport from "./pages/PerformanceReport";
 import Forecast from "./pages/Forecast";
 import DeliveryNote from "./pages/DeliveryNote/DeliveryNote";
 import DeliveryNoteDetail from "./pages/DeliveryNote/DeliveryNoteDetail";
-import HistoryDeliveryNote from "./pages/HistoryDeliveryNote/HistoryDeliveryNote";
+import HistoryDeliveryNote from "./pages/DeliveryNote/HistoryDeliveryNote";
 import Transaction from "./pages/Subcon/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
@@ -24,6 +24,7 @@ import HistoryDeliveryNoteDetail from "./pages/HistoryDeliveryNote/HistoryDelive
 import StockItems from "./pages/Subcon/StockItem";
 import AddTransaction from "./pages/Subcon/AddTransaction";
 import IndexPurchaseOrder from "./pages/PurchaseOrder/IndexPurchaseOrder";
+import DeliveryNoteDetailEdit from "./pages/DeliveryNote/DeliveryNoteDetailEdit";
 
 
 const App: React.FC = () => {
@@ -167,11 +168,11 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/history-delivery-note-detail"
+              path="/delivery-note-detail-edit"
               element={
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
-                  <HistoryDeliveryNoteDetail />
+                  <DeliveryNoteDetailEdit />
                 </ProtectedRoute>
               }
             />

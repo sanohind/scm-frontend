@@ -1,68 +1,118 @@
-const API = 'https://api.edutrashgo.com/api';
-const userRole = localStorage.getItem('role');
+const API = 'https://apiv2.edutrashgo.com/api';
 
-let rolePath = userRole ? `/${userRole}` : '';
-
-// login API endpoint
-export const APIlogin = API + '/login';
-
-// logout API endpoint is now a function
-export const APIlogout = () => {
+const getRolePath = () => {
     const userRole = localStorage.getItem('role');
-    const rolePath = userRole ? `/${userRole}` : '';
-    return API + rolePath + '/logout';
+    // console.log(userRole);
+    return userRole ? `/${userRole}` : '';
 };
 
-// API Test No Auth
-export const APIreadfile = API + '/listingreporttest/file/';
+// login API endpoint
+export const API_Login = () => API + '/login';
 
-// API Global
-export const API_poView = API + `/pohview/`;
-export const API_dnView = API + `/dnhview/`;
-export const API_labelView = API + `/lbview/`;
+// // logout API endpoint is now a function
+export const API_Logout = () => API + getRolePath() + `/logout`;
+
+// API Test No Auth
+export const API_Tes_Download_Performance_Report_Supplier = () => API + getRolePath() + `/listingreporttest/file/`;
+export const API_Tes_Download_Forecast_Report_Supplier = () => API + getRolePath() + `/forecasttest/file/`;
+export const API_Tes_Print_PO = () => API + `/pohview/`;
+export const API_Tes_Print_DN = () => API + `/dnhview/`;
+export const API_Tes_Print_Label = () => API + `/lbview/`;
+
 
 // supper admin 
-export const APIpartner4 = API + '/partner4';
-export const APIcreateuser = API + '/create4';
-export const APIedit4 = API + '/edit4/';
-export const APIupdate4 = API + '/update4/';
-export const APIlistuser = API + '/index4';
-export const APIupdatestatus = API + `/updatestatus/`;
+export const API_List_Partner_Admin = () => API + getRolePath() + `/partner/index`;
+
+export const API_Create_User = () => API + getRolePath() + '/create';
+export const API_Edit_User = () => API + getRolePath() + '/edit/';
+export const API_Update_USer = () => API + getRolePath() + '/update/';
+export const API_List_User = () => API + getRolePath() + '/index';
+export const API_Update_Status = () => API + getRolePath() + `/update/status/`;
 
 
 // purchasing
-export const API_readPerformanceReportPurchasing = API + `/listingreport3/file/`;
-export const APIpartner3 = API + `/partner3`;
-export const APIindexlistingreport = API + `/indexlistingreport3`;
-export const APIuploadlisting = API + `/createlistingreport3`;
-export const APIindexpoheader3 = API + `/indexpoheader3`;
-export const APIpohistory3 = API + `/pohistory3`;
-export const APIpoViewPurchasing3 = API + `/pohview3/`
-export const API_SyncPurchasing = API + `/syncPurchasing`;
+export const API_Sync = () => API + getRolePath() + `/sync`;
+
+export const API_List_Partner_Purchasing = () => API + getRolePath() + `/partner/index`;
+
+export const API_PO_Purchasing = () => API + getRolePath() + `/po/index/`;
+export const API_PO_Detail_Purchasing = () => API + getRolePath() + `/po/detail/`;
+export const API_PO_History_Purchasing = () => API + getRolePath() + `/po/history/`;
+
+export const API_Print_PO_Purchasing = () => API + getRolePath() + `/pohview3/`;
+
+export const API_Performance_Report_Purchasing = () => API + getRolePath() + `/performance-report/index/`;
+export const API_Download_Performance_Report_Purchasing = () => API + getRolePath() + `/performance-report/file/`;
+export const API_Create_Performance_Report_Purchasing = () => API + getRolePath() + `/createlistingreport3`;
+
+export const API_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/index/`;
+export const API_Download_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/file/`;
+export const API_Create_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/store`;
+export const API_Delete_Forecast_Report_Purchasing = () => API + getRolePath() + `/forecast/delete/`;
 
 
 // warehouse
-export const APIpartner2 = API + `/partner2`;
-export const APIindexdnheader2 = API + `/indexdnheader2`;
-export const APIindexdndetail2 = API + '/indexdndetail2/';
-export const APIdnhistory2 = API + `/dnhistory2`;
-export const APIdnViewWarehouse2 = API + `/dnhview2/`;
-export const API_SyncWarehouse = API + `/syncWarehouse`;
+export const API_Sync_Warehouse = () => API + getRolePath() + `/sync`;
+
+export const API_List_Partner_Warehouse = () => API + getRolePath() + `/partner/index`;
+
+export const API_DN_Warehouse = () => API + getRolePath() + `/dn/index/`;
+export const API_DN_Detail_Warehouse = () => API + getRolePath() + `/dn/detail/`;
+export const API_DN_History_Warehouse = () => API + getRolePath() + `/dn/history/`;
+
+export const API_Print_DN_Warehouse = () => API + getRolePath() + `/dn/print/`;
 
 
 // supplier
-export const API_dashboardSupplier = API + `/dashboard`;
-export const API_indexPOSupplier = API + `/indexpoheader1/`;
-export const API_updatePOSupplier = API + `/updatepoheader1/`;
-export const API_indexPerformanceReportSupplier = API + `/indexlistingreport1`;
-export const API_indexDNSupplier = API + `/indexdnheader1`;
-export const API_indexPOHistorySupplier = API + `/pohistory1/`;
-export const API_indexDNHistorySupplier = API + `/dnhistory1/`;
-export const API_readPerformanceReportSupplier = API + `/listingreport1/file/`;
-export const API_indexPODetailSupplier = API + `/indexpodetail1/`;
-export const API_indexDNDetailUpdateSupplier = API + `/updatedndetail1`;
-export const API_poViewSupplier = API + `/pohview1/`;
-export const API_dnViewSupplier = API + `/dnhview1/`;
-export const API_labelViewSupplier = API + `/lbview1/`;
-export const API_IndexForecastSupplier = API + `/supplier/forecast/index`;
-export const API_GetForecastFileSupplier = API + `/supplier/forecast/get/file/`;
+export const API_Dashboard = () => API + getRolePath() + `/dashboard`;
+
+export const API_PO_Supplier = () => API + getRolePath() + `/po/index/`;
+export const API_PO_Detail = () => API + getRolePath() + `/po/detail/`;
+export const API_Update_PO_Supplier = () => API + getRolePath() + `/po/update/`;
+export const API_PO_History_Supplier = () => API + getRolePath() + `/po/history/`;
+
+export const API_DN_Supplier = () => API + getRolePath() + `/dn/index`;
+export const API_DN_Detail = () => API + getRolePath() + `/dn/detail/`;
+export const API_DN_Edit_Supplier = () => API + getRolePath() + `/dn/edit/`;
+export const API_Update_DN_Supplier = () => API + getRolePath() + `/dn/update`;
+export const API_DN_History_Supplier = () => API + getRolePath() + `/dn/history/`;
+
+export const API_Print_PO_Supplier = () => API + getRolePath() + `/po/print/`;
+export const API_Print_DN_Supplier = () => API + getRolePath() + `/dn/print/`;
+export const API_Print_Label_Supplier = () => API + getRolePath() + `/label/print/`;
+
+export const API_Performance_Report_Supplier = () => API + getRolePath() + `/performance-report/index/`;
+export const API_Download_Performance_Report_Supplier = () => API + getRolePath() + `/performance-report/file/`;
+
+export const API_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/index`;
+export const API_Download_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/file/`;
+
+
+// Subcont
+export const API_Dashboard_Subcont = () => API + getRolePath() + `/dashboard`;
+
+export const API_PO_Subcont = () => API + getRolePath() + `/po/index/`;
+export const API_PO_Detail_Subcont = () => API + getRolePath() + `/po/detail/`;
+export const API_Update_PO_Subcont = () => API + getRolePath() + `/po/update/`;
+export const API_PO_History_Subcont = () => API + getRolePath() + `/po/history/`;
+
+export const API_DN_Subcont = () => API + getRolePath() + `/dn/index`;
+export const API_DN_Detail_Subcont = () => API + getRolePath() + `/dn/detail/`;
+export const API_DN_Edit_Subcont = () => API + getRolePath() + `/dn/edit/`;
+export const API_Update_DN_Subcont = () => API + getRolePath() + `/dn/update`;
+export const API_DN_History_Subcont = () => API + getRolePath() + `/dn/history/`;
+
+export const API_Print_PO_Subcont = () => API + getRolePath() + `/po/print/`;
+export const API_Print_DN_Subcont = () => API + getRolePath() + `/dn/print/`;
+export const API_Print_Label_Subcont = () => API + getRolePath() + `/label/print/`;
+
+export const API_Item_Subcont = () => API + getRolePath() + `/item/index`;
+export const API_Create_Item_Subcont = () => API + getRolePath() + `/item/store`;
+export const API_Transaction_Subcont = () => API + getRolePath() + `/trasaction/index`;
+export const API_Transaction_Item_Subcont = () => API + getRolePath() + `/transaction/store`;
+
+export const API_Performance_Report_Subcont = () => API + getRolePath() + `/performance-report/index/`;
+export const API_Download_Performance_Report_Subcont = () => API + getRolePath() + `/performance-report/file/`;
+
+export const API_Forecast_Report_Subcont = () => API + getRolePath() + `/forecast/index`;
+export const API_Download_Forecast_Report_Subcont = () => API + getRolePath() + `/forecast/file/`;

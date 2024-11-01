@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import Pagination from './Table2/Pagination';
-import { API_indexPerformanceReportSupplier, APIreadfile } from '../api/api';
+import { API_Performance_Report_Supplier, API_Download_Performance_Report_Supplier, API_Tes_Download_Performance_Report_Supplier } from '../api/api';
 import SearchMonth from './Table2/SearchMonth';
 
 import iconPdf from '../images/icon_pdf.svg';
@@ -30,7 +30,7 @@ const PerformanceReport = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_indexPerformanceReportSupplier}/${bp_code}`, {
+        const response = await fetch(`${API_Performance_Report_Supplier()}${bp_code}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -220,7 +220,7 @@ const PerformanceReport = () => {
                       </td>
                       <td className="px-1 py-3 text-center">{row.filedata}</td>
                       <td className="px-1 py-2 text-center flex items-center justify-center">
-                        <a href={`${APIreadfile}${row.attachedFile}`} download>
+                        <a href={`${API_Tes_Download_Performance_Report_Supplier()}${row.attachedFile}`} download>
                           {getFileIcon(row.attachedFile)}
                         </a>
                       </td>

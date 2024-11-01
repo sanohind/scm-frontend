@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { API_dashboardSupplier } from '../../api/api';
+import { API_Dashboard } from '../../api/api';
 import CardDataStats from '../../components/CardDataStats';
 
 
@@ -17,7 +17,7 @@ const DashboardSubcon: React.FC = () => {
       try {
         const token = localStorage.getItem('access_token');
 
-        const response = await fetch(API_dashboardSupplier, {
+        const response = await fetch(API_Dashboard(), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`, // Mengirim token untuk autentikasi

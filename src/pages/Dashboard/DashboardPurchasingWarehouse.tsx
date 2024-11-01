@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { API_SyncPurchasing } from '../../api/api';
+import { API_Sync } from '../../api/api';
 
 const DashboardPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -31,7 +31,7 @@ const DashboardPurchasingWarehouse: React.FC = () => {
   
       try {
         // Construct the URL with separate month and year parameters
-        const url = `${API_SyncPurchasing}?month=${month}&year=${year}`;
+        const url = `${API_Sync()}?month=${month}&year=${year}`;
   
         const response = await fetch(url, {
           method: 'GET',

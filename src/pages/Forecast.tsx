@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import Pagination from './Table2/Pagination';
-import { API_GetForecastFileSupplier, API_IndexForecastSupplier } from '../api/api';
+import { API_Download_Forecast_Report_Supplier, API_Forecast_Report_Supplier } from '../api/api';
 import SearchMonth from './Table2/SearchMonth';
 import SearchBar from './Table2/SearchBar';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -23,7 +23,7 @@ const Forecast = () => {
     const token = localStorage.getItem('access_token');
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_IndexForecastSupplier}`, {
+        const response = await fetch(`${API_Forecast_Report_Supplier()}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ const Forecast = () => {
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch(`${API_GetForecastFileSupplier}${attachedFile}`, {
+      const response = await fetch(`${API_Download_Forecast_Report_Supplier()}${attachedFile}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaExclamationTriangle  } from 'react-icons/fa';
-import { API_indexPOSupplier, API_updatePOSupplier } from '../../api/api';
+import { API_PO_Supplier, API_Update_PO_Supplier } from '../../api/api';
 import SearchMonth from '../Table2/SearchMonth';
 import SearchBar from '../Table2/SearchBar';
 import Pagination from '../Table2/Pagination';
@@ -24,7 +24,7 @@ const PurchaseOrder = () => {
     const bpCode = localStorage.getItem('bp_code');
 
     try {
-      const response = await fetch(`${API_indexPOSupplier}${bpCode}`, {
+      const response = await fetch(`${API_PO_Supplier()}${bpCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -136,7 +136,7 @@ const PurchaseOrder = () => {
 
   const updateResponse = async (po_no, response, reason = '') => {
     const token = localStorage.getItem('access_token');
-    const updateURL = `${API_updatePOSupplier}${po_no}`;
+    const updateURL = `${API_Update_PO_Supplier()}${po_no}`;
 
     try {
       const res = await fetch(updateURL, {
