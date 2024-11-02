@@ -85,7 +85,7 @@ export const API_Performance_Report_Supplier = () => API + getRolePath() + `/per
 export const API_Download_Performance_Report= () => API + getRolePath() + `/performance-report/file/`;
 
 export const API_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/index`;
-export const API_Download_Forecast_Report_Supplier = () => API + getRolePath() + `/forecast/file/`;
+export const API_Download_Forecast_Report = () => API + getRolePath() + `/forecast/file/`;
 
 
 // Subcont

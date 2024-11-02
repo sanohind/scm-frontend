@@ -7,23 +7,36 @@ import {
     API_Forecast_Report_Purchasing,
     API_Delete_Forecast_Report_Purchasing,
     API_List_Partner,
-    API_Download_Performance_Report,
+    API_Download_Forecast_Report,
 } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
 
 const CreateForecast = () => {
-    const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
+    interface ForecastReport {
+        no: string;
+        description: string;
+        upload_at: string;
+        filedata: string;
+        attachedFile: string;
+    }
+
+    const [data, setData] = useState<ForecastReport[]>([]);
+    const [filteredData, setFilteredData] = useState<ForecastReport[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(6);
+    const rowsPerPage = 5;
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-    const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [sortConfig, setSortConfig] = useState<{ key: keyof ForecastReport | '', direction: 'asc' | 'desc' | '' }>({ key: '', direction: '' });
+    const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
     const [suppliers, setSuppliers] = useState([]);
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
     const [description, setDescription] = useState('');
+
+    interface Supplier {
+        bp_code: string;
+        bp_name: string;
+    }
 
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
@@ -39,7 +52,7 @@ const CreateForecast = () => {
             if (!response.ok) throw new Error('Failed to fetch suppliers');
 
             const result = await response.json();
-            const suppliersList = result.data.map((supplier) => ({
+            const suppliersList = result.data.map((supplier: Supplier) => ({
                 value: supplier.bp_code,
                 label: `${supplier.bp_code} | ${supplier.bp_name}`,
             }));
@@ -50,7 +63,7 @@ const CreateForecast = () => {
         }
     };
 
-    const fetchForecastReport = async (supplierCode) => {
+    const fetchForecastReport = async (supplierCode: string) => {
         const token = localStorage.getItem('access_token');
         try {
             const response = await fetch(
@@ -68,7 +81,7 @@ const CreateForecast = () => {
     
             const result = await response.json();
             if (result.status && Array.isArray(result.data) && result.data.length > 0) {
-                const forecastReport = result.data.map((report) => ({
+                const forecastReport = result.data.map((report: any) => ({
                     no: report.forecast_id || 'N/A',
                     description: report.description || '-',
                     upload_at: report.upload_at || '-',
@@ -110,12 +123,12 @@ const CreateForecast = () => {
 
         if (sortConfig.key) {
             filtered.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
+                let aValue = a[sortConfig.key as keyof ForecastReport];
+                let bValue = b[sortConfig.key as keyof ForecastReport];
 
                 if (sortConfig.key === 'upload_at') {
-                    aValue = new Date(aValue);
-                    bValue = new Date(bValue);
+                    aValue = new Date(aValue).toISOString();
+                    bValue = new Date(bValue).toISOString();
                 }
 
                 if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -132,17 +145,17 @@ const CreateForecast = () => {
         currentPage * rowsPerPage
     );
 
-    const handlePageChange = (page) => setCurrentPage(page);
+    const handlePageChange = (page: number) => setCurrentPage(page);
 
-    const handleSort = (key) => {
-        let direction = 'asc';
+    const handleSort = (key: keyof ForecastReport) => {
+        let direction: 'asc' | 'desc' | '' = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
         }
         setSortConfig({ key, direction });
     };
 
-    const handleSupplierChange = (selectedOption) => {
+    const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
             fetchForecastReport(selectedOption.value);
@@ -153,21 +166,23 @@ const CreateForecast = () => {
         }
     };
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        if (e.target.files[0] && e.target.files[0].type !== "application/pdf") {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setFile(e.target.files[0]);
+        }
+        if (e.target.files && e.target.files[0] && e.target.files[0].type !== "application/pdf") {
             Swal.fire("Error", "Only PDF files are allowed", "error");
             setFile(null); // Reset the file input
-        } else {
+        } else if (e.target.files) {
             setFile(e.target.files[0]);
         }
     };
 
-    const handleDescriptionChange = (e) => {
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setDescription(e.target.value);
     };
 
-    const handleUpload = async (e) => {
+    const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!file || !description || !selectedSupplier) {
             Swal.fire('Error', 'Please fill all fields', 'error');
@@ -204,11 +219,11 @@ const CreateForecast = () => {
         }
     };
 
-    async function downloadFile(attachedFile) {
+    async function downloadFile(attachedFile: string) {
         const token = localStorage.getItem('access_token');
     
         try {
-          const response = await fetch(`${API_Download_Performance_Report()}${attachedFile}`, {
+          const response = await fetch(`${API_Download_Forecast_Report()}${attachedFile}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -238,7 +253,7 @@ const CreateForecast = () => {
         }
     }
 
-    const handleDelete = async (forecastId) => {
+    const handleDelete = async (forecastId: string) => {
         const token = localStorage.getItem('access_token');
         try {
             const response = await fetch(`${API_Delete_Forecast_Report_Purchasing()}${forecastId}`, {
@@ -254,7 +269,9 @@ const CreateForecast = () => {
             const result = await response.json();
             if (result.status) {
                 Swal.fire('Success', 'File deleted successfully', 'success');
-                fetchForecastReport(selectedSupplier.value);
+                if (selectedSupplier) {
+                    fetchForecastReport(selectedSupplier.value);
+                }
             } else {
                 Swal.fire('Error', result.message, 'error');
             }
@@ -407,7 +424,7 @@ const CreateForecast = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="text-center py-4">
+                                        <td colSpan={6} className="text-center py-4">
                                             No data available
                                         </td>
                                     </tr>
