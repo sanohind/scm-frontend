@@ -8,13 +8,21 @@ import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from
 
 
 const Forecast = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  interface ForecastData {
+    no: number;
+    description: string;
+    upload_at: string;
+    filedata: string;
+    attachedFile: string;
+  }
+  
+  const [data, setData] = useState<ForecastData[]>([]);
+  const [filteredData, setFilteredData] = useState<ForecastData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: 'periode', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState<{ key: keyof ForecastData; direction: 'asc' | 'desc' }>({ key: 'upload_at', direction: 'desc' });
 
   // Fetch data from API
   useEffect(() => {
@@ -46,10 +54,6 @@ const Forecast = () => {
     fetchData();
   }, []);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Format to YYYY-MM-DD
-  }
 
   // Handle search and sorting logic
   useEffect(() => {
@@ -74,8 +78,9 @@ const Forecast = () => {
 
       // Convert to Date if sorting by 'upload_at'
       if (sortConfig.key === 'upload_at') {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
+        const dateA = new Date(aValue as string).getTime();
+        const dateB = new Date(bValue as string).getTime();
+        return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
       }
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -92,34 +97,20 @@ const Forecast = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleSort = (key) => {
-    let direction = 'asc';
+  const handleSort = (key: keyof ForecastData) => {
+    let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
   };
 
-  function getFileIcon(filename) {
-    if (!filename) {
-      return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
-    }
-
-    const extension = filename.split('.').pop().toLowerCase();
-
-    switch (extension) {
-      case 'pdf':
-        return <img src={iconPdf} alt="PDF Icon" className="w-6 h-6" />;
-      default:
-        return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
-    }
-  }
 
   
   // Function to handle file download
-  async function downloadFile(attachedFile) {
+  async function downloadFile(attachedFile: string) {
     const token = localStorage.getItem('access_token');
 
     try {
@@ -203,13 +194,13 @@ const Forecast = () => {
                       <td className="px-2 py-3 text-center">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                       <td className="px-2 py-3 text-center">{row.description}</td>
                       <td className="px-2 py-3 text-center">{row.filedata}</td>
-                        <td className="px-2 py-3 text-center flex items-center justify-center">
+                      <td className="px-2 py-3 text-center flex items-center justify-center">
                         <button
                           onClick={() => downloadFile(row.attachedFile)}
                           className="px-2 py-1 hover:scale-110"
                         >
                           {(() => {
-                          const extension = row.attachedFile.split('.').pop().toLowerCase();
+                          const extension = row.attachedFile?.split('.').pop()?.toLowerCase() || '';
                           switch (extension) {
                             case 'pdf':
                             return <FaFilePdf className="w-6 h-6 text-red-600" />;
@@ -224,13 +215,13 @@ const Forecast = () => {
                           }
                           })()}
                         </button>
-                        </td>
-                        <td className="px-2 py-3 text-center">{row.upload_at}</td>
+                      </td>
+                      <td className="px-2 py-3 text-center">{row.upload_at}</td>
                       </tr>
                       ))
                     ) : (
                       <tr>
-                      <td colSpan="5" className="text-center py-4">
+                      <td colSpan={5} className="text-center py-4">
                         No data available for now
                       </td>
                       </tr>

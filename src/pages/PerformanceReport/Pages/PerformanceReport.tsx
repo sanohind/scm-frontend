@@ -16,14 +16,22 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
 const PerformanceReport = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  type DataType = {
+    no: string;
+    periode: string;
+    upload_at: string;
+    filedata: string;
+    attachedFile: string;
+  };
+  
+  const [data, setData] = useState<DataType[]>([]);
+  const [filteredData, setFilteredData] = useState<DataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: 'periode', direction: 'desc' });
-
+  const [sortConfig, setSortConfig] = useState<{ key: keyof DataType; direction: 'asc' | 'desc' }>({ key: 'periode', direction: 'desc' });
+  
   // Fetch data from API
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -85,16 +93,20 @@ const PerformanceReport = () => {
     filtered.sort((a, b) => {
       let aValue = a[sortConfig.key];
       let bValue = b[sortConfig.key];
-  
+
       // Konversi string ke Date jika kolom yang diurutkan adalah tanggal
       if (sortConfig.key === 'upload_at' || sortConfig.key === 'periode') {
-        aValue = new Date(aValue);
-        bValue = new Date(bValue);
+        const aDateValue = new Date(aValue);
+        const bDateValue = new Date(bValue);
+
+        if (aDateValue < bDateValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aDateValue > bDateValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      } else {
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
       }
-  
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
     });
 
     setFilteredData(filtered);
@@ -107,24 +119,24 @@ const PerformanceReport = () => {
   );
 
   // Handle page change
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
   
 
   // Handle sorting
-  const handleSort = (key) => {
-    let direction = 'asc';
+  const handleSort = (key: keyof DataType) => {
+    let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
   };
 
-  function getFileIcon(filename) {
+  function getFileIcon(filename: string) {
     if (!filename) {
       return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
     }
   
-    const extension = filename.split('.').pop().toLowerCase();
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
   
     switch (extension) {
       case 'pdf':
@@ -146,7 +158,7 @@ const PerformanceReport = () => {
     }
   }
 
-  async function downloadFile(attachedFile) {
+  async function downloadFile(attachedFile: string) {
     const token = localStorage.getItem('access_token');
 
     try {
@@ -267,7 +279,7 @@ const PerformanceReport = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center py-4">
+                    <td colSpan={5} className="text-center py-4">
                       No data available for now
                     </td>
                   </tr>
