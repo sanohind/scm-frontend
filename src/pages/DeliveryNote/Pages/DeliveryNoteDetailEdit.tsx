@@ -6,9 +6,37 @@ import { API_DN_Detail, API_Update_DN_Supplier } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
 
 const DeliveryNoteDetailEdit = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [dnDetails, setDNDetails] = useState({});
+  interface Detail {
+    no: string;
+    dnDetailNo: string;
+    partNumber: string;
+    partName: string;
+    UoM: string;
+    QTY: string;
+    qtyLabel: string;
+    qtyRequested: string;
+    qtyConfirm: string;
+    qtyDelivered: string;
+    qtyMinus: string;
+  }
+
+  interface DNDetails {
+    noDN: string;
+    noPO: string;
+    planDelivery: string;
+    statusDN: string;
+    confirmUpdateAt: string;
+  }
+  
+  const [dnDetails, setDNDetails] = useState<DNDetails>({
+    noDN: '',
+    noPO: '',
+    planDelivery: '',
+    statusDN: '',
+    confirmUpdateAt: '',
+  });
+  const [data, setData] = useState<Detail[]>([]);
+  const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const location = useLocation();
@@ -42,7 +70,7 @@ const DeliveryNoteDetailEdit = () => {
         });
         
 
-        const details = dn.detail.map((detail, index) => ({
+        const details = dn.detail.map((detail: any, index: number) => ({
           no: (index + 1).toString(),
           dnDetailNo: detail.dn_detail_no || '',
           partNumber: detail.part_no || '-',
@@ -86,7 +114,7 @@ const DeliveryNoteDetailEdit = () => {
     fetchDeliveryNotes();
   };
 
-  const handleQtyChange = (index, value) => {
+  const handleQtyChange = (index: number, value: string) => {
     const updatedData = [...filteredData];
     updatedData[index].qtyConfirm = value;
     setFilteredData(updatedData);
