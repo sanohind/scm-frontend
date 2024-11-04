@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import PurchaseOrder from "./Pages/PO/PurchaseOrder";
-import PurchasingPurchaseOrder from "./Pages/PO/PurchasingPurchaseOrder";
+import HistoryPurchaseOrder from "./Pages/History/HistoryPurchaseOrder";
+import PurchasingHistoryPurchaseOrder from "./Pages/History/PurchasingHistoryPurchaseOrder";
 
-const IndexPurchaseOrder: React.FC = () => {
+const IndexHistoryPurchaseOrder: React.FC = () => {
     const [userRole, setUserRole] = useState<string>('');
   
     useEffect(() => {
@@ -11,12 +11,12 @@ const IndexPurchaseOrder: React.FC = () => {
     }, []);
   
     if (userRole === 'supplier' || userRole === 'subcont') {
-      return <PurchaseOrder />;
+      return <HistoryPurchaseOrder />;
     } else if (userRole === 'purchasing') {
-      return <PurchasingPurchaseOrder />;
+      return <PurchasingHistoryPurchaseOrder />;
     } else {
       return <div>No dashboard available for your role.</div>;
     }
   };
   
-  export default IndexPurchaseOrder;
+  export default IndexHistoryPurchaseOrder;

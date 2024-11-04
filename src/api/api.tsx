@@ -37,7 +37,7 @@ export const API_List_Partner_Purchasing = () => API + getRolePath() + `/partner
 
 export const API_PO_Purchasing = () => API + getRolePath() + `/po/index/`;
 export const API_PO_Detail_Purchasing = () => API + getRolePath() + `/po/detail/`;
-export const API_PO_History_Purchasing = () => API + getRolePath() + `/po/history/`;
+export const API_PO_History = () => API + getRolePath() + `/po/history/`;
 
 export const API_Print_PO_Purchasing = () => API + getRolePath() + `/pohview3/`;
 

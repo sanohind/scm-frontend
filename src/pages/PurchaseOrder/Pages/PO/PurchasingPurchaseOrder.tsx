@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaExclamationTriangle } from 'react-icons/fa';
-import SearchBar from '../../Table2/SearchBar';
-import Pagination from '../../Table2/Pagination';
+import SearchBar from '../../../Table2/SearchBar';
+import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
-import { API_List_Partner_Purchasing, API_PO_Purchasing } from '../../../api/api';
+import { API_List_Partner_Purchasing, API_PO_Purchasing } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const PurchasingPurchaseOrder = () => {

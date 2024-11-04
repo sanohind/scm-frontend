@@ -5,7 +5,6 @@ import ManageUser from "./pages/ManageUser/Pages/ManageUser";
 import AddUser from "./pages/ManageUser/Pages/AddUser";
 import EditUser from "./pages/ManageUser/Pages/EditUser";
 import PurchaseOrderDetail from "./pages/PurchaseOrder/Pages/PurchaseOrderDetail";
-import HistoryPurchaseOrder from "./pages/PurchaseOrder/Pages/HistoryPurchaseOrder";
 import DeliveryNote from "./pages/DeliveryNote/Pages/DeliveryNote";
 import DeliveryNoteDetail from "./pages/DeliveryNote/Pages/DeliveryNoteDetail";
 import HistoryDeliveryNote from "./pages/DeliveryNote/Pages/HistoryDeliveryNote";
@@ -22,6 +21,7 @@ import DeliveryNoteDetailEdit from "./pages/DeliveryNote/Pages/DeliveryNoteDetai
 import SignIn from "./pages/Authentication/Pages/SignIn";
 import IndexPerformanceReport from "./pages/PerformanceReport/IndexPerformanceReport";
 import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
+import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
 
 
 const App: React.FC = () => {
@@ -105,7 +105,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['3', '1', '5']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
-                  <HistoryPurchaseOrder />
+                  <IndexHistoryPurchaseOrder />
                 </ProtectedRoute>
               }
             />
