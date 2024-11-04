@@ -105,7 +105,7 @@ const HistoryPurchaseOrder = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleRowClick = (noPO) => {
+  const handlePONavigate = (noPO) => {
     navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
@@ -165,12 +165,15 @@ const HistoryPurchaseOrder = () => {
             <tbody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((row, index) => (
-                  <tr
-                    key={index}
-                    className="odd:bg-white even:bg-gray-50 border-b cursor-pointer"
-                    onClick={() => handleRowClick(row.noPO)}
-                  >
-                    <td className="px-2 py-4 text-center text-blue-600 underline">{row.noPO}</td>
+                  <tr>
+                    <td className="px-2 py-4 text-center">
+                      <button
+                        onClick={() => handlePONavigate(row.noPO)}
+                        className="text-blue-600 underline"
+                      >
+                        {row.noPO}
+                      </button>
+                    </td>
                     <td className="px-2 py-4 text-center">{row.poDate}</td>
                     <td className="px-2 py-4 text-center">{row.status}</td>
                   </tr>

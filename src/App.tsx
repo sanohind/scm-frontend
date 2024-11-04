@@ -5,9 +5,7 @@ import ManageUser from "./pages/ManageUser/Pages/ManageUser";
 import AddUser from "./pages/ManageUser/Pages/AddUser";
 import EditUser from "./pages/ManageUser/Pages/EditUser";
 import PurchaseOrderDetail from "./pages/PurchaseOrder/Pages/PurchaseOrderDetail";
-import DeliveryNote from "./pages/DeliveryNote/Pages/DeliveryNote";
 import DeliveryNoteDetail from "./pages/DeliveryNote/Pages/DeliveryNoteDetail";
-import HistoryDeliveryNote from "./pages/DeliveryNote/Pages/HistoryDeliveryNote";
 import Transaction from "./pages/Subcon/Pages/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
@@ -22,7 +20,8 @@ import SignIn from "./pages/Authentication/Pages/SignIn";
 import IndexPerformanceReport from "./pages/PerformanceReport/IndexPerformanceReport";
 import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
 import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
-
+import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
+import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
 
 const App: React.FC = () => {
   return (
@@ -133,7 +132,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="Delivery Note | PT SANOH INDONESIA" />
-                  <DeliveryNote />
+                  <IndexDeliveryNote />
                 </ProtectedRoute>
               }
             />
@@ -151,7 +150,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
                   <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
-                  <HistoryDeliveryNote />
+                  <IndexHistoryDeliveryNote />
                 </ProtectedRoute>
               }
             />
@@ -159,7 +158,7 @@ const App: React.FC = () => {
               path="/delivery-note-detail-edit"
               element={
                 <ProtectedRoute allowedRoles={['2', '1', '5']}>
-                  <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
+                  <PageTitle title="Delivery Note Detail Edit | PT SANOH INDONESIA" />
                   <DeliveryNoteDetailEdit />
                 </ProtectedRoute>
               }

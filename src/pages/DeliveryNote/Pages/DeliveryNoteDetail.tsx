@@ -47,13 +47,15 @@ const DeliveryNoteDetail = () => {
         });
         
           const details = dn.detail.map((detail, index) => ({
-            no: (index + 1).toString(),
+            no: detail.dn_line,
             partNumber: detail.part_no || '-',
             partName: detail.item_desc_a || '-',
-            QTY: detail.dn_qty || '0',
-            qtyLabel: detail.dn_snp || '0',
-            qtyDelivered: detail.receipt_qty || '0',
-            qtyReceived: detail.receipt_qty || '0',
+            QTY: detail.dn_qty || '-',
+            qtyLabel: detail.dn_snp || '-',
+            qtyDelivered: detail.receipt_qty || '-',
+            qtyReceived: detail.receipt_qty || '-',
+            qtyConfirm: detail.qty_confirm || '-',
+            uom: detail.dn_unit || '-',
           }));
 
           setDetails(details);
@@ -122,7 +124,7 @@ const DeliveryNoteDetail = () => {
 
   return (
     <>
-      <Breadcrumb pageName="History Delivery Note Detail" />
+      <Breadcrumb pageName="Delivery Note Detail" />
       <div className="font-poppins bg-white text-black">
         <div className="flex flex-col p-6 gap-4">
           <div className="flex items-center">
@@ -169,7 +171,9 @@ const DeliveryNoteDetail = () => {
                   <th className="px-2 py-3 text-center border-b">No</th>
                   <th className="px-2 py-3 text-center border-b">Part Number</th>
                   <th className="px-2 py-3 text-center border-b">Part Name</th>
-                  <th className="px-2 py-3 text-center border-b">QTY Requested</th>
+                  <th className="px-2 py-3 text-center border-b">UoM</th>
+                  <th className="px-2 py-3 text-center border-b">QTY PO</th>
+                  <th className="px-2 py-3 text-center border-b">QTY Confirm</th>
                   <th className="px-2 py-3 text-center border-b">QTY Label</th>
                   <th className="px-2 py-3 text-center border-b">QTY Delivered</th>
                   <th className="px-2 py-3 text-center border-b">QTY Received</th>
@@ -185,7 +189,9 @@ const DeliveryNoteDetail = () => {
                       <td className="px-2 py-4 text-center">{row.no}</td>
                       <td className="px-2 py-4 text-center">{row.partNumber}</td>
                       <td className="px-2 py-4 text-center">{row.partName}</td>
+                      <td className="px-2 py-4 text-center">{row.uom}</td>
                       <td className="px-2 py-4 text-center">{row.QTY}</td>
+                      <td className="px-2 py-4 text-center">{row.qtyConfirm}</td>
                       <td className="px-2 py-4 text-center">{row.qtyLabel}</td>
                       <td className="px-2 py-4 text-center">{row.qtyDelivered}</td>
                       <td className="px-2 py-4 text-center">{row.qtyReceived}</td>
@@ -193,7 +199,7 @@ const DeliveryNoteDetail = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
+                    <td colSpan="9" className="text-center py-4">
                       No details available for this delivery note
                     </td>
                   </tr>

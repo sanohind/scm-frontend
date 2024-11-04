@@ -48,12 +48,12 @@ const DeliveryNoteDetailEdit = () => {
           partNumber: detail.part_no || '-',
           partName: detail.item_desc_a || '-',
           UoM: detail.dn_unit || '-',
-          QTY: detail.dn_qty || 0,
+          QTY: detail.dn_qty || '-',
           qtyLabel: detail.dn_snp || '-',
-          qtyRequested: detail.dn_qty || 0,
+          qtyRequested: detail.dn_qty || '-',
           qtyConfirm: detail.qty_confirm ?? detail.dn_qty,
-          qtyDelivered: detail.receipt_qty || 0,
-          qtyMinus: (detail.dn_qty || 0) - (detail.receipt_qty || 0),
+          qtyDelivered: detail.receipt_qty || '-',
+          qtyMinus: (detail.dn_qty || '-') - (detail.receipt_qty || '-'),
         }));
 
         

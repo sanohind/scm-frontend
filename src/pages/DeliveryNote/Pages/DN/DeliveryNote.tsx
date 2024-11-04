@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../../Table2/SearchBar';
-import Pagination from '../../Table2/Pagination';
-import { API_DN_Supplier } from '../../../api/api';
+import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
+import SearchBar from '../../../Table2/SearchBar';
+import Pagination from '../../../Table2/Pagination';
+import { API_DN_Supplier } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import SearchMonth from '../../Table2/SearchMonth';
+import SearchMonth from '../../../Table2/SearchMonth';
+import { useNavigate } from 'react-router-dom';
+
 
 const DeliveryNote = () => {
   const [data, setData] = useState([]);
@@ -15,6 +17,8 @@ const DeliveryNote = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+  
+  const navigate = useNavigate();
 
   const fetchDeliveryNotes = async () => {
     const token = localStorage.getItem('access_token');
@@ -103,6 +107,16 @@ const DeliveryNote = () => {
     setSortConfig({ key, direction });
   };
 
+  // Navigate to PO Detail page with noPO parameter
+  const handlePONavigate = (noPO) => {
+    navigate(`/purchase-order-detail?noPO=${noPO}`);
+  };
+
+  // Navigate to PO Detail page with noPO parameter
+  const handleDNNavigate = (noDN) => {
+    navigate(`/delivery-note-detail-edit?noDN=${noDN}`);
+  };
+
   return (
     <>
       <Breadcrumb pageName="Delivery Note" />
@@ -168,14 +182,20 @@ const DeliveryNote = () => {
                 paginatedData.map((row, index) => (
                   <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
                     <td className="px-2 py-4 text-center">
-                      <a href={`/delivery-note-detail-edit?noDN=${row.noDN}`} className="text-blue-600 underline">
+                      <button
+                        onClick={() => handleDNNavigate(row.noDN)}
+                        className="text-blue-600 underline"
+                      >
                         {row.noDN}
-                      </a>
+                      </button>
                     </td>
                     <td className="px-2 py-4 text-center">
-                      <a href={`/purchase-order-detail?noPO=${row.noPO}`} className="text-blue-600 underline">
+                      <button
+                        onClick={() => handlePONavigate(row.noPO)}
+                        className="text-blue-600 underline"
+                      >
                         {row.noPO}
-                      </a>
+                      </button>
                     </td>
                     <td className="px-2 py-4 text-center">{row.createdDate}</td>
                     <td className="px-2 py-4 text-center">{row.planDNDate}</td>
