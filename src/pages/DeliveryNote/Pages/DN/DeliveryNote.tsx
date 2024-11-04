@@ -10,11 +10,20 @@ import { useNavigate } from 'react-router-dom';
 
 
 const DeliveryNote = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  interface DeliveryNote {
+    noDN: string;
+    noPO: string;
+    createdDate: string;
+    planDNDate: string;
+    statusDN: string;
+    progress: string;
+  }
+
+  const [data, setData] = useState<DeliveryNote[]>([]);
+  const [filteredData, setFilteredData] = useState<DeliveryNote[]>([]);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   
@@ -37,7 +46,7 @@ const DeliveryNote = () => {
       const result = await response.json();
 
 
-      const deliveryNotes = result.data.map((dn) => ({
+      const deliveryNotes = result.data.map((dn: any) => ({
         noDN: dn.no_dn || '-',
         noPO: dn.po_no || '-',
         createdDate: dn.dn_created_date || '-',
@@ -77,8 +86,8 @@ const DeliveryNote = () => {
     // Apply sorting
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
+        let aValue = a[sortConfig.key as keyof DeliveryNote];
+        let bValue = b[sortConfig.key as keyof DeliveryNote];
 
         if (typeof aValue === 'string') aValue = aValue.toLowerCase();
         if (typeof bValue === 'string') bValue = bValue.toLowerCase();
@@ -97,9 +106,9 @@ const DeliveryNote = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleSort = (key) => {
+  const handleSort = (key: keyof DeliveryNote) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -108,12 +117,12 @@ const DeliveryNote = () => {
   };
 
   // Navigate to PO Detail page with noPO parameter
-  const handlePONavigate = (noPO) => {
+  const handlePONavigate = (noPO: string) => {
     navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
   // Navigate to PO Detail page with noPO parameter
-  const handleDNNavigate = (noDN) => {
+  const handleDNNavigate = (noDN: string) => {
     navigate(`/delivery-note-detail-edit?noDN=${noDN}`);
   };
 
@@ -121,7 +130,7 @@ const DeliveryNote = () => {
     <>
       <Breadcrumb pageName="Delivery Note" />
       <div className="font-poppins bg-white text-black p-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-4">
           <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           <SearchBar
             placeholder="Search no purchase order..."
@@ -129,7 +138,7 @@ const DeliveryNote = () => {
           />
         </div>
 
-        <div className="mt-6 relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
+        <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300">
           <table className="w-full text-sm text-left text-gray-700">
             <thead className="text-base text-gray-700">
               <tr>
@@ -205,7 +214,7 @@ const DeliveryNote = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-4">
+                  <td colSpan={6} className="text-center py-4">
                     No Delivery Note available for now
                   </td>
                 </tr>

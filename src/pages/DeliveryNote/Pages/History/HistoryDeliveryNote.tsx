@@ -8,12 +8,21 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import { API_DN_History_Supplier } from '../../../../api/api';
 import SearchMonth from '../../../Table2/SearchMonth';
 
+interface DeliveryNote {
+  noDN: string;
+  noPO: string;
+  statusDN: string;
+  planDNDate: string;
+  receivedDNDate: string;
+  noPackingSlip: string;
+}
+
 const HistoryDeliveryNote = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [data, setData] = useState<DeliveryNote[]>([]);
+  const [filteredData, setFilteredData] = useState<DeliveryNote[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const navigate = useNavigate();
@@ -37,7 +46,7 @@ const HistoryDeliveryNote = () => {
       const result = await response.json();
 
       if (result.data) {
-        const deliveryNotes = result.data.map((dn) => ({
+        const deliveryNotes = result.data.map((dn: any) => ({
           noDN: dn.dn_number || '-',
           noPO: dn.po_number || '-',
           statusDN: dn.dn_status || '-',
@@ -80,8 +89,8 @@ const HistoryDeliveryNote = () => {
     // Apply sorting
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
+        let aValue = a[sortConfig.key as keyof DeliveryNote];
+        let bValue = b[sortConfig.key as keyof DeliveryNote];
 
         if (typeof aValue === 'string') aValue = aValue.toLowerCase();
         if (typeof bValue === 'string') bValue = bValue.toLowerCase();
@@ -100,9 +109,9 @@ const HistoryDeliveryNote = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleSort = (key) => {
+  const handleSort = (key: keyof DeliveryNote) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -110,10 +119,10 @@ const HistoryDeliveryNote = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleDNNavigate = (noDN) => {
+  const handleDNNavigate = (noDN: string) => {
     navigate(`/delivery-note-detail?noDN=${noDN}`);
   };
-  const handlePONavigate = (noPO) => {
+  const handlePONavigate = (noPO: string) => {
     navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
@@ -211,7 +220,7 @@ const HistoryDeliveryNote = () => {
             </thead>
             <tbody>
               {paginatedData.length > 0 ? (
-                paginatedData.map((row, index) => (
+                paginatedData.map((row) => (
                   <tr>
                     <td className="px-2 py-4 text-center">
                       <button
@@ -237,7 +246,7 @@ const HistoryDeliveryNote = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-4">
+                  <td colSpan={6} className="text-center py-4">
                     No history delivery notes available for now
                   </td>
                 </tr>

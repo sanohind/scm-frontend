@@ -8,12 +8,25 @@ import { API_DN_Detail } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
 
 const DeliveryNoteDetail = () => {
-  const [details, setDetails] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  interface Detail {
+    no: number;
+    partNumber: string;
+    partName: string;
+    QTY: string;
+    qtyLabel: string;
+    qtyDelivered: string;
+    qtyReceived: string;
+    qtyConfirm: string;
+    uom: string;
+    [key: string]: string | number;
+  }
+  
+  const [details, setDetails] = useState<Detail[]>([]);
+  const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+  const [sortConfig] = useState({ key: '', direction: 'asc' });
   const location = useLocation();
   const navigate = useNavigate();
   const noDN = new URLSearchParams(location.search).get('noDN');
@@ -46,7 +59,7 @@ const DeliveryNoteDetail = () => {
             planDelivery: dn.plan_delivery_date || '-',
         });
         
-          const details = dn.detail.map((detail, index) => ({
+          const details = dn.detail.map((detail: any) => ({
             no: detail.dn_line,
             partNumber: detail.part_no || '-',
             partName: detail.item_desc_a || '-',
@@ -119,7 +132,7 @@ const DeliveryNoteDetail = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
 
   return (
@@ -199,7 +212,7 @@ const DeliveryNoteDetail = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="9" className="text-center py-4">
+                    <td colSpan={9} className="text-center py-4">
                       No details available for this delivery note
                     </td>
                   </tr>
