@@ -10,7 +10,7 @@ import Transaction from "./pages/Subcon/Pages/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
 import NotFound from "./pages/404";
-import Unauthorized from "./pages/Authentication/Unauthorized";
+import Unauthorized from "./pages/Authentication/Pages/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import StockItems from "./pages/Subcon/Pages/StockItem";
 import AddTransaction from "./pages/Subcon/Pages/AddTransaction";
@@ -54,7 +54,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/manage-user"
+              path="/list-user"
               element={
                 <ProtectedRoute allowedRoles={['4']}>
                   <PageTitle title="Manage User | PT SANOH INDONESIA" />

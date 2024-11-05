@@ -56,7 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(true);
     setUserRole(role);
     localStorage.setItem('access_token', token);
-    localStorage.setItem('userRole', role);
+    if (role) {
+      localStorage.setItem('userRole', role);
+    }
     const expirationTime = new Date().getTime() + 3540 * 1000;
     localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit
   };

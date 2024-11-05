@@ -167,7 +167,7 @@ const PurchaseOrder = () => {
   return (
     <>
       <Breadcrumb pageName="Purchase Order" />
-      <div className="font-poppins bg-white">
+      <div className="bg-white">
         <div className="flex flex-col p-6">
           <div className="flex justify-between items-center">
             <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
