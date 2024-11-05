@@ -224,7 +224,7 @@ const AddUser = () => {
               <label className="mb-2.5 block text-black dark:text-white">
                 Password
               </label>
-              <div className="flex flex-col md:flex-row gap-3">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                 <div className="relative w-full md:w-[300px]">
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -264,7 +264,7 @@ const AddUser = () => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className="w-full md:w-[200px] justify-center rounded bg-primary p-3 font-medium text-white hover:bg-opacity-90"
+              className="w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
             >
               Create User
             </button>

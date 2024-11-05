@@ -25,7 +25,7 @@ export const API_List_Partner_Admin = () => API + getRolePath() + `/partner/inde
 
 export const API_Create_User = () => API + getRolePath() + '/create';
 export const API_Edit_User = () => API + getRolePath() + '/edit/';
-export const API_Update_USer = () => API + getRolePath() + '/update/';
+export const API_Update_User = () => API + getRolePath() + '/update/';
 export const API_List_User = () => API + getRolePath() + '/index';
 export const API_Update_Status = () => API + getRolePath() + `/update/status/`;
 
