@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import { API_List_User, API_Update_Status } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +6,7 @@ import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
 import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
+import { toast, ToastContainer } from 'react-toastify';
 
 interface User {
     UserID: string;
@@ -81,7 +81,7 @@ const ManageUser: React.FC = () => {
             setRoleOptions(uniqueRoles);
         } catch (error) {
             console.error('Error fetching data:', error);
-            Swal.fire('Error', `Fetch error: ${error}`, 'error');
+            toast.error(`Fetch error: ${error}`);
             setLoading(false);
         }
     };
@@ -90,24 +90,41 @@ const ManageUser: React.FC = () => {
         const token = localStorage.getItem('access_token');
 
         try {
-            const response = await fetch(`${API_Update_Status()}${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: status.toString() }),
-            });
+            const response = await toast.promise(
+                fetch(`${API_Update_Status()}${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: status.toString() }),
+                }),
+                {
+                    pending: {
+                        render: `Updating status for "${username}"...`,
+                        autoClose: 3000
+                    },
+                    success: {
+                        render: `Status for "${username}" Successfully Updated to ${status === 1 ? 'Active' : 'Deactive'}`,
+                        autoClose: 3000
+                    },
+                    error: {
+                        render({data}) {
+                            return `Failed to update status for "${username}": ${data}`;
+                        },
+                        autoClose: 3000
+                    }
+                }
+            );
 
             if (!response.ok) {
-                throw new Error(`Failed to update status for "${username}": ${response.status} ${response.statusText}`);
+                throw new Error(`${response.status} ${response.statusText}`);
             }
 
             await response.json();
-            await fetchListUser(); // Fetch list user data after successful update
-            // Swal.fire('Success', `Status for "${username}" successfully updated`, 'success');
+            await fetchListUser();
         } catch (error) {
-            // Swal.fire('Error', `Failed to update status for "${username}": ${error}`, 'error');
+            throw error;
         }
     };
 
@@ -212,9 +229,9 @@ const ManageUser: React.FC = () => {
     const handleEditPage = (UserId: string) => {
         navigate(`/edit-user?userId=${UserId}`);
       };
-
     return (
         <>
+            <ToastContainer position="top-right" />
             <Breadcrumb pageName="Manage User" />
             <div className="bg-white">
                 <div className="flex flex-col p-6">

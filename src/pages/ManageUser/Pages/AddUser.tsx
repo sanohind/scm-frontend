@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Select from "react-select";
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import Swal from 'sweetalert2';
 import { API_Create_User, API_List_Partner } from '../../../api/api';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const AddUser = () => {
   const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ const AddUser = () => {
       if (!response.ok) throw new Error('Failed to fetch suppliers');
       
       const result = await response.json();
-      const suppliersList = result.data.map(supplier => ({
+      const suppliersList = result.data.map((supplier: { bp_code: string; bp_name: string }) => ({
         value: supplier.bp_code,
         label: `${supplier.bp_code} | ${supplier.bp_name}`,
       }));
@@ -42,14 +43,15 @@ const AddUser = () => {
       setSuppliers(suppliersList);
     } catch (error) {
       console.error('Error fetching suppliers:', error);
+      toast.error(`Error fetching suppliers: ${error}`);
     }
   };
 
-  const handleSupplierChange = (selectedOption) => {
+  const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedSupplier(selectedOption);
   };
 
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
     setEmailError(!value.includes('@'));
@@ -76,7 +78,7 @@ const AddUser = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupplier || emailError) {
       Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
@@ -107,14 +109,14 @@ const AddUser = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        Swal.fire('Success', 'User successfully created!', 'success');
+        toast.success('User successfully created!');
         resetForm();
       } else {
-        Swal.fire('Error', `Failed to create user: ${result.message}`, 'error');
+        toast.error(`Failed to create user: ${result.message}`);
       }
     } catch (error) {
       console.error('Error during user creation:', error);
-      Swal.fire('Error', 'An error occurred while creating the user.', 'error');
+      toast.error('An error occurred while creating the user.');
     }
   };
 
@@ -129,6 +131,7 @@ const AddUser = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Add User" />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">

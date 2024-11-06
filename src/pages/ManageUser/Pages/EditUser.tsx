@@ -3,12 +3,14 @@ import { API_Edit_User, API_List_Partner, API_Update_User } from "../../../api/a
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import Select from "react-select";
 import Swal from "sweetalert2";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from 'react-toastify';
+
 
 const EditUser = () => {
-  const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [suppliers, setSuppliers] = useState<{ value: string; label: string }[]>([]);
+  const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -16,7 +18,7 @@ const EditUser = () => {
   const [role, setRole] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get('userId');
@@ -45,7 +47,7 @@ const EditUser = () => {
       if (!response.ok) throw new Error('Failed to fetch suppliers');
       
       const result = await response.json();
-      const suppliersList = result.data.map(supplier => ({
+      const suppliersList = result.data.map((supplier: { bp_code: string; bp_name: string }) => ({
         value: supplier.bp_code,
         label: `${supplier.bp_code} | ${supplier.bp_name}`,
       }));
@@ -53,10 +55,11 @@ const EditUser = () => {
       setSuppliers(suppliersList);
     } catch (error) {
       console.error('Error fetching suppliers:', error);
+      toast.error(`Error fetching suppliers: ${error}`);
     }
   };
 
-  const fetchUserData = async (userId) => {
+  const fetchUserData = async (userId: string) => {
     const token = localStorage.getItem("access_token");
     try {
       const response = await fetch(`${API_Edit_User()}${userId}`, {
@@ -74,10 +77,11 @@ const EditUser = () => {
       populateForm(userData);
     } catch (error) {
       console.error("Error fetching user data:", error);
+      toast.error(`Error fetching user data: ${error}`);
     }
   };
 
-  const populateForm = (data) => {
+  const populateForm = (data: { bp_code: string; name: string; role: string; username: string; email: string }) => {
     if (!data) {
       console.error("Cannot populate form: data is undefined");
       return;
@@ -90,7 +94,7 @@ const EditUser = () => {
     setEmail(data.email || "");
   };
 
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
     setEmailError(!value.includes('@'));
@@ -117,7 +121,7 @@ const EditUser = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupplier || emailError) {
       Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
@@ -146,19 +150,23 @@ const EditUser = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        Swal.fire('Success', 'User successfully created!', 'success');
+        toast.success('User successfully updated!');
+        setTimeout(() => {
+          navigate('/list-user');
+        }, 2000);
       } else {
-        Swal.fire('Error', `Failed to create user: ${result.message}`, 'error');
+        toast.error(`Failed to update user: ${result.message}`);
       }
     } catch (error) {
-      console.error('Error during user creation:', error);
-      Swal.fire('Error', 'An error occurred while creating the user.', 'error');
+      console.error('Error during user update:', error);
+      toast.error('An error occurred while updating the user.');
     }
   };
 
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Edit User" />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
