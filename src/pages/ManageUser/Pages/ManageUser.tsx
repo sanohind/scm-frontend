@@ -15,6 +15,7 @@ interface User {
     Name: string;
     Role: string;
     Status: string;
+    isLoading?: boolean;
 }
 
 const ManageUser: React.FC = () => {
@@ -22,6 +23,7 @@ const ManageUser: React.FC = () => {
     const [filteredData, setFilteredData] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(6);
+    const [loading, setLoading] = useState(true);  // Loading state for skeleton loading
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -35,6 +37,7 @@ const ManageUser: React.FC = () => {
 
     const fetchListUser = async () => {
         const token = localStorage.getItem('access_token');
+        setLoading(true);
 
         try {
             const response = await fetch(API_List_User(), {
@@ -60,6 +63,7 @@ const ManageUser: React.FC = () => {
 
             setData(users);
             setFilteredData(users);
+            setLoading(false);
             
             // Extract unique roles for MultiSelect options
             const uniqueRoles = Array.from(new Set(result.data.map((user: any) => user.role)))
@@ -72,6 +76,7 @@ const ManageUser: React.FC = () => {
         } catch (error) {
             console.error('Error fetching data:', error);
             Swal.fire('Error', `Fetch error: ${error}`, 'error');
+            setLoading(false);
         }
     };
 
@@ -152,10 +157,6 @@ const ManageUser: React.FC = () => {
         setSortConfig({ key, direction });
     };
 
-    const updateStatus = () => {
-
-    };
-
     const getRoleName = (role: string) => {
         switch (role) {
             case '4':
@@ -172,6 +173,33 @@ const ManageUser: React.FC = () => {
                 return 'Unknown Role';
         }
     };
+
+    const SkeletonRow = () => (
+        <tr className="odd:bg-white even:bg-gray-50 border-b">
+            <td className="px-2 py-4 text-center">
+                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-16 h-4 mx-auto skeleton rounded"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-8 h-8 mx-auto skeleton rounded-full"></div>
+            </td>
+            <td className="px-2 py-4 text-center">
+                <div className="w-8 h-8 mx-auto skeleton rounded-full"></div>
+            </td>
+        </tr>
+    );
+      
 
     const handleEditPage = (UserId) => {
         navigate(`/edit-user?userId=${UserId}`);
@@ -253,57 +281,62 @@ const ManageUser: React.FC = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {paginatedData.length > 0 ? (
-                            paginatedData.map((row, index) => (
-                                <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                                    <td className="px-2 py-4 text-center">{row.Username}</td>
-                                    <td className="px-2 py-4 text-center">{row.SupplierCode}</td>
-                                    <td className="px-2 py-4 text-center">{row.Name}</td>
-                                    <td className="px-2 py-4 text-center">{row.Role}</td>
-                                    <td className="px-2 py-4 text-center">{row.Status}</td>
-                                    
-                                    <td className="px-2 py-4 text-center">
-                                        {row.isLoading ? (
-                                            <div className="flex justify-center">
-                                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-900"></div>
-                                            </div>
-                                        ) : (
+                            <tbody>
+                                {loading ? (
+                                        Array.from({ length: rowsPerPage }).map((_, index) => (
+                                            <SkeletonRow key={index} />
+                                        ))
+                                    ) : (
+                                paginatedData.length > 0 ? (
+                                paginatedData.map((row, index) => (
+                                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
+                                        <td className="px-2 py-4 text-center">{row.Username}</td>
+                                        <td className="px-2 py-4 text-center">{row.SupplierCode}</td>
+                                        <td className="px-2 py-4 text-center">{row.Name}</td>
+                                        <td className="px-2 py-4 text-center">{row.Role}</td>
+                                        <td className="px-2 py-4 text-center">{row.Status}</td>
+                                        
+                                        <td className="px-2 py-4 text-center">
+                                            {row.isLoading ? (
+                                                <div className="flex justify-center">
+                                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-900"></div>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={async () => {
+                                                        const updatedData = data.map(item => 
+                                                            item.UserID === row.UserID ? { ...item, isLoading: true } : item
+                                                        );
+                                                        setData(updatedData);
+                                                        await handleStatusChange(row.UserID, row.Status === 'Active' ? 0 : 1, row.Username);
+                                                    }}
+                                                    className="hover:opacity-80 transition-opacity"
+                                                >
+                                                    {row.Status === 'Active' ? 
+                                                        <FaToggleOn className="text-3xl text-blue-900" /> : 
+                                                        <FaToggleOff className="text-3xl text-gray-400" />
+                                                    }
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td className="px-2 py-4 text-center">
                                             <button
-                                                onClick={async () => {
-                                                    const updatedData = data.map(item => 
-                                                        item.UserID === row.UserID ? { ...item, isLoading: true } : item
-                                                    );
-                                                    setData(updatedData);
-                                                    await handleStatusChange(row.UserID, row.Status === 'Active' ? 0 : 1, row.Username);
-                                                }}
+                                                onClick={() => handleEditPage(row.UserID)}
                                                 className="hover:opacity-80 transition-opacity"
                                             >
-                                                {row.Status === 'Active' ? 
-                                                    <FaToggleOn className="text-3xl text-blue-900" /> : 
-                                                    <FaToggleOff className="text-3xl text-gray-400" />
-                                                }
+                                                <FaUserEdit className="text-2xl text-blue-900" />
                                             </button>
-                                        )}
-                                    </td>
-                                    <td className="px-2 py-4 text-center">
-                                        <button
-                                            onClick={() => handleEditPage(row.UserID)}
-                                            className="hover:opacity-80 transition-opacity"
-                                        >
-                                            <FaUserEdit className="text-2xl text-blue-900" />
-                                        </button>
+                                        </td>
+                                    </tr>
+                                ))
+                                ) : (
+                                <tr>
+                                    <td colSpan={7} className="text-center py-4">
+                                    No List User available for now
                                     </td>
                                 </tr>
-                            ))
-                            ) : (
-                            <tr>
-                                <td colSpan="7" className="text-center py-4">
-                                No List User available for now
-                                </td>
-                            </tr>
-                            )}
-                        </tbody>
+                                ))}
+                            </tbody>
                         </table>
                     </div>
 
