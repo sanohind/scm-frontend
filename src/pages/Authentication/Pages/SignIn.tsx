@@ -49,7 +49,7 @@ const SignIn: React.FC = () => {
           localStorage.setItem("role", "subcont");          
           break;
         default:
-          toast.error('Role tidak dikenali!');
+          toast.error('Role not found!');
           break;
       }
 

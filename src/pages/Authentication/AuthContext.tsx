@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { API_Logout } from '../../api/api';
+import { toast, ToastContainer } from 'react-toastify';
 
 type Role = '1' | '2' | '3' | '4' | '5' | null;
 
@@ -40,10 +41,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.clear();
         return;
       }
+
       if (expirationTime && new Date().getTime() > parseInt(expirationTime)) {
         setUserRole(null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('token_expiration');
+        toast.error('Session expired, please login again');
         setIsAuthenticated(false);
       } 
     };
@@ -53,14 +56,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (role: Role, token: string) => {
+    toast.success('Welcome back!');
     setIsAuthenticated(true);
     setUserRole(role);
     localStorage.setItem('access_token', token);
     if (role) {
       localStorage.setItem('userRole', role);
     }
-    const expirationTime = new Date().getTime() + 3540 * 1000;
-    localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit
+    const expirationTime = new Date().getTime() + 3599 * 1000;
+    localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit 59 Detik
   };
 
   const logout = async () => {    
@@ -80,24 +84,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUserRole(null);
         localStorage.clear();
         setIsAuthenticated(false);
+        toast.success('Logout success');
       } catch (error : any) {
         setUserRole(null);
         localStorage.clear();
         setIsAuthenticated(false);
+        toast.error('Logout failed: ' + (error.response ? error.response.data : error.message));
         console.error('Error:', error.response ? error.response.data : error.message);
       }
     } else {
       setUserRole(null);
       localStorage.clear();
       setIsAuthenticated(false);
+      toast.error('Error: Token not found');
       console.error('Error: Token not found');
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
+    <>
+      <ToastContainer position="top-right" />
+      <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout, isLoading }}>
+        {children}
+      </AuthContext.Provider>
+    </>
   );
 };
 
