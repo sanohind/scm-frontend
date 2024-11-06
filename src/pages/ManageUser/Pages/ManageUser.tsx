@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { API_List_User, API_Update_Status } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
-import { FaEdit, FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit } from 'react-icons/fa';
+import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
 
 interface User {
@@ -15,15 +15,21 @@ interface User {
     Name: string;
     Role: string;
     Status: string;
+    RoleCode: string;
     isLoading?: boolean;
+}
+
+interface Option {
+    value: string;
+    text: string;
 }
 
 const ManageUser: React.FC = () => {
     const [data, setData] = useState<User[]>([]);
     const [filteredData, setFilteredData] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(6);
-    const [loading, setLoading] = useState(true);  // Loading state for skeleton loading
+    const [rowsPerPage] = useState(6);
+    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -68,8 +74,8 @@ const ManageUser: React.FC = () => {
             // Extract unique roles for MultiSelect options
             const uniqueRoles = Array.from(new Set(result.data.map((user: any) => user.role)))
             .map((role) => ({
-                value: role,
-                text: getRoleName(role),
+                value: role as string,
+                text: getRoleName(role as string),
             }));
             
             setRoleOptions(uniqueRoles);
@@ -124,18 +130,20 @@ const ManageUser: React.FC = () => {
         // Apply sorting
         if (sortConfig.key) {
             filtered.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
-        
-                // Convert to Date if sorting by date column
-                if (sortConfig.key === 'Status' || sortConfig.key === 'Role') {
-                    aValue = new Date(aValue);
-                    bValue = new Date(bValue);
+                const aValue = a[sortConfig.key as keyof User];
+                const bValue = b[sortConfig.key as keyof User];
+                
+                if (!aValue || !bValue) return 0;
+                
+                if (sortConfig.key === 'Status') {
+                    return sortConfig.direction === 'asc'
+                        ? aValue.toString().localeCompare(bValue.toString())
+                        : bValue.toString().localeCompare(aValue.toString());
                 }
-        
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
+                
+                return sortConfig.direction === 'asc'
+                    ? aValue.toString().localeCompare(bValue.toString())
+                    : bValue.toString().localeCompare(aValue.toString());
             });
         }
     
@@ -147,9 +155,9 @@ const ManageUser: React.FC = () => {
         currentPage * rowsPerPage
     );
 
-    const handlePageChange = (page) => setCurrentPage(page);
+    const handlePageChange = (page: number) => setCurrentPage(page);
 
-    const handleSort = (key) => {
+    const handleSort = (key: keyof User) => {
         let direction = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
@@ -201,7 +209,7 @@ const ManageUser: React.FC = () => {
     );
       
 
-    const handleEditPage = (UserId) => {
+    const handleEditPage = (UserId: string) => {
         navigate(`/edit-user?userId=${UserId}`);
       };
 
@@ -240,25 +248,11 @@ const ManageUser: React.FC = () => {
                                     className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">Name
                                 </th>
                                 <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    onClick={() => handleSort('Role')}
-                                >
-                                    <span className="flex items-center justify-center">
-                                    {sortConfig.key === 'Role' ? (
-                                        sortConfig.direction === 'asc' ? (
-                                        <FaSortUp className="mr-1" />
-                                        ) : (
-                                        <FaSortDown className="mr-1" />
-                                        )
-                                    ) : (
-                                        <FaSortDown className="opacity-50 mr-1" />
-                                    )}
-                                    Role
-                                    </span>
+                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36">Role
                                 </th>
                                 <th
                                     className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    onClick={() => handleSort('status')}
+                                    onClick={() => handleSort('Status')}
                                 >
                                     <span className="flex items-center justify-center">
                                     {sortConfig.key === 'Status' ? (
