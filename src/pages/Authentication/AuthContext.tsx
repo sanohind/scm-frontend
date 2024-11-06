@@ -56,7 +56,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (role: Role, token: string) => {
-    toast.success('Welcome back!');
+    const name = localStorage.getItem('name');
+    toast.success('Welcome back! ' + name);
     setIsAuthenticated(true);
     setUserRole(role);
     localStorage.setItem('access_token', token);
