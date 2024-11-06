@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_Sync } from '../../../api/api';
+import { toast, ToastContainer } from 'react-toastify';
 
 const DashboardPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -32,24 +33,24 @@ const DashboardPurchasingWarehouse: React.FC = () => {
       try {
         // Construct the URL with separate month and year parameters
         const url = `${API_Sync()}?month=${month}&year=${year}`;
-  
+      
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
           },
         });
-  
+      
         const data = await response.json();
-  
+      
         if (response.ok) {
-          addNotification('Data has been synchronized successfully.', 'success');
+          toast.success('Data has been synchronized successfully.');
         } else {
-          addNotification(data.message || 'An error occurred during synchronization.', 'error');
+          toast.error(data.message || 'An error occurred during synchronization.');
         }
       } catch (error) {
-        addNotification('An error occurred during synchronization.', 'error');
+        toast.error('An error occurred during synchronization.');
       } finally {
         setIsSyncing(false);
       }
@@ -57,6 +58,7 @@ const DashboardPurchasingWarehouse: React.FC = () => {
   
     return (
       <>
+        <ToastContainer position="top-right" />
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark px-3">
           <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
             <h3 className="font-medium text-lg text-black dark:text-white">

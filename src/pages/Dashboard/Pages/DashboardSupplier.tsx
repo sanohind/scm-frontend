@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { API_Dashboard } from '../../../api/api';
 import CardDataStats from '../../../components/CardDataStats';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 const DashboardSupplier: React.FC = () => {
@@ -13,6 +14,7 @@ const DashboardSupplier: React.FC = () => {
   });
 
   useEffect(() => {
+
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('access_token');
@@ -34,16 +36,26 @@ const DashboardSupplier: React.FC = () => {
               po_active: data.po_active || 0,
               po_in_progress: data.po_in_progress || 0,
               dn_active: data.dn_active || 0,
-              dn_in_progress: data.dn_in_progress || 0,
+              dn_in_progress: data.dn_confirmed || 0,
             });
+            if (data.po_active > 0) {
+              toast.warning(`You have ${data.po_active} PO active`);
+            }
           } else {
             console.error('Failed to load dashboard data:', result.message);
+            toast.error(`Failed to load dashboard data: ${result.message}`);
           }
         } else {
           console.error('Failed to fetch data:', response.status);
+          toast.error(`Failed to fetch data: ${response.status}`);
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        if (error instanceof Error) {
+          toast.error(`Error fetching dashboard data: ${error.message}`);
+        } else {
+          toast.error('Error fetching dashboard data');
+        }
       }
     };
 
@@ -52,6 +64,7 @@ const DashboardSupplier: React.FC = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardDataStats
           title="Purchase Order Open"
