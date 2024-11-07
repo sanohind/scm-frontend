@@ -3,17 +3,9 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
 import { API_Download_Performance_Report, API_Performance_Report_Supplier } from '../../../api/api';
 import SearchMonth from '../../Table2/SearchMonth';
-
-import iconPdf from '../../../images/icon_pdf.svg';
-import iconDoc from '../../../images/icon_doc.svg';
-import iconDocx from '../../../images/icon_docx.svg';
-import iconJpg from '../../../images/icon_jpg.svg';
-import iconPng from '../../../images/icon_png.svg';
-import iconExcel from '../../../images/icon_excel.svg';
-import iconFile from '../../../images/icon_file.svg';
 import SearchBar from '../../Table2/SearchBar';
-import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import Swal from 'sweetalert2';
+import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const PerformanceReport = () => {
   type DataType = {
@@ -59,6 +51,11 @@ const PerformanceReport = () => {
         setFilteredData(result.data);
       } catch (error) {
         console.error('Error fetching data:', error);
+        if (error instanceof Error) {
+          toast.error(`Failed to fetch data: ${error.message}`);
+        } else {
+          toast.error('Failed to fetch data: An unknown error occurred.');
+        }
       }
     };
 
@@ -131,70 +128,76 @@ const PerformanceReport = () => {
     setSortConfig({ key, direction });
   };
 
-  function getFileIcon(filename: string) {
-    if (!filename) {
-      return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
-    }
-  
-    const extension = filename.split('.').pop()?.toLowerCase() || '';
-  
-    switch (extension) {
-      case 'pdf':
-        return <img src={iconPdf} alt="PDF Icon" className="w-6 h-6" />;
-      case 'doc':
-        return <img src={iconDoc} alt="DOC Icon" className="w-6 h-6" />;
-      case 'docx':
-        return <img src={iconDocx} alt="DOCX Icon" className="w-6 h-6" />;
-      case 'jpg':
-      case 'jpeg':
-        return <img src={iconJpg} alt="JPG Icon" className="w-6 h-6" />;
-      case 'png':
-        return <img src={iconPng} alt="PNG Icon" className="w-6 h-6" />;
-      case 'xls':
-      case 'xlsx':
-        return <img src={iconExcel} alt="Excel Icon" className="w-6 h-6" />;
-      default:
-        return <img src={iconFile} alt="File Icon" className="w-6 h-6" />;
-    }
-  }
 
   async function downloadFile(attachedFile: string) {
     const token = localStorage.getItem('access_token');
+    const toastId = toast.loading('Preparing download...', { progress: 0 });
+
+    const downloadPromise = async () => {
+      const xhr = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+        xhr.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            toast.update(toastId, {
+              render: `Downloading... ${progress}%`,
+              progress: progress / 100,
+            });
+          }
+        };
+
+        xhr.onload = async () => {
+          if (xhr.status === 200) {
+            const blob = xhr.response;
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = attachedFile;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            resolve('Download complete');
+          } else {
+            reject(new Error('Download failed'));
+          }
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('Network error occurred'));
+        };
+
+        xhr.open('GET', `${API_Download_Performance_Report()}${attachedFile}`, true);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.responseType = 'blob';
+        xhr.send();
+      });
+    };
 
     try {
-      const response = await fetch(`${API_Download_Performance_Report()}${attachedFile}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      await downloadPromise();
+      toast.update(toastId, {
+        render: 'Download complete!', 
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to download file.');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = attachedFile;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error while downloading file:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to download file.',
-      })
+      toast.update(toastId, {
+        render: `Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        type: 'error',
+        isLoading: false,
+        autoClose: 3000
+      });
+      toast.error('Failed to download file');
     }
   }
    
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Performance Report" />
       <div className="font-poppins bg-white ">
         <div className="flex flex-col p-6">
@@ -270,8 +273,11 @@ const PerformanceReport = () => {
                         <button
                           onClick={() => downloadFile(row.attachedFile)}
                           className="px-2 py-1 hover:scale-110"
-                        >
-                          {getFileIcon(row.attachedFile)}
+                        >                          
+                          {row.attachedFile?.endsWith('.pdf') && <FaFilePdf className="w-6 h-6 text-red-500" />}
+                          {(row.attachedFile?.endsWith('.doc') || row.attachedFile?.endsWith('.docx')) && <FaFileWord className="w-6 h-6 text-blue-500" />}
+                          {(row.attachedFile?.endsWith('.xls') || row.attachedFile?.endsWith('.xlsx')) && <FaFileExcel className="w-6 h-6 text-green-500" />}
+                          {!row.attachedFile?.endsWith('.pdf') && !row.attachedFile?.endsWith('.doc') && !row.attachedFile?.endsWith('.docx') && !row.attachedFile?.endsWith('.xls') && !row.attachedFile?.endsWith('.xlsx') && <FaFile className="w-6 h-6 text-yellow-600" />}
                         </button>
                       </td>
                       <td className="px-2 py-3 text-center">{row.upload_at}</td>
