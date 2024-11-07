@@ -12,6 +12,7 @@ import {
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
+import { toast, ToastContainer } from 'react-toastify';
 
 const CreateForecast = () => {
     interface ForecastReport {
@@ -60,6 +61,7 @@ const CreateForecast = () => {
             setSuppliers(suppliersList);
         } catch (error) {
             console.error('Error fetching suppliers:', error);
+            toast.error(`Error fetching suppliers: ${error}`);
         }
     };
 
@@ -94,14 +96,11 @@ const CreateForecast = () => {
             } else {
                 setData([]);
                 setFilteredData([]);
+                toast.info('No forecast report available');
             }
         } catch (error) {
             console.error('Error fetching forecast report:', error);
-            Swal.fire(
-                'Error',
-                'Failed to fetch forecast report. Please try again later.',
-                'error'
-            );
+            toast.error(`Error fetching forecast report: ${error}`);
             setData([]);
             setFilteredData([]);
         }
@@ -195,61 +194,128 @@ const CreateForecast = () => {
         formData.append('description', description);
         formData.append('bp_code', selectedSupplier.value);
 
-        try {
-            const response = await fetch(API_Create_Forecast_Report_Purchasing(), {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
+        const toastId = toast.loading('Preparing upload...', { progress: 0 });
+
+        const uploadPromise = async () => {
+            const xhr = new XMLHttpRequest();
+            
+            return new Promise((resolve, reject) => {
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const progress = Math.round((event.loaded / event.total) * 100);
+                        toast.update(toastId, {
+                            render: `Uploading... ${progress}%`,
+                            progress: progress / 100,
+                        });
+                    }
+                };
+
+                xhr.onload = async () => {
+                    if (xhr.status === 201) {
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.status) {
+                            toast.update(toastId, { 
+                                render: 'Upload complete!',
+                                type: 'success',
+                                isLoading: false,
+                                autoClose: 3000
+                            });
+                            Swal.fire('Success', 'File uploaded successfully', 'success');
+                            fetchForecastReport(selectedSupplier.value);
+                            resolve(result);
+                        } else {
+                            reject(new Error(result.message));
+                        }
+                    } else {
+                        reject(new Error('Upload failed'));
+                    }
+                };
+
+                xhr.onerror = () => {
+                    reject(new Error('Network error occurred'));
+                };
+
+                xhr.open('POST', API_Create_Forecast_Report_Purchasing(), true);
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.send(formData);
             });
+        };
 
-            if (!response.ok) throw new Error('Failed to upload file');
-
-            const result = await response.json();
-            if (result.status) {
-                Swal.fire('Success', 'File uploaded successfully', 'success');
-                fetchForecastReport(selectedSupplier.value);
-            } else {
-                Swal.fire('Error', result.message, 'error');
-            }
+        try {
+            await uploadPromise();
         } catch (error) {
-            console.error('Error uploading file:', error);
-            Swal.fire('Error', 'Failed to upload file. Please try again later.', 'error');
+            toast.update(toastId, {
+                render: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 3000
+            });
+            Swal.fire('Error', 'Failed to upload file', 'error');
         }
     };
 
     async function downloadFile(attachedFile: string) {
         const token = localStorage.getItem('access_token');
-    
+        const toastId = toast.loading('Preparing download...', { progress: 0 });
+
+        const downloadPromise = async () => {
+            const xhr = new XMLHttpRequest();
+            
+            return new Promise((resolve, reject) => {
+                xhr.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const progress = Math.round((event.loaded / event.total) * 100);
+                        toast.update(toastId, {
+                            render: `Downloading... ${progress}%`,
+                            progress: progress / 100,
+                        });
+                    }
+                };
+
+                xhr.onload = async () => {
+                    if (xhr.status === 200) {
+                        const blob = xhr.response;
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = attachedFile;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        resolve('Download complete');
+                    } else {
+                        reject(new Error('Download failed'));
+                    }
+                };
+
+                xhr.onerror = () => {
+                    reject(new Error('Network error occurred'));
+                };
+
+                xhr.open('GET', `${API_Download_Forecast_Report()}${attachedFile}`, true);
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.responseType = 'blob';
+                xhr.send();
+            });
+        };
+
         try {
-          const response = await fetch(`${API_Download_Forecast_Report()}${attachedFile}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-    
-          if (!response.ok) {
-            throw new Error('Failed to download file.');
-          }
-    
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = attachedFile;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
+            await downloadPromise();
+            toast.update(toastId, {
+                render: 'Download complete!',
+                type: 'success',
+                isLoading: false,
+                autoClose: 3000
+            });
         } catch (error) {
-          console.error('Error while downloading file:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to download file.',
-          })
+            toast.update(toastId, {
+                render: `Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 3000
+            });
+            Swal.fire('Error', 'Failed to download file', 'error');
         }
     }
 
@@ -268,21 +334,22 @@ const CreateForecast = () => {
 
             const result = await response.json();
             if (result.status) {
-                Swal.fire('Success', 'File deleted successfully', 'success');
+                toast.success('File deleted successfully');
                 if (selectedSupplier) {
                     fetchForecastReport(selectedSupplier.value);
                 }
             } else {
-                Swal.fire('Error', result.message, 'error');
+                toast.error(result.message);
             }
         } catch (error) {
             console.error('Error deleting file:', error);
-            Swal.fire('Error', 'Failed to delete file. Please try again later.', 'error');
+            toast.error(`Error deleting file: ${error}`);
         }
     };
 
     return (
         <>
+            <ToastContainer position='top-right' />
             <Breadcrumb pageName="Create Forecast Report" />
             <div className="font-poppins bg-white">
                 <div className="flex flex-col p-6">

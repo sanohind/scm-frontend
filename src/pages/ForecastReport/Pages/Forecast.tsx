@@ -5,6 +5,7 @@ import { API_Download_Forecast_Report, API_Forecast_Report_Supplier } from '../.
 import SearchMonth from '../../Table2/SearchMonth';
 import SearchBar from '../../Table2/SearchBar';
 import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 const Forecast = () => {
@@ -49,6 +50,7 @@ const Forecast = () => {
         setFilteredData(result.data);
       } catch (error) {
         console.error('Error fetching data:', error);
+        toast.error(`Failed to fetch data: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     };
     fetchData();
@@ -112,36 +114,72 @@ const Forecast = () => {
   // Function to handle file download
   async function downloadFile(attachedFile: string) {
     const token = localStorage.getItem('access_token');
+    const toastId = toast.loading('Preparing download...', { progress: 0 });
+
+    const downloadPromise = async () => {
+      const xhr = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        toast.update(toastId, {
+          render: `Downloading... ${progress}%`,
+          progress: progress / 100,
+        });
+        }
+      };
+
+      xhr.onload = async () => {
+        if (xhr.status === 200) {
+        const blob = xhr.response;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = attachedFile;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        resolve('Download complete');
+        } else {
+        reject(new Error('Download failed'));
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Network error occurred'));
+      };
+
+      xhr.open('GET', `${API_Download_Forecast_Report()}${attachedFile}`, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.responseType = 'blob';
+      xhr.send();
+      });
+    };
 
     try {
-      const response = await fetch(`${API_Download_Forecast_Report()}${attachedFile}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      await downloadPromise();
+      toast.update(toastId, {
+      render: 'Download complete!', 
+      type: 'success',
+      isLoading: false,
+      autoClose: 3000
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to download file.');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = attachedFile;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error while downloading file:', error);
-      alert('Failed to download file.');
+      toast.update(toastId, {
+      render: `Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      type: 'error',
+      isLoading: false,
+      autoClose: 3000
+      });
+      toast.error('Failed to download file');
     }
   }
 
   return (
     <>
+      <ToastContainer position='top-right' />
       <Breadcrumb pageName="Forecast Report" />
       <div className="font-poppins bg-white">
         <div className="flex flex-col p-6">
@@ -217,29 +255,29 @@ const Forecast = () => {
                         </button>
                       </td>
                       <td className="px-2 py-3 text-center">{row.upload_at}</td>
-                      </tr>
-                      ))
-                    ) : (
-                      <tr>
-                      <td colSpan={5} className="text-center py-4">
-                        No data available for now
-                      </td>
-                      </tr>
-                    )}
-                    </tbody>
-                  </table>
-                  </div>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4">
+                      No data available for now
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-                  <Pagination
-                  totalRows={filteredData.length}
-                  rowsPerPage={rowsPerPage}
-                  currentPage={currentPage}
-                  onPageChange={handlePageChange}
-                  />
-                </div>
-                </div>
-              </>
-              );
-            };
+          <Pagination
+          totalRows={filteredData.length}
+          rowsPerPage={rowsPerPage}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          />
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Forecast;
