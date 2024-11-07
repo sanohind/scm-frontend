@@ -224,7 +224,6 @@ const ManageUser: React.FC = () => {
             </td>
         </tr>
     );
-      
 
     const handleEditPage = (UserId: string) => {
         navigate(`/edit-user?userId=${UserId}`);

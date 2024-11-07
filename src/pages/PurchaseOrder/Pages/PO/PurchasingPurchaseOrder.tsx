@@ -7,20 +7,39 @@ import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
 import { API_List_Partner, API_PO_Purchasing } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 const PurchasingPurchaseOrder = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  interface PurchaseOrder {
+    noPO: string;
+    poDate: string;
+    planDelivery: string;
+    poRevision: string;
+    note: string;
+    status: string;
+    response: string;
+    reason: string;
+    [key: string]: string | undefined;
+  }
+  
+  const [data, setData] = useState<PurchaseOrder[]>([]);
+  const [filteredData, setFilteredData] = useState<PurchaseOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [sortConfig, setSortConfig] = useState<{ key: keyof PurchaseOrder | ''; direction: string }>({ key: '', direction: '' });
+  interface Supplier {
+    value: string;
+    label: string;
+  }
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
     try {
       const response = await fetch(API_List_Partner(), {
         method: 'GET',
@@ -33,19 +52,23 @@ const PurchasingPurchaseOrder = () => {
       if (!response.ok) throw new Error('Failed to fetch suppliers');
 
       const result = await response.json();
-      const suppliersList = result.data.map(supplier => ({
+      const suppliersList = result.data.map((supplier: { bp_code: string; bp_name: string }) => ({
         value: supplier.bp_code,
         label: `${supplier.bp_code} | ${supplier.bp_name}`,
       }));
 
       setSuppliers(suppliersList);
+      setLoading(false);
+      // toast.success('Suppliers fetched successfully');
     } catch (error) {
       console.error('Error fetching suppliers:', error);
+      toast.error(`Failed to fetch suppliers: ${error}`);
     }
   };
 
-  const fetchPurchaseOrders = async (supplierCode) => {
+  const fetchPurchaseOrders = async (supplierCode: string) => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
     try {
       const response = await fetch(`${API_PO_Purchasing()}${supplierCode}`, {
         method: 'GET',
@@ -55,18 +78,17 @@ const PurchasingPurchaseOrder = () => {
         },
       });
 
-      // if (!response.ok) throw new Error('Failed to fetch purchase orders');
-
       if (!response.ok) {
         console.error('Failed to fetch purchase orders:', response.status);
         setFilteredData([]);
         setData([]);
+        toast.error(`Failed to fetch purchase orders, ${response.status}`);
         return;
       }
 
       const result = await response.json();
       if (result.status && Array.isArray(result.data) && result.data.length > 0) {
-        const purchaseOrder = result.data.map(po => ({
+        const purchaseOrder = result.data.map((po: any) => ({
           noPO: po.po_no || 'N/A',
           poDate: po.po_date || '-',
           planDelivery: po.planned_receipt_date || '-',
@@ -79,14 +101,16 @@ const PurchasingPurchaseOrder = () => {
 
         setData(purchaseOrder);
         setFilteredData(purchaseOrder);
+        setLoading(false);
+        // toast.success('Purchase orders fetched successfully');
       } else {
         setData([]);
         setFilteredData([]);
-        Swal.fire('No PO data found', result.message, 'info');
+        toast.info(`No PO data found, ${result.message}`);
       }
     } catch (error) {
       console.error('Error fetching purchase orders:', error);
-      Swal.fire('Error', 'Failed to fetch purchase orders. Please try again later.', 'error');
+      toast.error(`Failed to fetch purchase orders: ${error}`);
       setData([]);
       setFilteredData([]);
     }
@@ -111,10 +135,12 @@ const PurchasingPurchaseOrder = () => {
         let bValue = b[sortConfig.key];
 
         if (sortConfig.key === 'poDate' || sortConfig.key === 'planDelivery') {
-          aValue = new Date(aValue);
-          bValue = new Date(bValue);
+          aValue = aValue ? new Date(aValue).toISOString() : '';
+          bValue = bValue ? new Date(bValue).toISOString() : '';
         }
 
+        if (!aValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (!bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -129,9 +155,9 @@ const PurchasingPurchaseOrder = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleSort = (key) => {
+  const handleSort = (key: keyof PurchaseOrder) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -139,7 +165,7 @@ const PurchasingPurchaseOrder = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleSupplierChange = (selectedOption) => {
+  const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedSupplier(selectedOption);
     if (selectedOption) {
       fetchPurchaseOrders(selectedOption.value);
@@ -150,22 +176,23 @@ const PurchasingPurchaseOrder = () => {
     }
   };
 
-  const handleShowReason = (reason) => {
+  const handleShowReason = (reason: string) => {
     Swal.fire({
       title: 'Reason for Decline',
       html: `<p style="border: 1px solid #ccc; padding: 10px; font-size: 12px; text-align: left;">${reason}</p>`,
       icon: 'info',
-      confirmButtonColor: '#1D4ED8',
+      confirmButtonColor: '#1E3A8A', // Changed to Tailwind's blue-900 color
       confirmButtonText: 'OK',
     });
   };
 
-  const handlePONavigate = (noPO) => {
+  const handlePONavigate = (noPO: string) => {
     navigate(`/purchase-order-detail?noPO=${noPO}`);
   };
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Purchase Order" />
       <div className="font-poppins bg-white">
         <div className="flex flex-col p-6">
@@ -256,7 +283,7 @@ const PurchasingPurchaseOrder = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">No Purchase Order available for now</td>
+                    <td colSpan={7} className="text-center py-4">No Purchase Order available for now</td>
                   </tr>
                 )}
               </tbody>

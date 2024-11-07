@@ -6,14 +6,25 @@ import Pagination from '../../Table2/Pagination';
 import { API_PO_Detail } from '../../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaPrint } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const PurchaseOrderDetail = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  interface DetailData {
+    no: number;
+    partNumber: string;
+    partName: string;
+    UoM: string;
+    QTY: number;
+    QTYReceipt: number;
+  }
+  
+  const [data, setData] = useState<DetailData[]>([]);
+  const [filteredData, setFilteredData] = useState<DetailData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+  const [loading, setLoading] = useState(true);
   const [poDetails, setPODetails] = useState({
     noPO: '',
     planDelivery: '',
@@ -27,6 +38,7 @@ const PurchaseOrderDetail = () => {
 
   const fetchPurchaseOrderDetails = async () => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
 
     try {
       const response = await fetch(`${API_PO_Detail()}${noPO}`, {
@@ -49,7 +61,7 @@ const PurchaseOrderDetail = () => {
         });
 
         // Set details data
-        const detailsData = result.data.detail.map((detail, index) => ({
+        const detailsData = result.data.detail.map((detail: any, index: number) => ({
           no: index + 1,
           partNumber: detail.bp_part_no || '-',
           partName: detail.item_desc_a || '-',
@@ -60,12 +72,15 @@ const PurchaseOrderDetail = () => {
 
         setData(detailsData);
         setFilteredData(detailsData);
+        setLoading(false);
+        // toast.success('Purchase Order details fetched successfully');
       } else {
         Swal.fire('Error', 'No Purchase Order details found.', 'error');
+        toast.error(`No Purchase Order details found: ${result.message}`);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      Swal.fire('Error', 'Failed to fetch Purchase Order details.', 'error');
+      toast.error(`Failed to fetch data: ${error}`);
     }
   };
 
@@ -80,7 +95,7 @@ const PurchaseOrderDetail = () => {
 
     // Apply search filter
     if (searchQuery) {
-      filtered = filtered.filter((row) =>
+      filtered = filtered.filter((row: any) =>
         row.partNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         row.partName.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -89,11 +104,13 @@ const PurchaseOrderDetail = () => {
     // Apply sorting
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
+        let aValue: string | number = a[sortConfig.key as keyof DetailData];
+        let bValue: string | number = b[sortConfig.key as keyof DetailData];
 
-        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
-        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          aValue = (aValue as string).toLowerCase();
+          bValue = (bValue as string).toLowerCase();
+        }
 
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -109,9 +126,9 @@ const PurchaseOrderDetail = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page) => setCurrentPage(page);
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleSort = (key) => {
+  const handleSort = (key: keyof DetailData) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -119,38 +136,77 @@ const PurchaseOrderDetail = () => {
     setSortConfig({ key, direction });
   };
 
+  const SkeletonRow = () => (
+    <tr className="animate-pulse">
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-12 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-24 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-12 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
+      </td>
+      <td className="px-2 py-4 text-center">
+        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
+      </td>
+    </tr>
+  );
+
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Purchase Order Detail" />
-      <div className="font-poppins bg-white text-black">
+      <div className="bg-white text-black">
         <div className="flex flex-col p-6 gap-4">
           <div className="flex items-center">
             <span className="mr-2">No. PO:</span>
-            <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.noPO}</span>
+            {loading ? (
+              <div className="h-6 skeleton rounded w-24"></div>
+            ) : (
+              <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.noPO}</span>
+            )}
           </div>
           
           <div className="flex justify-between">
-            
             <div className="flex gap-4">
               <div className="flex items-center">
                 <span className="mr-2">Plan Delivery Date:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.planDelivery}</span>
+                {loading ? (
+                  <div className="h-6 skeleton rounded w-32"></div>
+                ) : (
+                  <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.planDelivery}</span>
+                )}
               </div>
               <div className="flex items-center">
                 <span className="mr-2">Note:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.note}</span>
+                {loading ? (
+                  <div className="h-6 skeleton rounded w-48"></div>
+                ) : (
+                  <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.note}</span>
+                )}
               </div>
             </div>
             <div className="flex items-center">
               <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded"
+                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
                 onClick={() => window.print()}
-              >
+                    >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
                 <span>Print PO</span>
               </button>
             </div>
           </div>
+        
 
           <div className="flex justify-end">
             <SearchBar
@@ -165,7 +221,20 @@ const PurchaseOrderDetail = () => {
               <thead className="text-base text-gray-700">
                 <tr>
                   <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-20">No
+                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-20"
+                    onClick={() => handleSort('no')}>
+                    <span className="flex items-center justify-center">
+                      {sortConfig.key === 'no' ? (
+                        sortConfig.direction === 'asc' ? (
+                          <FaSortUp className="mr-1" />
+                        ) : (
+                          <FaSortDown className="mr-1" />
+                        )
+                      ) : (
+                        <FaSortDown className="opacity-50 mr-1" />
+                      )}
+                      No
+                    </span>
                   </th>
                   <th className="py-3 text-center border-b border-b-gray-400 w-60">Part Number</th>
                   <th className="py-3 text-center border-b border-b-gray-400 w-80">Part Name</th>
@@ -192,7 +261,12 @@ const PurchaseOrderDetail = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.length > 0 ? (
+                {loading ? (
+                  Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <SkeletonRow key={index} />
+                  ))
+                ) : (
+                paginatedData.length > 0 ? (
                   paginatedData.map((row, index) => (
                     <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
                       <td className="px-2 py-4 text-center">{row.no}</td>
@@ -206,11 +280,11 @@ const PurchaseOrderDetail = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4">
+                    <td colSpan={7} className="text-center py-4">
                       No data available
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
