@@ -300,7 +300,7 @@ const PurchaseOrder = () => {
                       <td className="px-2 py-4 text-center">{row.note}</td>
                       <td className="px-2 py-4 text-center">{row.status}</td>
                       <td className={`text-center ${
-                          row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-500' : ''
+                          row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-600' : ''
                         }`}>
                         {row.response === 'Accepted' ? (
                           <span className="text-black">{row.response}</span>
@@ -322,13 +322,13 @@ const PurchaseOrder = () => {
                         ) : (
                           <div className="flex gap-2 justify-center">
                             <button
-                              className="px-3 py-2 bg-green-400 text-black rounded"
+                              className="px-4 py-2 bg-green-500 text-black rounded"
                               onClick={() => handleResponse(row.noPO, 'Accepted')}
                             >
                               Accept
                             </button>
                             <button
-                              className="px-3 py-2 bg-red-500 text-white rounded"
+                              className="px-4 py-2 bg-red-600 text-white rounded"
                               onClick={() => handleResponse(row.noPO, 'Declined')}
                             >
                               Decline

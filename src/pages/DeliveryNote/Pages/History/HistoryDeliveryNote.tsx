@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
-import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import { API_DN_History_Supplier } from '../../../../api/api';
 import SearchMonth from '../../../Table2/SearchMonth';
+import { toast, ToastContainer } from 'react-toastify';
 
 interface DeliveryNote {
   noDN: string;
@@ -58,11 +58,15 @@ const HistoryDeliveryNote = () => {
         setData(deliveryNotes);
         setFilteredData(deliveryNotes);
       } else {
-        Swal.fire('Error', 'No history delivery notes found.', 'error');
+        toast.error('No history delivery notes found');
       }
     } catch (error) {
       console.error('Error fetching history delivery notes:', error);
-      Swal.fire('Error', 'Failed to fetch history delivery notes.', 'error');
+      if (error instanceof Error) {
+        toast.error(`Error fetching history delivery notes: ${error.message}`);
+      } else {
+        toast.error('Error fetching history delivery notes');
+      }
     }
   };
 
@@ -128,6 +132,7 @@ const HistoryDeliveryNote = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="History Delivery Note" />
       <div className="font-poppins bg-white text-black p-6 sm:w-150 md:w-180 xl:w-230">
         <div className="flex justify-between mb-4">
@@ -220,8 +225,8 @@ const HistoryDeliveryNote = () => {
             </thead>
             <tbody>
               {paginatedData.length > 0 ? (
-                paginatedData.map((row) => (
-                  <tr>
+                paginatedData.map((row, index) => (
+                  <tr key={index}>
                     <td className="px-2 py-4 text-center">
                       <button
                         onClick={() => handleDNNavigate(row.noDN)}

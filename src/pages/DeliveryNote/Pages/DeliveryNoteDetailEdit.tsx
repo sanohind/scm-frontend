@@ -4,6 +4,7 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
 import { API_DN_Detail, API_Update_DN_Supplier } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const DeliveryNoteDetailEdit = () => {
   interface Detail {
@@ -81,7 +82,7 @@ const DeliveryNoteDetailEdit = () => {
           qtyRequested: detail.dn_qty || '-',
           qtyConfirm: detail.qty_confirm ?? detail.dn_qty,
           qtyDelivered: detail.receipt_qty || '-',
-          qtyMinus: (detail.dn_qty || '-') - (detail.receipt_qty || '-'),
+          qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
         }));
 
         
@@ -90,11 +91,15 @@ const DeliveryNoteDetailEdit = () => {
         setFilteredData(details);
 
       } else {
-        Swal.fire('Error', 'No Delivery Notes found.', 'error');
+        toast.error('No Delivery Notes found.');
       }
     } catch (error) {
       console.error('Error fetching delivery notes:', error);
-      Swal.fire('Error', 'Failed to fetch delivery notes.', 'error');
+      if (error instanceof Error) {
+        toast.error(`Error fetching delivery notes: ${error.message}`);
+      } else {
+        toast.error('Error fetching delivery notes');
+      }
     }
   };
 
@@ -143,12 +148,18 @@ const DeliveryNoteDetailEdit = () => {
 
       if (!response.ok) throw new Error('Failed to update DN details');
 
+      toast.success('Data submitted successfully!');
       Swal.fire('Success', 'Data submitted successfully!', 'success');
       setConfirmMode(false);
       setIsCheckboxChecked(false);
       fetchDeliveryNotes();
     } catch (error) {
       console.error('Failed to update DN details:', error);
+      if (error instanceof Error) {
+        toast.error(`Failed to update DN details: ${error.message}`);
+      } else {
+        toast.error('Failed to update DN details');
+      }
       Swal.fire('Error', 'Failed to update DN details.', 'error');
     }
   };
@@ -157,6 +168,7 @@ const DeliveryNoteDetailEdit = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note Detail" />
       <div className="font-poppins bg-white text-black">
         <div className="flex flex-col p-6 gap-4">
@@ -179,14 +191,14 @@ const DeliveryNoteDetailEdit = () => {
             </div>
             <div className="flex gap-2 items-center">
               <button
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded"
                 onClick={() => window.print()}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
                 <span>Print Label</span>
               </button>
               <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded"
+                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
                 onClick={() => window.print()}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
@@ -199,7 +211,7 @@ const DeliveryNoteDetailEdit = () => {
             <table className="w-full text-sm text-left text-gray-700">
               <thead className="text-base text-gray-700">
                 <tr>
-                  <th className="px-2 py-3 text-center">No</th>
+                  <th className="px-3 py-3 text-center">No</th>
                   <th className="px-2 py-3 text-center">Part Number</th>
                   <th className="px-2 py-3 text-center">Part Name</th>
                   <th className="px-2 py-3 text-center">UoM</th>
@@ -225,7 +237,7 @@ const DeliveryNoteDetailEdit = () => {
                       {confirmMode ? (
                         <input
                           type="number"
-                          className="border border-gray-300 rounded px-2 py-1 text-center"
+                          className="border border-gray-300 rounded text-center"
                           value={detail.qtyConfirm}
                           onChange={(e) => handleQtyChange(index, e.target.value)}
                         />
@@ -234,7 +246,9 @@ const DeliveryNoteDetailEdit = () => {
                       )}
                     </td>
                     <td className="px-2 py-4 text-center">{detail.qtyDelivered}</td>
-                    <td className="px-2 py-4 text-center">{detail.qtyMinus}</td>
+                    <td className="px-2 py-4 text-center">
+                      {isNaN(Number(detail.qtyMinus)) ? '-' : detail.qtyMinus}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -246,7 +260,7 @@ const DeliveryNoteDetailEdit = () => {
             {!confirmMode && (
               <button
                 onClick={handleConfirmMode}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
+                className="bg-blue-900 text-white px-4 py-2 rounded"
               >
                 {dnDetails.confirmUpdateAt ? 'Edit' : 'Confirm Order'}
               </button>
@@ -270,14 +284,14 @@ const DeliveryNoteDetailEdit = () => {
               <>
                 <button
                   onClick={handleSubmit}
-                  className={`bg-green-500 text-white px-6 py-2 rounded mr-2 ${!isCheckboxChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-green-600 text-white px-6 py-2 rounded mr-2 ${!isCheckboxChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                   disabled={!isCheckboxChecked}
                 >
                   Save
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  className="bg-red-600 text-white px-4 py-2 rounded"
                 >
                   Cancel
                 </button>

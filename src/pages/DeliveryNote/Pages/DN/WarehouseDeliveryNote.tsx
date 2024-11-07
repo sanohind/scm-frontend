@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
-import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
 import { API_List_Partner, API_DN_Warehouse } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 const WarehouseDeliveryNote = () => {
   interface DeliveryNote {
@@ -67,6 +67,7 @@ const WarehouseDeliveryNote = () => {
 
       if (!response.ok) {
         console.error('Failed to fetch delivery note:', response.status);
+        toast.error(`Failed to fetch delivery note. ${response.statusText}`);
         setFilteredData([]);
         setData([]);
         return;
@@ -89,11 +90,15 @@ const WarehouseDeliveryNote = () => {
       } else {
         setData([]);
         setFilteredData([]);
-        Swal.fire('No DN data found', result.message, 'info');
+        toast.info(`No DN data found for ${supplierCode}`);
       }
     } catch (error) {
       console.error('Error fetching delivery note:', error);
-      Swal.fire('Error', 'Failed to fetch delivery note. Please try again later.', 'error');
+      if (error instanceof Error) {
+        toast.error(`Error fetching delivery note: ${error.message}`);
+      } else {
+        toast.error('Error fetching delivery note');
+      }
       setData([]);
       setFilteredData([]);
     }
@@ -164,6 +169,7 @@ const WarehouseDeliveryNote = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note" />
       <div className="font-poppins bg-white">
         <div className="flex flex-col p-6">

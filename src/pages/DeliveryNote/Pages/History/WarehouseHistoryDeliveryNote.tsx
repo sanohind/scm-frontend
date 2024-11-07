@@ -7,6 +7,7 @@ import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
 import { API_List_Partner, API_DN_History_Warehouse } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 const WarehouseHistoryDeliveryNote = () => {
   interface DeliveryNote {
@@ -49,6 +50,11 @@ const WarehouseHistoryDeliveryNote = () => {
 
       setSuppliers(suppliersList);
     } catch (error) {
+      if (error instanceof Error) {
+        toast.error(`Error fetching suppliers: ${error.message}`);
+      } else {
+        toast.error('Error fetching suppliers');
+      }
       console.error('Error fetching suppliers:', error);
     }
   };
@@ -87,11 +93,15 @@ const WarehouseHistoryDeliveryNote = () => {
       } else {
         setData([]);
         setFilteredData([]);
-        Swal.fire('No History DN data found', result.message, 'info');
+        toast.error('No History DN data found');
       }
     } catch (error) {
       console.error('Error fetching history delivery note:', error);
-      Swal.fire('Error', 'Failed to fetch history delivery note. Please try again later.', 'error');
+      if (error instanceof Error) {
+        toast.error(`Error fetching history delivery note: ${error.message}`);
+      } else {
+        toast.error('Error fetching history delivery note');
+      }
       setData([]);
       setFilteredData([]);
     }
@@ -162,6 +172,7 @@ const WarehouseHistoryDeliveryNote = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="history Delivery Note" />
       <div className="font-poppins bg-white">
         <div className="flex flex-col p-6">

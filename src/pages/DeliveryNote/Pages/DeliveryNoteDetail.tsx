@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../Table2/SearchBar';
 import Pagination from '../../Table2/Pagination';
-import Swal from 'sweetalert2';
 import { API_DN_Detail } from '../../../api/api';
 import { FaPrint } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const DeliveryNoteDetail = () => {
   interface Detail {
@@ -75,17 +75,24 @@ const DeliveryNoteDetail = () => {
           setFilteredData(details);
         
       } else {
-        Swal.fire('Error', 'No delivery note details found.', 'error');
+        toast.error('No delivery note details found');
       }
     } catch (error) {
       console.error('Error fetching delivery note details:', error);
-      Swal.fire('Error', 'Failed to fetch delivery note details.', 'error');
+      if (error instanceof Error) {
+        toast.error(`Error fetching delivery note details: ${error.message}`);
+      } else {
+        toast.error('Error fetching delivery note details');
+      }
     }
   };
 
   useEffect(() => {
     if (noDN) {
       fetchDeliveryNoteDetails();
+    } else {
+      toast.error('No delivery note number found');
+      navigate('/delivery-note');
     }
   }, [noDN]);
 
@@ -137,6 +144,7 @@ const DeliveryNoteDetail = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note Detail" />
       <div className="font-poppins bg-white text-black">
         <div className="flex flex-col p-6 gap-4">
@@ -159,7 +167,7 @@ const DeliveryNoteDetail = () => {
             </div>
             <div className="flex items-center">
               <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-500 text-white rounded"
+                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
                 onClick={() => navigate(`/print-dn?noDN=${noDN}`)}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}

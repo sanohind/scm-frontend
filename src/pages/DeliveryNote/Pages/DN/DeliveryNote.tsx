@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchMonth from '../../../Table2/SearchMonth';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 const DeliveryNote = () => {
@@ -44,8 +45,6 @@ const DeliveryNote = () => {
       if (!response.ok) throw new Error('Failed to fetch delivery notes');
 
       const result = await response.json();
-
-
       const deliveryNotes = result.data.map((dn: any) => ({
         noDN: dn.no_dn || '-',
         noPO: dn.po_no || '-',
@@ -59,6 +58,11 @@ const DeliveryNote = () => {
       setFilteredData(deliveryNotes);
     } catch (error) {
       console.error('Error fetching delivery notes:', error);
+      if (error instanceof Error) {
+        toast.error(`Error fetching delivery notes: ${error.message}`);
+      } else {
+        toast.error('Error fetching delivery notes');
+      }
     }
   };
 
@@ -128,6 +132,7 @@ const DeliveryNote = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note" />
       <div className="font-poppins bg-white text-black p-6">
         <div className="flex justify-between items-center mb-4">
