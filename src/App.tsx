@@ -6,14 +6,12 @@ import AddUser from "./pages/ManageUser/Pages/AddUser";
 import EditUser from "./pages/ManageUser/Pages/EditUser";
 import PurchaseOrderDetail from "./pages/PurchaseOrder/Pages/PurchaseOrderDetail";
 import DeliveryNoteDetail from "./pages/DeliveryNote/Pages/DeliveryNoteDetail";
-import Transaction from "./pages/Subcon/Pages/Transaction";
 import PageTitle from "./components/PageTitle";
 import DefaultLayout from "./layout/DefaultLayout";
 import NotFound from "./pages/404";
 import Unauthorized from "./pages/Authentication/Pages/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import StockItems from "./pages/Subcon/Pages/StockItem";
-import AddTransaction from "./pages/Subcon/Pages/AddTransaction";
+import StockItems from "./pages/Subcon/Pages/StockItems";
 import IndexPurchaseOrder from "./pages/PurchaseOrder/IndexPurchaseOrder";
 import DeliveryNoteDetailEdit from "./pages/DeliveryNote/Pages/DeliveryNoteDetailEdit";
 import SignIn from "./pages/Authentication/Pages/SignIn";
@@ -22,6 +20,10 @@ import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
 import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
+import ReportTransactions from "./pages/Subcon/Pages/TransactionsReport";
+import StockManagement from "./pages/Subcon/Pages/StockManagement";
+import CenteredTabs from "./pages/Subcon/Pages/Test";
+import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 
 const App: React.FC = () => {
   return (
@@ -29,7 +31,7 @@ const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           {/* Public Route */}
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/auth/login" element={<SignIn />} />
 
           {/* Protected Routes with DefaultLayout */}
           <Route element={<DefaultLayout/>}>
@@ -174,20 +176,20 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/transaction"
+              path="/stock-management"
               element={
                 <ProtectedRoute allowedRoles={['5']}>
-                  <PageTitle title="Transaksi Subcon | PT SANOH INDONESIA" />
-                  <Transaction />
+                  <PageTitle title="Transaksi | PT SANOH INDONESIA" />
+                  <StockManagement />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/add-transaction"
+              path="/transactions-report"
               element={
                 <ProtectedRoute allowedRoles={['5']}>
-                  <PageTitle title="Transaksi Subcon | PT SANOH INDONESIA" />
-                  <AddTransaction />
+                  <PageTitle title="Transactions Report | PT SANOH INDONESIA" />
+                  <TransactionsReport />
                 </ProtectedRoute>
               }
             />
@@ -214,6 +216,18 @@ const App: React.FC = () => {
               </>
             }
           />
+
+          {/* Test Page */}
+          <Route
+            path="/test"
+            element={
+              <>
+                <PageTitle title="Test | PT SANOH INDONESIA" />
+                <CenteredTabs/>
+              </>
+            }
+          />
+          
 
         </Routes>
       </BrowserRouter>

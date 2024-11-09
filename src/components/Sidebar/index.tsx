@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import Logo from '../../images/logo-sanoh.png';
-import { FaUserPlus, FaUsers } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaUserPlus, FaUsers } from 'react-icons/fa';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -1094,7 +1094,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                   {/* <!-- Menu Item Transaction --> */}
                   <li>
                     <NavLink
-                      to="/transaction"
+                      to="/stock-management"
                       end
                       className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
@@ -1127,10 +1127,29 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                           </clipPath>
                         </defs>
                       </svg>
-                      Transaction
+                      Stock Management
                     </NavLink>
                   </li>
                   {/* <!-- Menu Item Transaction --> */}
+                  
+                  {/* <!-- Menu Item Report Transactions --> */}
+                  <li>
+                    <NavLink
+                      to="/transactions-report"
+                      end
+                      className={({ isActive }) =>
+                        `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
+                          isActive
+                            ? 'bg-graydark text-white'
+                            : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
+                        }`
+                      }
+                    >
+                        <FaFileInvoiceDollar className="fill-current" size={18} />
+                      Transactions Report
+                    </NavLink>
+                  </li>
+                  {/* <!-- Menu Item Report Transaction --> */}
 
                 </ul>
               </div>
