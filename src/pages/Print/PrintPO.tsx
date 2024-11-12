@@ -605,7 +605,7 @@ const PrintPO = () => {
   const concatAddress = (address: string) => address || 'N/A';
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
       {poData ? (
         <BlobProvider document={<PurchaseOrderDocument data={poData} />}>
           {({ url, loading, error }) => {
