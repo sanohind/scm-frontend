@@ -346,7 +346,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
               </View>
               <Text style={styles.tableCol}>{item.delivery_date}</Text>
               <Text style={styles.tableRowQTY}>{item.quantity}</Text>
-              <Text style={styles.tableRowQTY}>{item.unit}</Text>
+              <Text style={[styles.tableRowQTY, {textAlign: 'center'}]}>{item.unit}</Text>
               <Text style={styles.tableRowPrice}>{item.unit_price}</Text>
               <Text style={styles.tableRowAmount}>{item.amount}</Text>
             </View>
