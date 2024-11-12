@@ -1,7 +1,7 @@
 {
-  "name": "tailadmin-react-free",
+  "name": "sms-pt-sanoh-indonesia",
   "private": true,
-  "version": "1.3.8",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "author": {
-    "name": "TailAdmin",
-    "email": "hello@tailadmin.com",
-    "url": "https://tailadmin.com"
+    "name": "Sanoh",
+    "email": "sanoh@sanohindonesia.co.id",
+    "url": "https://sanohindonesia.co.id/"
   },
   "dependencies": {
     "@coreui/coreui": "^5.2.0",
@@ -51,6 +51,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
     "@types/react": "^18.2.17",
     "@types/react-date-range": "^1.4.9",
     "@types/react-datepicker": "^6.2.0",
