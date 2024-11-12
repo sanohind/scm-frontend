@@ -15,4 +15,7 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 3000, // Adjust the limit as needed
   },
+  server: {
+    historyApiFallback: true,
+  },
 });
