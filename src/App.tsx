@@ -24,6 +24,7 @@ import ReportTransactions from "./pages/Subcon/Pages/TransactionsReport";
 import StockManagement from "./pages/Subcon/Pages/StockManagement";
 import CenteredTabs from "./pages/Subcon/Pages/Test";
 import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
+import PrintPO from "./pages/Print/PrintPO";
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,16 @@ const App: React.FC = () => {
         <Routes>
           {/* Public Route */}
           <Route path="/auth/login" element={<SignIn />} />
+
+          <Route
+              path="/print/purchase-order"
+              element={
+                <ProtectedRoute allowedRoles={['1','3','5']}>
+                  <PageTitle title="Print Purchase Order | PT SANOH INDONESIA" />
+                  <PrintPO />
+                </ProtectedRoute>
+              }
+            />
 
           {/* Protected Routes with DefaultLayout */}
           <Route element={<DefaultLayout/>}>

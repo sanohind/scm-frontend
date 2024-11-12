@@ -1,0 +1,179 @@
+/* src/css/printPO.css */
+
+body {
+    @apply font-poppins m-0 p-0 bg-gray-200;
+}
+
+.container {
+    @apply w-[210mm] min-h-[297mm] p-5 bg-white box-border relative mx-auto;
+}
+
+.header, .footer {
+    @apply mb-1 text-xs flex justify-between items-start;
+}
+
+.logo img {
+    @apply w-[275px];
+}
+
+.company-info {
+    @apply text-center flex-grow text-base;
+}
+
+.company-info h3 {
+    @apply my-7 underline text-center flex-grow mr-[250px];
+}
+
+.page-info {
+    @apply absolute top-2.5 right-5 text-xs font-bold;
+}
+
+.details {
+    @apply grid grid-cols-2 text-xs mb-0 mt-0 leading-tight;
+}
+
+.details-left, .details-right {
+    @apply text-left;
+}
+
+.details-left div, .details-right .row {
+    @apply mb-1;
+}
+
+.details-left strong, .details-right .label {
+    @apply inline-block pr-0;
+}
+
+.details-right {
+    @apply flex flex-col items-end text-right m-0 p-0 text-[7px];
+}
+
+.details-right .row {
+    @apply flex m-0 p-0 leading-tight;
+}
+
+.details-right .label {
+    @apply font-bold m-0 p-0 min-w-[80px] text-[10px];
+}
+
+.details-right .value {
+    @apply font-bold m-0 p-0 min-w-[100px] text-[10px];
+}
+
+table {
+    @apply w-full border-collapse mb-0.5 text-[7px] table-auto text-center;
+}
+
+table, th, td {
+    @apply border border-black p-1.5 break-words whitespace-normal text-center text-[10px];
+}
+
+th {
+    @apply bg-white text-black font-bold text-center align-middle;
+}
+
+td {
+    @apply align-middle bg-white border border-black border-t-0 border-b-0;
+}
+
+table td:nth-child(1) {
+    @apply w-[3%] text-[10px] text-right;
+}
+
+table td:nth-child(2) {
+    @apply w-[20%] text-[10px] border-l-0 border-r-0 text-left;
+}
+
+table td:nth-child(3) {
+    @apply w-[10%] text-[10px] text-center;
+}
+
+table td:nth-child(4) {
+    @apply w-[5%] text-[10px] text-right;
+}
+
+table td:nth-child(5) {
+    @apply w-[5%] text-[10px] text-left;
+}
+
+table td:nth-child(6) {
+    @apply w-[10%] text-[10px] text-right;
+}
+
+table td:nth-child(7) {
+    @apply w-[10%] text-[10px] text-right;
+}
+
+.summary-row td {
+    @apply border-t-2 border-black font-bold min-w-[10px] p-2 text-[14px] text-right;
+}
+
+.summary-row .summary-value {
+    @apply bg-white text-[9px] text-right pr-2.5;
+}
+
+.footer {
+    @apply mt-5 font-sans text-[9px];
+}
+
+.row {
+    @apply flex justify-start mb-0.5 text-[9px];
+}
+
+.label {
+    @apply w-[150px] text-left;
+}
+
+.value {
+    @apply text-left;
+}
+
+.terms {
+    @apply text-[9px];
+}
+
+.terms div {
+    @apply mb-0;
+}
+
+.garis-vertical {
+    @apply border-t border-gray-800 w-[25%];
+}
+
+@media print {
+    body {
+        @apply m-0 p-0 bg-white;
+    }
+
+    .container {
+        @apply w-[210mm] min-h-[297mm] p-[20mm] m-0;
+    }
+
+    .page {
+        @apply page-break-after-always;
+    }
+
+    .page:last-child {
+        @apply page-break-after-auto;
+    }
+
+    .page-break {
+        @apply page-break-before-always;
+    }
+
+    .header {
+        @apply fixed top-0 left-0 right-0 h-[100px] bg-white;
+    }
+
+    .page-content {
+        @apply mt-[120px];
+    }
+
+    .footer {
+        @apply fixed bottom-[20mm] left-0 right-0;
+    }
+
+    .page-info {
+        @apply fixed top-[10mm] right-[10mm];
+    }
+}

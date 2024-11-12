@@ -226,7 +226,7 @@ const TransactionReport = () => {
 
     // Add logo
     const img = new Image();
-    img.src = '../../../src/images/logo_sanoh_address.png'; // Replace with the actual path to the logo
+    img.src = '../../../src/images/logo_sanoh_address.png';
     img.onload = () => {
       doc.addImage(img, 'PNG', 10, 10, 100, 20);
 

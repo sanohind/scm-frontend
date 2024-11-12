@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../Table2/SearchBar';
 import Pagination from '../../Table2/Pagination';
@@ -35,6 +35,8 @@ const PurchaseOrderDetail = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const noPO = queryParams.get('noPO');
+
+  const navigate = useNavigate();
 
   const fetchPurchaseOrderDetails = async () => {
     const token = localStorage.getItem('access_token');
@@ -136,6 +138,10 @@ const PurchaseOrderDetail = () => {
     setSortConfig({ key, direction });
   };
 
+  const handlePrintPO = () => {
+    window.open(`/print/purchase-order?noPO=${noPO}`, '_blank');
+  };
+
   const SkeletonRow = () => (
     <tr className="animate-pulse">
       <td className="px-2 py-4 text-center">
@@ -199,7 +205,7 @@ const PurchaseOrderDetail = () => {
             <div className="flex items-center">
               <button
                 className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={() => window.print()}
+                onClick={handlePrintPO}
                     >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
                 <span>Print PO</span>

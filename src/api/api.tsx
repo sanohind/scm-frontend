@@ -77,7 +77,7 @@ export const API_DN_Edit_Supplier = () => API + getRolePath() + `/dn/edit/`;
 export const API_Update_DN_Supplier = () => API + getRolePath() + `/dn/update`;
 export const API_DN_History_Supplier = () => API + getRolePath() + `/dn/history/`;
 
-export const API_Print_PO_Supplier = () => API + getRolePath() + `/po/print/`;
+export const API_Print_PO = () => API + getRolePath() + `/po/print/`;
 export const API_Print_DN_Supplier = () => API + getRolePath() + `/dn/print/`;
 export const API_Print_Label_Supplier = () => API + getRolePath() + `/label/print/`;
 
