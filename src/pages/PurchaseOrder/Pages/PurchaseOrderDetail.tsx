@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../Table2/SearchBar';
 import Pagination from '../../Table2/Pagination';
@@ -36,7 +36,6 @@ const PurchaseOrderDetail = () => {
   const queryParams = new URLSearchParams(location.search);
   const noPO = queryParams.get('noPO');
 
-  const navigate = useNavigate();
 
   const fetchPurchaseOrderDetails = async () => {
     const token = localStorage.getItem('access_token');
