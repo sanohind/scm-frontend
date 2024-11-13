@@ -1,7 +1,7 @@
 {
   "name": "sms-pt-sanoh-indonesia",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "author": {
-    "name": "Sanoh",
+    "name": "Sanoh Indonesia",
     "email": "sanoh@sanohindonesia.co.id",
     "url": "https://sanohindonesia.co.id/"
   },

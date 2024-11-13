@@ -88,9 +88,9 @@ const StockManagement = () => {
 
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs value={value} onChange={handleChange} centered>
-            <Tab label="Stock Ingoing" />
-            <Tab label="Stock Ready" />
-            <Tab label="Stock Outgoing" />
+            <Tab label="Record Incoming" />
+            <Tab label="Record Ready" />
+            <Tab label="Record Outgoing" />
           </Tabs>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
@@ -158,13 +158,13 @@ const StockManagement = () => {
                 {/* Quantity NG */}
                 <div className="mb-4.5 w-full">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Quantity Not Good  <span className="text-gray-400">( Leave blank if no NG parts )</span>
+                      Quantity NG  <span className="text-gray-400">( Leave blank if no NG parts )</span>
                     </label>
                   <input
                     type="number"
                     value={qtyNg}
                     onChange={(e) => setQtyNg(e.target.value)}
-                    placeholder="Enter Quantity Not Good"
+                    placeholder="Enter Quantity NG"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
                 </div>

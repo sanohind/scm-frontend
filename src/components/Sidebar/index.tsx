@@ -1094,7 +1094,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                   {/* <!-- Menu Item Transaction --> */}
                   <li>
                     <NavLink
-                      to="/stock-management"
+                      to="/transactions"
                       end
                       className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
@@ -1127,7 +1127,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                           </clipPath>
                         </defs>
                       </svg>
-                      Stock Management
+                      Transactions
                     </NavLink>
                   </li>
                   {/* <!-- Menu Item Transaction --> */}

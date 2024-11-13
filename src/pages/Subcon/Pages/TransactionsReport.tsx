@@ -409,6 +409,7 @@ const TransactionReport = () => {
               <thead className="text-base text-gray-700">
                 <tr>
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Date</th>
+                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Delivery Note</th>
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Transaction Type</th>
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Status</th>
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Part Name</th>
@@ -424,6 +425,7 @@ const TransactionReport = () => {
                   paginatedData.map((row, index) => (
                     <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
                       <td className="px-2 py-4 text-center">{new Date(row.timestamp).toLocaleString()}</td>
+                      <td className="px-2 py-4 text-center">{row.deliveryNote}</td>
                       <td className="px-2 py-4 text-center">{row.type}</td>
                       <td className="px-2 py-4 text-center">{row.status}</td>
                       <td className="px-2 py-4 text-center">{row.partName}</td>
@@ -435,7 +437,7 @@ const TransactionReport = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-4">
+                    <td colSpan={8} className="text-center py-4">
                       No data available
                     </td>
                   </tr>
@@ -443,7 +445,7 @@ const TransactionReport = () => {
               </tbody>
             <tfoot>
               <tr className="bg-gray-100">
-                <td colSpan={5} className="px-2 py-4 text-center font-semibold">Totals:</td>
+                <td colSpan={6} className="px-2 py-4 text-center font-semibold">Totals:</td>
                 <td className="px-2 py-4 text-center font-semibold">
                   {paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}
                 </td>

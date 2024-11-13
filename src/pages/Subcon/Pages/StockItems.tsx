@@ -168,12 +168,12 @@ const StockItems = () => {
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Stock Total</th>
                 </tr>
                 <tr>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Incoming Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Not Good Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Incoming Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Not Good Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Unprocess Incoming Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">NG Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Unprocess Incoming Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery Stock</th>
+                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">NG Stock</th>
                 </tr>
                 
               </thead>

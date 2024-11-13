@@ -20,10 +20,10 @@ import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
 import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
-import StockManagement from "./pages/Subcon/Pages/StockManagement";
 import CenteredTabs from "./pages/Subcon/Pages/Test";
 import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 import PrintPO from "./pages/Print/PrintPO";
+import Transactions from "./pages/Subcon/Pages/Transactions";
 
 const App: React.FC = () => {
   return (
@@ -186,11 +186,11 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/stock-management"
+              path="/transactions"
               element={
                 <ProtectedRoute allowedRoles={['5']}>
                   <PageTitle title="Transaksi | PT SANOH INDONESIA" />
-                  <StockManagement />
+                  <Transactions />
                 </ProtectedRoute>
               }
             />

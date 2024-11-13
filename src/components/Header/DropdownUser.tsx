@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import Swal from 'sweetalert2';
-import UserLogo from '../../images/user/user-01.png';
+import UserLogo from '../../images/user/user_logo_default.png';
 import { useAuth } from '../../pages/Authentication/AuthContext';
 
 
@@ -16,16 +16,15 @@ const DropdownUser = () => {
   // Ambil data dari localStorage pada saat komponen dimuat
   useEffect(() => {
     const storedName = localStorage.getItem('name');
-    const storedSupplierName = localStorage.getItem('bp_code');
 
     if (storedName) {
       setName(storedName);
     }
-    if (storedSupplierName) {
-      setSupplierName(storedSupplierName);
-      // Cari gambar di Google berdasarkan nama supplier
-      setSupplierImage(`https://picsum.photos/seed/${storedSupplierName}/200`);
-    }
+    // if (storedName) {
+    //   setSupplierName(storedName);
+    //   // Cari gambar di Google berdasarkan nama supplier
+    //   setSupplierImage(`https://picsum.photos/seed/${storedName}/200`);
+    // }
   }, []);
 
   const handleLogout = async () => {

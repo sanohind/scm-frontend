@@ -138,7 +138,7 @@ const PurchaseOrderDetail = () => {
   };
 
   const handlePrintPO = () => {
-    window.open(`/print/purchase-order?noPO=${noPO}`, '_blank');
+    window.open(`/#/print/purchase-order?noPO=${noPO}`, '_blank');
   };
 
   const SkeletonRow = () => (
