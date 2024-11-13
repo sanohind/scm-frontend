@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./pages/Authentication/AuthContext";
 import ProtectedRoute from "./pages/Authentication/ProtectedRoute";
 import ManageUser from "./pages/ManageUser/Pages/ManageUser";
@@ -28,7 +28,7 @@ import PrintPO from "./pages/Print/PrintPO";
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           {/* Public Route */}
           <Route path="/auth/login" element={<SignIn />} />
@@ -238,7 +238,7 @@ const App: React.FC = () => {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 };
