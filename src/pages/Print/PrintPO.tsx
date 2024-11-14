@@ -16,6 +16,7 @@ import logoSanohAddress from '../../images/logo_sanoh_address.png';
 import signatureDeniar from '../../images/signature/Pak_Deniar.png';
 import signatureFadli from '../../images/signature/Pak_Fadli.png';
 import signatureMisbahul from '../../images/signature/Pak_Misbahul.png';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Register the Poppins font
 Font.register({
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     fontSize: 8,
     lineHeight: 1.1,
+    marginTop: 7,
   },
   detailsLeft: {
     width: '66%',
@@ -179,6 +181,13 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     paddingTop: 8,
   },
+  tableRowUnit: {
+    width: '10%',
+    borderRightWidth: 1,
+    borderColor: '#000',
+    textAlign: 'right',
+    paddingTop: 8,
+  },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -229,6 +238,16 @@ const styles = StyleSheet.create({
     margin: 5,
     justifyContent: 'center', 
     alignItems: 'center',
+  },
+  signatureTitle: {
+    borderBottomWidth: 1, 
+    borderColor: '#7e7e7e'
+  },
+  signatureName: {
+    borderBottomWidth: 1, 
+    borderTopWidth: 1, 
+    borderColor: '#7e7e7e',
+    paddingTop: 2,
   },
 });
 
@@ -365,7 +384,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
               </View>
               <Text style={styles.tableCol}>{item.delivery_date}</Text>
               <Text style={styles.tableRowQTY}>{item.quantity}</Text>
-              <Text style={[styles.tableRowQTY, {textAlign: 'center'}]}>{item.unit}</Text>
+              <Text style={[styles.tableRowUnit, {textAlign: 'center'}]}>{item.unit}</Text>
               <Text style={styles.tableRowPrice}>{item.unit_price}</Text>
               <Text style={styles.tableRowAmount}>{item.amount}</Text>
             </View>
@@ -453,21 +472,21 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
           <View style={{ width: '50%' }}>
             <View style={{ flexDirection: 'row' }}>
               <View style={[styles.signatureBox, { borderWidth: 1, borderColor: '#000' }]}>
-                <Text style={{ borderBottomWidth: 1, borderColor: '#7e7e7e'}}>Prepared</Text>
+                <Text style={styles.signatureTitle}>Prepared</Text>
                 <Image src={signatureDeniar} style={styles.signatureImage} />
-                <Text style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#7e7e7e'}}>DENIAR F</Text>
+                <Text style={styles.signatureName}>DENIAR F</Text>
                 <Text>Purchasing</Text>
               </View>
               <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
-                <Text style={{ borderBottomWidth: 1, borderColor: '#7e7e7e'}}>Checked</Text>
+                <Text style={styles.signatureTitle}>Checked</Text>
                 <Image src={signatureFadli} style={styles.signatureImage} />
-                <Text style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#7e7e7e'}}>FADLI YUSRAL</Text>
+                <Text style={styles.signatureName}>FADLI YUSRAL</Text>
                 <Text>Dept. Manager</Text>
               </View>
               <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
-                <Text style={{ borderBottomWidth: 1, borderColor: '#7e7e7e'}}>Approved</Text>
+                <Text style={styles.signatureTitle}>Approved</Text>
                 <Image src={signatureMisbahul} style={styles.signatureImage} />
-                <Text style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#7e7e7e'}}>MISBAHUL MUNIR</Text>
+                <Text style={styles.signatureName}>MISBAHUL MUNIR</Text>
                 <Text>Purchasing</Text>
               </View>
             </View>
@@ -624,32 +643,45 @@ const PrintPO = () => {
   const concatAddress = (address: string) => address || 'N/A';
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
-      {poData ? (
-        <BlobProvider document={<PurchaseOrderDocument data={poData} />}>
-          {({ url, loading, error }) => {
-            if (loading) {
-              return <p>Rendering PDF Please Wait... (5 seconds)</p>;
-            }
-            if (error) {
-              return <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>;
-            }
-            return (
-              <div>
-                <iframe
-                  src={url || ''}
-                  style={{ width: '100vw', height: '100vh' }}
-                  frameBorder="0"
-                  title={`PurchaseOrder_${poData.header.po_number}.pdf`}
-                />
-              </div>
-            );
-          }}
-        </BlobProvider>
-      ) : (
-        <p>Loading Data From Server...</p>
-      )}
-    </div>
+    <>
+      <ToastContainer position="top-right" />
+      <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
+        {poData ? (
+          <BlobProvider document={<PurchaseOrderDocument data={poData} />}>
+            {({ url, loading, error }) => {
+                if (loading) {
+                const id = toast.loading("Rendering PDF, please wait...");
+                setTimeout(() => {
+                  toast.update(id, { 
+                  render: "PDF Ready", 
+                  type: "success", 
+                  isLoading: false,
+                  autoClose: 2000 
+                  });
+                }, 1000);
+                return <p>Rendering PDF Please Wait...</p>;
+                }
+                if (error) {
+                // toast.error(`Error Rendering PDF: ${error.message}. Please Try Again Later`);
+                return <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>;
+                }
+              return (
+                <div>
+                  <iframe
+                    src={url || ''}
+                    style={{ width: '100vw', height: '100vh' }}
+                    frameBorder="0"
+                    title={`PurchaseOrder_${poData.header.po_number}.pdf`}
+                  />
+                </div>
+              );
+            }}
+          </BlobProvider>
+        ) : (
+          <p>Loading Data From Server...</p>
+        )}
+      </div>
+    </>
   );
 };
 
