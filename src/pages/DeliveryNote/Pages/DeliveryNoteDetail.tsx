@@ -141,6 +141,14 @@ const DeliveryNoteDetail = () => {
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
+  const handlePrintDN = () => {
+    window.open(`/#/print/delivery-note?noDN=${noDN}`, '_blank');
+  };
+
+  const handlePrintLabel = () => {
+    window.open(`/#/print/label/delivery-note?noDN=${noDN}`, '_blank');
+  };
+
 
   return (
     <>
@@ -165,13 +173,20 @@ const DeliveryNoteDetail = () => {
                 <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.planDelivery}</span>
               </div>
             </div>
-            <div className="flex items-center">
+            <div className="flex gap-2 items-center">
               <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={() => navigate(`/print-dn?noDN=${noDN}`)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded"
+                onClick={handlePrintLabel}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print PO</span>
+                <span>Print Label</span>
+              </button>
+              <button
+                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
+                onClick={handlePrintDN}
+              >
+                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
+                <span>Print DN</span>
               </button>
             </div>
           </div>

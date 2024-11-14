@@ -13,9 +13,9 @@ import {
 import Swal from 'sweetalert2';
 import { API_Print_PO } from '../../api/api';
 import logoSanohAddress from '../../images/logo_sanoh_address.png';
-import signatureDeniar from '../../images/Pak_Deniar.png';
-import signatureFadli from '../../images/Pak_Fadli.png';
-import signatureMisbahul from '../../images/Pak_Misbahul.png';
+import signatureDeniar from '../../images/signature/Pak_Deniar.png';
+import signatureFadli from '../../images/signature/Pak_Fadli.png';
+import signatureMisbahul from '../../images/signature/Pak_Misbahul.png';
 
 // Register the Poppins font
 Font.register({
@@ -23,10 +23,27 @@ Font.register({
   fonts: [
     {
       src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf',
+      fontWeight: 'normal',
     },
     {
       src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf',
       fontWeight: 'bold',
+    },
+    {
+      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-SemiBold.ttf',
+      fontWeight: 'semibold',
+    },
+    {
+      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Medium.ttf',
+      fontWeight: 'medium',
+    },
+    {
+      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Light.ttf',
+      fontWeight: 'light',
+    },
+    {
+      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Thin.ttf',
+      fontWeight: 'thin',
     },
   ],
 });
@@ -120,6 +137,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderColor: '#000',
     paddingVertical: 2,
+    paddingTop: 8,
   },
   tableColDescription: {
     width: '35%',
@@ -133,31 +151,33 @@ const styles = StyleSheet.create({
     width: '20%',
     borderRightWidth: 1,
     borderColor: '#000',
-    paddingVertical: 2,
+    paddingTop: 8,
   },
   tableColQty: {
     width: '10%',
     borderRightWidth: 1,
     borderColor: '#000',
-    paddingVertical: 2,
-  },
-  tableRowQTY: {
-    width: '10%',
-    borderRightWidth: 1,
-    borderColor: '#000',
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    textAlign: 'right',
+    paddingTop: 8,
   },
   tableColPrice: {
     width: '12%',
     paddingVertical: 2,
     borderRightWidth: 1,
     borderColor: '#000',
+    paddingTop: 8,
   },
   tableColAmount: {
     width: '15%',
     paddingVertical: 2,
+    paddingTop: 8,
+  },
+  tableRowQTY: {
+    width: '10%',
+    borderRightWidth: 1,
+    borderColor: '#000',
+    paddingRight: 5,
+    textAlign: 'right',
+    paddingTop: 8,
   },
   tableRow: {
     flexDirection: 'row',
@@ -166,7 +186,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems: 'stretch',
     minHeight: 24,
-    fontSize: 6,
+    fontSize: 7,
   },
   tableRowDescription: {
     width: '35%',
@@ -178,17 +198,17 @@ const styles = StyleSheet.create({
   },
   tableRowAmount: {
     width: '15%',
-    paddingVertical: 2,
     textAlign: 'right',
-    paddingHorizontal: 5,
+    paddingTop: 8,
+    paddingRight: 5,
   },
   tableRowPrice: {
     width: '12%',
-    paddingVertical: 2,
     borderRightWidth: 1,
     borderColor: '#000',
     textAlign: 'right',
-    paddingHorizontal: 5,
+    paddingRight: 5,
+    paddingTop: 8,
   },
   terms: {
     marginTop: 20,

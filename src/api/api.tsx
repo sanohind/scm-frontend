@@ -78,8 +78,8 @@ export const API_Update_DN_Supplier = () => API + getRolePath() + `/dn/update`;
 export const API_DN_History_Supplier = () => API + getRolePath() + `/dn/history/`;
 
 export const API_Print_PO = () => API + getRolePath() + `/po/print/`;
-export const API_Print_DN_Supplier = () => API + getRolePath() + `/dn/print/`;
-export const API_Print_Label_Supplier = () => API + getRolePath() + `/label/print/`;
+export const API_Print_DN = () => API + getRolePath() + `/dn/print/`;
+export const API_Print_Label = () => API + getRolePath() + `/label/print/`;
 
 export const API_Performance_Report_Supplier = () => API + getRolePath() + `/performance-report/index/`;
 export const API_Download_Performance_Report= () => API + getRolePath() + `/performance-report/file/`;

@@ -164,6 +164,14 @@ const DeliveryNoteDetailEdit = () => {
     }
   };
 
+  const handlePrintDN = () => {
+    window.open(`/#/print/delivery-note?noDN=${noDN}`, '_blank');
+  };
+
+  const handlePrintLabel = () => {
+    window.open(`/#/print/label/delivery-note?noDN=${noDN}`, '_blank');
+  };
+
 
 
   return (
@@ -192,14 +200,14 @@ const DeliveryNoteDetailEdit = () => {
             <div className="flex gap-2 items-center">
               <button
                 className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded"
-                onClick={() => window.print()}
+                onClick={handlePrintLabel}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
                 <span>Print Label</span>
               </button>
               <button
                 className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={() => window.print()}
+                onClick={handlePrintDN}
               >
                 <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
                 <span>Print DN</span>

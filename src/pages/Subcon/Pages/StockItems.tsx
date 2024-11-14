@@ -164,8 +164,7 @@ const StockItems = () => {
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Part No</th>
                   <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Part Name</th>
                   <th className="py-3 px-3 text-center border-b border-x" colSpan={3}>Fresh</th>
-                  <th className="py-3 px-3 text-center border-b border-x" colSpan={3}>Replating</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Stock Total</th>
+                  <th className="py-3 px-3 text-center border-b border-x" colSpan={3}>Replating</th>                  
                 </tr>
                 <tr>
                   <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Unprocess Incoming Stock</th>
@@ -192,12 +191,11 @@ const StockItems = () => {
                   <td className="px-2 py-4 text-center">{row.replatingIncoming}</td>
                   <td className="px-2 py-4 text-center">{row.replatingReadyDelivery}</td>
                   <td className="px-2 py-4 text-center">{row.replatingNotGood}</td>
-                  <td className="px-2 py-4 text-center">{row.stockTotal}</td>
                 </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="text-center py-4">
+                  <td colSpan={8} className="text-center py-4">
                     No data available
                   </td>
                 </tr>

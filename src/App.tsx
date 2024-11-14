@@ -24,6 +24,8 @@ import CenteredTabs from "./pages/Subcon/Pages/Test";
 import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 import PrintPO from "./pages/Print/PrintPO";
 import Transactions from "./pages/Subcon/Pages/Transactions";
+import PrintDN from "./pages/Print/PrintDN";
+import PrintLabel from "./pages/Print/PrintLabel";
 
 const App: React.FC = () => {
   return (
@@ -34,14 +36,32 @@ const App: React.FC = () => {
           <Route path="/auth/login" element={<SignIn />} />
 
           <Route
-              path="/print/purchase-order"
-              element={
-                <ProtectedRoute allowedRoles={['1','3','5']}>
-                  <PageTitle title="Print Purchase Order | PT SANOH INDONESIA" />
-                  <PrintPO />
-                </ProtectedRoute>
-              }
-            />
+            path="/print/purchase-order"
+            element={
+              <ProtectedRoute allowedRoles={['1','3','5']}>
+                <PageTitle title="Print Purchase Order | PT SANOH INDONESIA" />
+                <PrintPO />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/print/delivery-note"
+            element={
+              <ProtectedRoute allowedRoles={['1','2','5']}>
+                <PageTitle title="Print Delivery Note | PT SANOH INDONESIA" />
+                <PrintDN />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/print/label/delivery-note"
+            element={
+              <ProtectedRoute allowedRoles={['1','2','5']}>
+                <PageTitle title="Print Label Delivery Note | PT SANOH INDONESIA" />
+                <PrintLabel />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Routes with DefaultLayout */}
           <Route element={<DefaultLayout/>}>
