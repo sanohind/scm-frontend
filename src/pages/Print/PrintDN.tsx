@@ -396,7 +396,7 @@ const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
                 </View>
 
                 {/* Signature Section */}
-                <View style={styles.signatureSection}>
+                <View style={styles.signatureSection} break>
                     <View style={{ width: '55%' }}>
                         <Text>SUPPLIER</Text>
                         <View style={ styles.signatureBox}>

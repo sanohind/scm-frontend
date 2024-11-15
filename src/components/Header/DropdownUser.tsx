@@ -16,15 +16,16 @@ const DropdownUser = () => {
   // Ambil data dari localStorage pada saat komponen dimuat
   useEffect(() => {
     const storedName = localStorage.getItem('name');
+    const storedSupplierName = localStorage.getItem('bp_code');
 
     if (storedName) {
       setName(storedName);
     }
-    // if (storedName) {
-    //   setSupplierName(storedName);
-    //   // Cari gambar di Google berdasarkan nama supplier
-    //   setSupplierImage(`https://picsum.photos/seed/${storedName}/200`);
-    // }
+
+    if (storedSupplierName) {
+      setSupplierName(storedSupplierName);
+      setSupplierImage(`https://picsum.photos/seed/${storedSupplierName}/200`);
+    }
   }, []);
 
   const handleLogout = async () => {

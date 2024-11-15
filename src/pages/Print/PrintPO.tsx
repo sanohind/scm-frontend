@@ -463,7 +463,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
         </View>
 
         {/* Signature Section */}
-        <View style={styles.signatureSection}>
+        <View style={styles.signatureSection} break>
           <View style={{ width: '40%', textAlign: 'center', fontSize: 8 }}>
             <Text>Accepted & Confirmed</Text>
             <Text>{data.header.supplier_name || ''}</Text>
