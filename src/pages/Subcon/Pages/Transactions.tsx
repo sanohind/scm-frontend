@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -6,20 +6,21 @@ import Select from 'react-select';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../api/api';
-import { set } from 'date-fns';
 import Swal from 'sweetalert2';
-
-// Dummy data representing API fetch result
-
 
 const StockManagement = () => {
   const [value, setValue] = useState(0);
-  const [selectedPart, setSelectedPart] = useState(null);
+  const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
   const [qtyOk, setQtyOk] = useState('');
   const [qtyNg, setQtyNg] = useState('');
   const [status, setStatus] = useState('');
   const [deliveryNote, setDeliveryNote] = useState('');
-  const [apiData, setApiData] = useState([]);
+  const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
+
+interface ApiItem {
+  part_number: string;
+  part_name: string;
+}
 
 useEffect(() => {
   const fetchData = async () => {
@@ -33,7 +34,7 @@ useEffect(() => {
       const result = await response.json();
       if (result.status) {
         // Transform the data structure to match our needs
-        const transformedData = result.data.map(item => ({
+        const transformedData = result.data.map((item: ApiItem) => ({
           partNumber: item.part_number,
           partName: item.part_name
         }));
@@ -53,15 +54,15 @@ const partOptions = apiData.map(item => ({
   label: item.partName
 }));
 
-  const handleChange = (event, newValue) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const handlePartChange = (selectedOption) => {
+  const handlePartChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedPart(selectedOption);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const confirm = await Swal.fire({
