@@ -129,7 +129,7 @@ const partOptions = apiData.map(item => ({
   return (
     <>
       <ToastContainer position="top-right" />
-      <Breadcrumb pageName="Stock Management" />
+      <Breadcrumb pageName="Transactions" />
       <div className='max-w-[1200px] mx-auto px-4 md:px-6'>
 
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>

@@ -23,7 +23,7 @@ import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
 import CenteredTabs from "./pages/Subcon/Pages/Test";
 import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 import PrintPO from "./pages/Print/PrintPO";
-import Transactions from "./pages/Subcon/Pages/StockManagement";
+import Transactions from "./pages/Subcon/Pages/Transactions";
 import PrintDN from "./pages/Print/PrintDN";
 import PrintLabel from "./pages/Print/PrintLabel";
 
