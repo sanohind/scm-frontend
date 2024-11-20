@@ -1,25 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Select from 'react-select';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../api/api';
+import { set } from 'date-fns';
+import Swal from 'sweetalert2';
 
 // Dummy data representing API fetch result
-const apiData = [
-  { partNumber: 'P001', partName: 'Brake Pipe' },
-  { partNumber: 'P002', partName: 'Fuel Line' },
-  { partNumber: 'P003', partName: 'Hydraulic Hose' },
-  { partNumber: 'P004', partName: 'Coupling' },
-  { partNumber: 'P005', partName: 'Steel Tube' },
-];
 
-// Transform API data to match react-select format
-const partOptions = apiData.map(item => ({
-  value: item.partNumber,
-  label: item.partName
-}));
 
 const StockManagement = () => {
   const [value, setValue] = useState(0);
@@ -27,6 +18,40 @@ const StockManagement = () => {
   const [qtyOk, setQtyOk] = useState('');
   const [qtyNg, setQtyNg] = useState('');
   const [status, setStatus] = useState('');
+  const [deliveryNote, setDeliveryNote] = useState('');
+  const [apiData, setApiData] = useState([]);
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(API_List_Item_Subcont(), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const result = await response.json();
+      if (result.status) {
+        // Transform the data structure to match our needs
+        const transformedData = result.data.map(item => ({
+          partNumber: item.part_number,
+          partName: item.part_name
+        }));
+        setApiData(transformedData);
+      }
+    } catch (error) {
+      console.error('Error fetching parts:', error);
+    }
+  };
+
+  fetchData();
+}, []);
+
+// Transform API data to match react-select format
+const partOptions = apiData.map(item => ({
+  value: item.partNumber,
+  label: item.partName
+}));
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -38,7 +63,29 @@ const StockManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    const confirm = await Swal.fire({
+      title: 'Confirm Submission',
+      html: `
+      <p>Are you sure the data entered is correct?</p>
+      <br>
+      <p><strong>Status:</strong> ${status}</p>
+      <p><strong>Transaction Type:</strong> ${value === 0 ? 'In' : value === 1 ? 'Process' : 'Out'}</p>
+      <p><strong>Part Name:</strong> ${selectedPart?.label}</p>
+      <p><strong>Quantity OK:</strong> ${qtyOk}</p>
+      <p><strong>Quantity NG:</strong> ${qtyNg ? qtyNg : 0}</p>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6', 
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, submit it!'
+    });
+
+    if (!confirm.isConfirmed) {
+      return;
+    }
+
     try {
       const token = localStorage.getItem('access_token');
       if (!token) {
@@ -47,15 +94,15 @@ const StockManagement = () => {
       }
 
       const transactionData = {
-        type: value === 0 ? 'ingoing' : value === 1 ? 'ready' : 'outgoing',
-        timestamp: new Date().toISOString(),
+        transaction_type: value === 0 ? 'In' : value === 1 ? 'Process' : 'Out',
         status: status,
-        partNumber: selectedPart?.value,
-        qtyOk: qtyOk,
-        qtyNg: qtyNg ? qtyNg : "0"
+        delivery_note: deliveryNote,
+        item_code: selectedPart?.value,
+        qty_ok: qtyOk,
+        qty_ng: qtyNg ? qtyNg : 0,
       };
 
-      const response = await fetch('/api/stock-transaction', {
+      const response = await fetch(API_Create_Transaction_Subcont(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +119,6 @@ const StockManagement = () => {
       setSelectedPart(null);
       setQtyOk('');
       setQtyNg('');
-      setStatus('');
       
     } catch (error) {
       toast.error('Failed to record transaction');
@@ -95,6 +141,7 @@ const StockManagement = () => {
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
               <div className="p-4 md:p-6.5 ">
+
                 {/* Status Selection */}
                 <div className="mb-4.5 w-full">
                   <label className="mb-2.5 block text-black dark:text-white">
@@ -107,10 +154,27 @@ const StockManagement = () => {
                     required
                   >
                     <option value="" disabled>Select Status</option>
-                    <option value="fresh">Fresh</option>
-                    <option value="replating">Replating</option>
+                    <option value="Fresh">Fresh</option>
+                    <option value="Replating">Replating</option>
                   </select>
                 </div>
+
+                {/* Delivery Note Input */}
+                {value !== 1 && (
+                  <div className="mb-4.5 w-full">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Delivery Note <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={deliveryNote}
+                    onChange={(e) => setDeliveryNote(e.target.value)}
+                    placeholder="Enter Delivery Note"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    required
+                  />
+                  </div>
+                )}
 
                 {/* Part Name Selection */}
                 <div className="mb-4.5 w-full">
@@ -124,6 +188,7 @@ const StockManagement = () => {
                     placeholder="Select Part Name"
                     className="w-full"
                     isClearable
+                    required
                   />
                 </div>
 
