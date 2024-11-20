@@ -2,140 +2,63 @@ import { useEffect, useState } from 'react';
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import SearchBar from '../../Table2/SearchBar';
 import Pagination from '../../Table2/Pagination';
-// import { API_getStockItems } from '../../api/api';
-import Swal from 'sweetalert2';
-import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import { API_Item_Subcont } from '../../../api/api';
 
 const StockItems = () => {
+  const [data, setData] = useState<StockItem[]>([]);
   const [filteredData, setFilteredData] = useState<StockItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
-
 
   interface StockItem {
-    partNumber: string;
-    partName: string;
-    freshIncoming: number;
-    freshReadyDelivery: number;
-    freshNotGood: number;
-    replatingIncoming: number;
-    replatingReadyDelivery: number;
-    replatingNotGood: number;
-    stockTotal: number;
+    part_number: string;
+    part_name: string;
+    incoming_fresh_stock: number;
+    ready_fresh_stock: number;
+    ng_fresh_stock: number;
+    incoming_replating_stock: number;
+    ready_replating_stock: number;
+    ng_replating_stock: number;
   }
-  
-  const [data, setData] = useState<StockItem[]>([
-      {
-        partNumber: "P001",
-        partName: "Brake Pipe",
-        freshIncoming: 100,
-        freshReadyDelivery: 50,
-        freshNotGood: 5,
-        replatingIncoming: 20,
-        replatingReadyDelivery: 15,
-        replatingNotGood: 2,
-        stockTotal: 192
-      },
-    {
-      partNumber: "P002",
-      partName: "Fuel Line",
-      freshIncoming: 150,
-      freshReadyDelivery: 75,
-      freshNotGood: 8,
-      replatingIncoming: 30,
-      replatingReadyDelivery: 25,
-      replatingNotGood: 3,
-      stockTotal: 291
-    },
-    {
-      partNumber: "P003",
-      partName: "Hydraulic Hose",
-      freshIncoming: 80,
-      freshReadyDelivery: 40,
-      freshNotGood: 4,
-      replatingIncoming: 15,
-      replatingReadyDelivery: 10,
-      replatingNotGood: 1,
-      stockTotal: 150
-    },
-    {
-      partNumber: "P004",
-      partName: "Coupling",
-      freshIncoming: 200,
-      freshReadyDelivery: 100,
-      freshNotGood: 10,
-      replatingIncoming: 40,
-      replatingReadyDelivery: 30,
-      replatingNotGood: 5,
-      stockTotal: 385
-    },
-    {
-      partNumber: "P005",
-      partName: "Steel Tube",
-      freshIncoming: 120,
-      freshReadyDelivery: 60,
-      freshNotGood: 6,
-      replatingIncoming: 25,
-      replatingReadyDelivery: 20,
-      replatingNotGood: 2,
-      stockTotal: 233
+
+  const fetchStockItems = async () => {
+    const token = localStorage.getItem('access_token');
+    try {
+      const response = await fetch(API_Item_Subcont(), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error('Network response was not ok');
+      const result = await response.json();
+      setData(result.data);
+      setFilteredData(result.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Error fetching data');
     }
-  ]);
-
-  // const fetchStockItems = async () => {
-  //   const token = localStorage.getItem('access_token');
-  //   try {
-  //     const response = await fetch(API_getStockItems, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Authorization': `Bearer ${token}`,
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-
-  //     if (!response.ok) throw new Error('Network response was not ok');
-  //     const result = await response.json();
-  //     setData(result.data);
-  //     setFilteredData(result.data);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //     Swal.fire('Error', 'Failed to fetch stock items.', 'error');
-  //   }
-  // };
+  };
 
   useEffect(() => {
-    // fetchStockItems();
+    fetchStockItems();
   }, []);
 
   useEffect(() => {
     let filtered = [...data];
     if (searchQuery) {
       filtered = filtered.filter((row) =>
-        row.partNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.partName.toLowerCase().includes(searchQuery.toLowerCase())
+        row.part_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.part_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Apply sorting
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        let aValue = a[sortConfig.key as keyof StockItem];
-        let bValue = b[sortConfig.key as keyof StockItem];
-
-        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
-        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
-
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
     setFilteredData(filtered);
-  }, [searchQuery, sortConfig, data]);
+  }, [searchQuery, data]);
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -181,16 +104,16 @@ const StockItems = () => {
               {paginatedData.length > 0 ? (
                 paginatedData.map((row, index) => (
                 <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                  <td className="px-2 py-4 text-center">{row.partNumber}</td>
-                  <td className="px-2 py-4 text-center">{row.partName}</td>
+                  <td className="px-2 py-4 text-center">{row.part_number}</td>
+                  <td className="px-2 py-4 text-center">{row.part_name}</td>
                   {/* Fresh columns */}
-                  <td className="px-2 py-4 text-center">{row.freshIncoming}</td>
-                  <td className="px-2 py-4 text-center">{row.freshReadyDelivery}</td>
-                  <td className="px-2 py-4 text-center">{row.freshNotGood}</td>
+                  <td className="px-2 py-4 text-center">{row.incoming_fresh_stock}</td>
+                  <td className="px-2 py-4 text-center">{row.ready_fresh_stock}</td>
+                  <td className="px-2 py-4 text-center">{row.ng_fresh_stock}</td>
                   {/* Replating columns */}
-                  <td className="px-2 py-4 text-center">{row.replatingIncoming}</td>
-                  <td className="px-2 py-4 text-center">{row.replatingReadyDelivery}</td>
-                  <td className="px-2 py-4 text-center">{row.replatingNotGood}</td>
+                  <td className="px-2 py-4 text-center">{row.incoming_replating_stock}</td>
+                  <td className="px-2 py-4 text-center">{row.ready_replating_stock}</td>
+                  <td className="px-2 py-4 text-center">{row.ng_replating_stock}</td>
                 </tr>
                 ))
               ) : (
