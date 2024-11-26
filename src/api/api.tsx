@@ -109,7 +109,7 @@ export const API_Print_Label_Subcont = () => API + getRolePath() + `/label/print
 export const API_Item_Subcont = () => API + getRolePath() + `/item/index`;
 export const API_List_Item_Subcont = () => API + getRolePath() + `/item/list`;
 export const API_Create_Item_Subcont = () => API + getRolePath() + `/item/store`;
-export const API_Transaction_Subcont = () => API + getRolePath() + `/trasaction/index`;
+export const API_Transaction_Subcont = () => API + getRolePath() + `/transaction/index`;
 export const API_Create_Transaction_Subcont = () => API + getRolePath() + `/transaction/store`;
 
 export const API_Performance_Report_Subcont = () => API + getRolePath() + `/performance-report/index/`;

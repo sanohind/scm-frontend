@@ -1,4 +1,4 @@
-import { BrowserRouter, HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./pages/Authentication/AuthContext";
 import ProtectedRoute from "./pages/Authentication/ProtectedRoute";
 import ManageUser from "./pages/ManageUser/Pages/ManageUser";
@@ -20,7 +20,6 @@ import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
 import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
-import CenteredTabs from "./pages/Subcon/Pages/Test";
 import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 import PrintPO from "./pages/Print/PrintPO";
 import Transactions from "./pages/Subcon/Pages/Transactions";
@@ -252,8 +251,7 @@ const App: React.FC = () => {
             path="/test"
             element={
               <>
-                <PageTitle title="Test | PT SANOH INDONESIA" />
-                <CenteredTabs/>
+
               </>
             }
           />

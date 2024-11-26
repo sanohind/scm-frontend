@@ -72,7 +72,7 @@ const StockItems = () => {
       <ToastContainer />
       <Breadcrumb pageName="Stock Items" />
       <div className="font-poppins bg-white text-black">
-        <div className="flex flex-col p-6 gap-4">
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
           <div className="flex justify-end">
             <SearchBar
               placeholder="Search part number or name..."
@@ -80,53 +80,48 @@ const StockItems = () => {
             />
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-1">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Part No</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400" rowSpan={2}>Part Name</th>
-                  <th className="py-3 px-3 text-center border-b border-x" colSpan={3}>Fresh</th>
-                  <th className="py-3 px-3 text-center border-b border-x" colSpan={3}>Replating</th>                  
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" rowSpan={2}>Part No</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" rowSpan={2}>Part Name</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" colSpan={3}>Fresh</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" colSpan={3}>Replating</th>
                 </tr>
                 <tr>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Unprocess Incoming Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">NG Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Unprocess Incoming Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">Ready Delivery Stock</th>
-                  <th className="py-2 px-2 text-center border-b border-x border-b-gray-400">NG Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Unprocess Incoming Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Ready Delivery Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Unprocess Incoming Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Ready Delivery Stock</th>
+                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Stock</th>
                 </tr>
-                
               </thead>
-
-              <tbody>
-              {paginatedData.length > 0 ? (
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {paginatedData.length > 0 ? (
                 paginatedData.map((row, index) => (
-                <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                  <td className="px-2 py-4 text-center">{row.part_number}</td>
-                  <td className="px-2 py-4 text-center">{row.part_name}</td>
-                  {/* Fresh columns */}
-                  <td className="px-2 py-4 text-center">{row.incoming_fresh_stock}</td>
-                  <td className="px-2 py-4 text-center">{row.ready_fresh_stock}</td>
-                  <td className="px-2 py-4 text-center">{row.ng_fresh_stock}</td>
-                  {/* Replating columns */}
-                  <td className="px-2 py-4 text-center">{row.incoming_replating_stock}</td>
-                  <td className="px-2 py-4 text-center">{row.ready_replating_stock}</td>
-                  <td className="px-2 py-4 text-center">{row.ng_replating_stock}</td>
-                </tr>
+                  <tr key={index} className="hover:bg-gray-50">
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_fresh_stock}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_fresh_stock}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_replating_stock}</td>
+                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
+                  </tr>
                 ))
-              ) : (
+                ) : (
                 <tr>
-                  <td colSpan={8} className="text-center py-4">
-                    No data available
-                  </td>
+                  <td colSpan={8} className="px-3 py-4 text-center text-gray-500">No data available</td>
                 </tr>
-              )}
+                )}
               </tbody>
-            
-            </table>
-          </div>
+              </table>
+            </div>
+            </div>
 
           <Pagination
             totalRows={filteredData.length}

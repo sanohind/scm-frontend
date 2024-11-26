@@ -1,189 +1,143 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
 import MultiSelect from '../../../components/Forms/MultiSelect';
-import { ToastContainer } from 'react-toastify';
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import { toast, ToastContainer } from 'react-toastify';
 import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-
-// Dummy data representing transaction logs
-const transactionLogs = [
-
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  {
-    timestamp: '2023-10-01T10:00:00Z',
-    type: 'ingoing',
-    status: 'fresh',
-    partName: 'Brake Pipe',
-    partNumber: 'P001',
-    qtyOk: 100,
-    qtyNg: 5,
-  },
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  {
-    timestamp: '2023-10-01T10:00:00Z',
-    type: 'ingoing',
-    status: 'fresh',
-    partName: 'Brake Pipe',
-    partNumber: 'P001',
-    qtyOk: 100,
-    qtyNg: 5,
-  },
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  {
-    timestamp: '2023-10-01T10:00:00Z',
-    type: 'ingoing',
-    status: 'fresh',
-    partName: 'Brake Pipe',
-    partNumber: 'P001',
-    qtyOk: 100,
-    qtyNg: 5,
-  },
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  {
-    timestamp: '2023-10-01T10:00:00Z',
-    type: 'ingoing',
-    status: 'fresh',
-    partName: 'Brake Pipe',
-    partNumber: 'P001',
-    qtyOk: 100,
-    qtyNg: 5,
-  },
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  {
-    timestamp: '2023-10-01T10:00:00Z',
-    type: 'ingoing',
-    status: 'fresh',
-    partName: 'Brake Pipe',
-    partNumber: 'P001',
-    qtyOk: 100,
-    qtyNg: 5,
-  },
-  {
-    timestamp: '2023-10-02T11:00:00Z',
-    type: 'ready',
-    status: 'replating',
-    partName: 'Fuel Line',
-    partNumber: 'P002',
-    qtyOk: 75,
-    qtyNg: 3,
-  },
-  // Add more dummy data as needed
-];
-
-const partOptions = [
-  { value: 'Brake Pipe', text: 'Brake Pipe' },
-  { value: 'Fuel Line', text: 'Fuel Line' },
-  { value: 'Hydraulic Hose', text: 'Hydraulic Hose' },
-  { value: 'Coupling', text: 'Coupling' },
-  { value: 'Steel Tube', text: 'Steel Tube' },
-];
+import { API_List_Item_Subcont, API_Transaction_Subcont } from '../../../api/api';
 
 const TransactionReport = () => {
-  const [filteredData, setFilteredData] = useState(transactionLogs);
+  interface TransactionLog {
+    timestamp: string;
+    type: string;
+    status: string;
+    partName: string;
+    partNumber: string;
+    qtyOk: number;
+    qtyNg: number;
+    deliveryNote: string;
+  }
+  
+  const [filteredData, setFilteredData] = useState<TransactionLog[]>([]);
+  const [allData, setAllData] = useState<TransactionLog[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(6);
-  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+  const [rowsPerPage] = useState(6);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: null,
-      endDate: null,
-      key: 'selection'
-    }
-  ]);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [partOptions, setPartOptions] = useState<{ value: string; text: string }[]>([]);
 
   useEffect(() => {
-    let filtered = [...transactionLogs];
+    const fetchPartOptions = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(API_List_Item_Subcont(), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const result = await response.json();
+        if (result.status) {
+          const options = result.data.map((item: { part_number: string; part_name: string }) => ({
+            value: item.part_name,
+            text: item.part_name,
+          }));
+          setPartOptions(options);
+        } else {
+          console.error('Failed to fetch part options:', result.message);
+          toast.error('Failed to fetch part options');
+        }
+      } catch (error) {
+        console.error('Error fetching part options:', error);
+        toast.error('Error fetching part options');
+      }
+    };
+
+    fetchPartOptions();
+  }, []);
+
+  const fetchTransactionLogs = async () => {
+    if (!startDate || !endDate) {
+      console.error('Start Date and End Date must be selected');
+      toast.warning('Start Date and End Date must be selected');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+
+      // Format dates in 'YYYY-MM-DD' format
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-CA'); // 'en-CA' gives 'YYYY-MM-DD' format
+      };
+
+      const startDateString = formatDate(startDate);
+      const endDateString = formatDate(endDate);
+
+      const response = await fetch(
+        `${API_Transaction_Subcont()}?start_date=${startDateString}&end_date=${endDateString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const result = await response.json();
+      if (result.status) {
+        const logs = result.data.map((item: any) => ({
+          timestamp: `${item.transaction_date}T${item.transaction_time}`,
+          type: item.transaction_type,
+          status: item.status,
+          partName: item.part_name,
+          partNumber: item.part_number,
+          qtyOk: item.qty_ok,
+          qtyNg: item.qty_ng,
+          deliveryNote: item.delivery_note,
+        }));
+        setAllData(logs);
+        setFilteredData(logs);
+      } else {
+        console.error('Failed to fetch transaction logs:', result.message);
+        toast.error('Failed to fetch transaction logs');
+      }
+    } catch (error) {
+      console.error('Error fetching transaction logs:', error);
+      toast.error('Error fetching transaction logs');
+    }
+  };
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      fetchTransactionLogs();
+    }
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    let filtered = [...allData];
 
     // Filter by transaction type
     if (selectedTransactionTypes.length > 0) {
-      filtered = filtered.filter((row) => selectedTransactionTypes.includes(row.type));
+      filtered = filtered.filter((row: any) => selectedTransactionTypes.includes(row.type));
     }
 
     // Filter by status
     if (selectedStatuses.length > 0) {
-      filtered = filtered.filter((row) => selectedStatuses.includes(row.status));
+      filtered = filtered.filter((row: any) => selectedStatuses.includes(row.status));
     }
 
     // Filter by part name
     if (selectedParts.length > 0) {
-      filtered = filtered.filter((row) => selectedParts.includes(row.partName));
-    }
-
-    // Filter by date range
-    if (dateRange[0].startDate && dateRange[0].endDate) {
-      filtered = filtered.filter((row) => {
-        const rowDate = new Date(row.timestamp);
-        return rowDate >= dateRange[0].startDate && rowDate <= new Date(dateRange[0].endDate.getTime() + 24 * 60 * 60 * 1000 - 1);
-      });
+      filtered = filtered.filter((row: any) => selectedParts.includes(row.partName));
     }
 
     // Apply sorting
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
-
-        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
-        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
-
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-
     setFilteredData(filtered);
-  }, [selectedTransactionTypes, selectedStatuses, selectedParts, dateRange, sortConfig]);
+  }, [allData, selectedTransactionTypes, selectedStatuses, selectedParts]);
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -191,13 +145,22 @@ const TransactionReport = () => {
   );
 
   const handlePageChange = (page: number) => setCurrentPage(page);
-  
+
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-    const tableColumn = ["Date", "Transaction Type", "Status", "Part Name", "Part Number", "Quantity OK", "Quantity NG", "Total"];
+    const tableColumn = [
+      'Date',
+      'Transaction Type',
+      'Status',
+      'Part Name',
+      'Part Number',
+      'Quantity OK',
+      'Quantity NG',
+      'Total',
+    ];
     const tableRows: (string | number)[][] = [];
 
-    filteredData.forEach(row => {
+    filteredData.forEach((row) => {
       const rowData = [
         new Date(row.timestamp).toLocaleString(),
         row.type,
@@ -206,21 +169,21 @@ const TransactionReport = () => {
         row.partNumber,
         row.qtyOk,
         row.qtyNg,
-        row.qtyOk + row.qtyNg
+        row.qtyOk + row.qtyNg,
       ];
       tableRows.push(rowData);
     });
 
     // Add totals row
     const totalsRow = [
-      "Totals:",
-      "",
-      "",
-      "",
-      "",
+      'Totals:',
+      '',
+      '',
+      '',
+      '',
       filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
       filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
-      filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)
+      filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0),
     ];
     tableRows.push(totalsRow);
 
@@ -234,17 +197,20 @@ const TransactionReport = () => {
       const bpName = localStorage.getItem('bp_code') || 'All';
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Transaction Report ${bpName}`, doc.internal.pageSize.getWidth() / 2, 38, { align: 'center' });
+      doc.text(`Transaction Report ${bpName}`, doc.internal.pageSize.getWidth() / 2, 38, {
+        align: 'center',
+      });
 
       // Add date range
-      const startDate = dateRange[0].startDate ? new Date(dateRange[0].startDate).toLocaleDateString() : 'All';
-      const endDate = dateRange[0].endDate ? new Date(dateRange[0].endDate).toLocaleDateString() : 'All';
+      const startDateString = startDate ? startDate.toLocaleDateString() : 'All';
+      const endDateString = endDate ? endDate.toLocaleDateString() : 'All';
       doc.setFont('helvetica', 'normal');
-      doc.text(`Date Range: ${startDate} - ${endDate}`, 10, 45);
+      doc.text(`Date Range: ${startDateString} - ${endDateString}`, 10, 45);
 
       // Add filters
       const filters = [];
-      if (selectedTransactionTypes.length > 0) filters.push(`Transaction Types: ${selectedTransactionTypes.join(', ')}`);
+      if (selectedTransactionTypes.length > 0)
+        filters.push(`Transaction Types: ${selectedTransactionTypes.join(', ')}`);
       if (selectedStatuses.length > 0) filters.push(`Status: ${selectedStatuses.join(', ')}`);
       if (selectedParts.length > 0) filters.push(`Parts: ${selectedParts.join(', ')}`);
       doc.setFont('helvetica', 'normal');
@@ -267,28 +233,36 @@ const TransactionReport = () => {
   };
 
   const handleDownloadExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(filteredData.map(row => ({
-      Date: new Date(row.timestamp).toLocaleString(),
-      'Transaction Type': row.type,
-      Status: row.status,
-      'Part Name': row.partName,
-      'Part Number': row.partNumber,
-      'Quantity OK': row.qtyOk,
-      'Quantity NG': row.qtyNg,
-      Total: row.qtyOk + row.qtyNg,
-    })));
+    const ws = XLSX.utils.json_to_sheet(
+      filteredData.map((row) => ({
+        Date: new Date(row.timestamp).toLocaleString(),
+        'Transaction Type': row.type,
+        Status: row.status,
+        'Part Name': row.partName,
+        'Part Number': row.partNumber,
+        'Quantity OK': row.qtyOk,
+        'Quantity NG': row.qtyNg,
+        Total: row.qtyOk + row.qtyNg,
+      }))
+    );
 
     // Add totals row
-    XLSX.utils.sheet_add_aoa(ws, [[
-      'Totals:',
-      '',
-      '',
-      '',
-      '',
-      filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
-      filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
-      filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)
-    ]], { origin: -1 });
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [
+        [
+          'Totals:',
+          '',
+          '',
+          '',
+          '',
+          filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
+          filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
+          filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0),
+        ],
+      ],
+      { origin: -1 }
+    );
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transaction Report');
@@ -296,85 +270,81 @@ const TransactionReport = () => {
     const bpName = localStorage.getItem('bp_code') || 'All';
     XLSX.writeFile(wb, `transaction_report_${bpName}.xlsx`);
   };
-  
+
   return (
     <>
       <ToastContainer />
       <Breadcrumb pageName="Transaction Report" />
       <div className="font-poppins bg-white text-black">
-        <div className="flex flex-col p-6 gap-4">
-          <div className="flex justify-between gap-4">
-            <div className="relative w-1/4">
-              <div
-                className="border rounded px-4 py-3 cursor-pointer bg-white flex justify-between text-gray-400"
-                onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-              >
-                {dateRange[0].startDate && dateRange[0].endDate ? (
-                  `${dateRange[0].startDate.toLocaleDateString()} - ${dateRange[0].endDate.toLocaleDateString()}`
-                ) : (
-                  'Select Date Range'
-                )}
-                {dateRange[0].startDate && dateRange[0].endDate && (
-                  <button
-                    className="ml-2 text-black"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDateRange([{ startDate: null, endDate: null, key: 'selection' }]);
-                    }}
-                  >
-                    &times;
-                  </button>
-                )}
-              </div>
-              {isDatePickerOpen && (
-                <>
-                  <div className="fixed inset-0" onClick={() => setIsDatePickerOpen(false)} />
-                  <div className="absolute z-10 mt-2">
-                    <DateRange
-                      editableDateInputs={true}
-                      onChange={(item) => {
-                        setDateRange([
-                          {
-                            startDate: item.selection.startDate || null,
-                            endDate: item.selection.endDate || null,
-                            key: 'selection',
-                          },
-                        ]);
-                      }}
-                      moveRangeOnFirstSelection={false}
-                      ranges={dateRange}
-                      className="border rounded shadow-lg bg-white"
-                    />
-                  </div>
-                </>
-              )}
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+          {/* Filters Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* Start Date */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Date
+              </label>
+              <input
+                type="date"
+                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setStartDate(new Date(e.target.value))}
+              />
             </div>
-            <div className="w-1/4">
+
+            {/* End Date */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                End Date
+              </label>
+              <input
+                type="date"
+                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setEndDate(new Date(e.target.value))}
+              />
+            </div>
+
+            {/* Transaction Type */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Transaction Type
+              </label>
               <MultiSelect
                 id="transactionTypeSelect"
                 label="Filter by Transaction Type"
                 options={[
-                  { value: 'ingoing', text: 'Ingoing' },
-                  { value: 'ready', text: 'Ready' },
-                  { value: 'outgoing', text: 'Outgoing' },
+                  { value: 'Ingoing', text: 'Ingoing' },
+                  { value: 'Process', text: 'Process' },
+                  { value: 'Outgoing', text: 'Outgoing' },
                 ]}
                 selectedOptions={selectedTransactionTypes}
                 onChange={setSelectedTransactionTypes}
               />
             </div>
-            <div className="w-1/4">
+
+            {/* Status */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <MultiSelect
                 id="statusSelect"
                 label="Filter by Status"
                 options={[
-                  { value: 'fresh', text: 'Fresh' },
-                  { value: 'replating', text: 'Replating' },
+                  { value: 'Fresh', text: 'Fresh' },
+                  { value: 'Replating', text: 'Replating' },
                 ]}
                 selectedOptions={selectedStatuses}
                 onChange={setSelectedStatuses}
               />
             </div>
-            <div className="w-1/4">
+
+            {/* Part Name */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Part Name
+              </label>
               <MultiSelect
                 id="partNameSelect"
                 label="Filter by Part Name"
@@ -383,89 +353,83 @@ const TransactionReport = () => {
                 onChange={setSelectedParts}
               />
             </div>
-            
-          </div>
-          <div className="flex justify-end gap-4">
-            
-
-          <button
-            className="bg-blue-900 text-white py-2 px-4 rounded-md flex items-center gap-2"
-            onClick={handleDownloadPDF}
-          >
-            <FaFilePdf />
-            Download PDF
-          </button>
-          <button
-            className="bg-blue-900 text-white py-2 px-4 rounded-md flex items-center gap-2"
-            onClick={handleDownloadExcel}
-          >
-            <FaFileExcel />
-            Download Excel
-          </button>
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-1">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Date</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Delivery Note</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Transaction Type</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Status</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Part Name</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Part Number</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Quantity OK</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Quantity NG</th>
-                  <th className="py-3 px-3 text-center border-b border-x border-b-gray-400">Total</th>
-                </tr>
-              </thead>
+          {/* Download Buttons */}
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <button
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
+              onClick={handleDownloadPDF}
+            >
+              <FaFilePdf className="w-4 h-4" />
+              <span>Download PDF</span>
+            </button>
+            <button
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
+              onClick={handleDownloadExcel}
+            >
+              <FaFileExcel className="w-4 h-4" />
+              <span>Download Excel</span>
+            </button>
+          </div>
 
-              <tbody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center">{new Date(row.timestamp).toLocaleString()}</td>
-                      <td className="px-2 py-4 text-center">{row.deliveryNote}</td>
-                      <td className="px-2 py-4 text-center">{row.type}</td>
-                      <td className="px-2 py-4 text-center">{row.status}</td>
-                      <td className="px-2 py-4 text-center">{row.partName}</td>
-                      <td className="px-2 py-4 text-center">{row.partNumber}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyOk}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyNg}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyOk + row.qtyNg}</td>
-                    </tr>
-                  ))
-                ) : (
+          {/* Table Section */}
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td colSpan={8} className="text-center py-4">
-                      No data available
+                    {['Date', 'Delivery Note', 'Transaction Type', 'Status', 'Part Name', 'Part Number', 'Qty OK', 'Qty NG', 'Total'].map((header) => (
+                      <th key={header} className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {paginatedData.length > 0 ? (
+                    paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.type}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyNg}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk + row.qtyNg}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={9} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot className="bg-gray-50">
+                  <tr>
+                    <td colSpan={6} className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">Totals:</td>
+                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">{paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}</td>
+                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">{paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}</td>
+                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                      {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
                     </td>
                   </tr>
-                )}
-              </tbody>
-            <tfoot>
-              <tr className="bg-gray-100">
-                <td colSpan={6} className="px-2 py-4 text-center font-semibold">Totals:</td>
-                <td className="px-2 py-4 text-center font-semibold">
-                  {paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}
-                </td>
-                <td className="px-2 py-4 text-center font-semibold">
-                  {paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}
-                </td>
-                <td className="px-2 py-4 text-center font-semibold">
-                  {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
-                </td>
-              </tr>
-            </tfoot>
-            </table>
+                </tfoot>
+              </table>
+            </div>
           </div>
 
-          <Pagination
-            totalRows={filteredData.length}
-            rowsPerPage={rowsPerPage}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
+          {/* Pagination */}
+          <div className="mt-4">
+            <Pagination
+              totalRows={filteredData.length}
+              rowsPerPage={rowsPerPage}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       </div>
     </>

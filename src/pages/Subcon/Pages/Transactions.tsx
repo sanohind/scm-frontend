@@ -17,42 +17,42 @@ const StockManagement = () => {
   const [deliveryNote, setDeliveryNote] = useState('');
   const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
 
-interface ApiItem {
-  part_number: string;
-  part_name: string;
-}
+  interface ApiItem {
+    part_number: string;
+    part_name: string;
+  }
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(API_List_Item_Subcont(), {
-        headers: {
-          'Authorization': `Bearer ${token}`
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(API_List_Item_Subcont(), {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const result = await response.json();
+        if (result.status) {
+          // Transform the data structure to match our needs
+          const transformedData = result.data.map((item: ApiItem) => ({
+            partNumber: item.part_number,
+            partName: item.part_name
+          }));
+          setApiData(transformedData);
         }
-      });
-      const result = await response.json();
-      if (result.status) {
-        // Transform the data structure to match our needs
-        const transformedData = result.data.map((item: ApiItem) => ({
-          partNumber: item.part_number,
-          partName: item.part_name
-        }));
-        setApiData(transformedData);
+      } catch (error) {
+        console.error('Error fetching parts:', error);
       }
-    } catch (error) {
-      console.error('Error fetching parts:', error);
-    }
-  };
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
-// Transform API data to match react-select format
-const partOptions = apiData.map(item => ({
-  value: item.partNumber,
-  label: item.partName
-}));
+  // Transform API data to match react-select format
+  const partOptions = apiData.map(item => ({
+    value: item.partNumber,
+    label: item.partName
+  }));
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -131,29 +131,29 @@ const partOptions = apiData.map(item => ({
     <>
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Transactions" />
-      <div className='max-w-[1200px] mx-auto px-4 md:px-6'>
-
+      <div className='mx-auto'>
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs value={value} onChange={handleChange} centered>
             <Tab label="Record Incoming" />
-            <Tab label="Record Ready" />
+            <Tab label="Record Process" />
             <Tab label="Record Outgoing" />
           </Tabs>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
-              <div className="p-4 md:p-6.5 ">
-
+              <div className="p-4 md:p-6.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Left Column */}
+              <div>
                 {/* Status Selection */}
-                <div className="mb-4.5 w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Status <span className="text-meta-1">*</span>
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">Status <span className="text-meta-1">*</span>
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     required
-                  >
+                      >
                     <option value="" disabled>Select Status</option>
                     <option value="Fresh">Fresh</option>
                     <option value="Replating">Replating</option>
@@ -162,25 +162,24 @@ const partOptions = apiData.map(item => ({
 
                 {/* Delivery Note Input */}
                 {value !== 1 && (
-                  <div className="mb-4.5 w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Delivery Note <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={deliveryNote}
-                    onChange={(e) => setDeliveryNote(e.target.value)}
-                    placeholder="Enter Delivery Note"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    required
-                  />
+                  <div className="mb-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Delivery Note <span className="text-meta-1">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={deliveryNote}
+                      onChange={(e) => setDeliveryNote(e.target.value)}
+                      placeholder="Enter Delivery Note"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      required
+                    />
                   </div>
                 )}
 
                 {/* Part Name Selection */}
-                <div className="mb-4.5 w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Part Name <span className="text-meta-1">*</span>
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">Part Name <span className="text-meta-1">*</span>
                   </label>
                   <Select
                     options={partOptions}
@@ -195,53 +194,53 @@ const partOptions = apiData.map(item => ({
 
                 {/* Part Number Display */}
                 <div className="mb-4.5 w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                  Part Number
+                  <label className="mb-2.5 block text-black dark:text-white">Part Number
                   </label>
                   <input
                     type="text"
                     value={selectedPart ? selectedPart.value : ''}
                     readOnly
                     className="w-full rounded border-[1.5px] border-stroke bg-gray-100 py-3 px-5 text-black outline-none transition disabled:cursor-default dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
+                      />
                 </div>
-
-                {/* Quantity OK */}
-                <div className="mb-4.5 w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Quantity OK <span className="text-meta-1">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={qtyOk}
-                    onChange={(e) => setQtyOk(e.target.value)}
-                    placeholder="Enter Quantity OK"
-                    required
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
                 </div>
+                  {/* Right Column */}
+                  <div>
+                    {/* Quantity OK */}
+                    <div className="mb-4.5 w-full">
+                      <label className="mb-2.5 block text-black dark:text-white">Quantity OK <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={qtyOk}
+                        onChange={(e) => setQtyOk(e.target.value)}
+                        placeholder="Enter Quantity OK"
+                        required
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
 
-                {/* Quantity NG */}
-                <div className="mb-4.5 w-full">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Quantity NG  <span className="text-gray-400">( Leave blank if no NG parts )</span>
-                    </label>
-                  <input
-                    type="number"
-                    value={qtyNg}
-                    onChange={(e) => setQtyNg(e.target.value)}
-                    placeholder="Enter Quantity NG"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
+                    {/* Quantity NG */}
+                    <div className="mb-4.5 w-full">
+                      <label className="mb-2.5 block text-black dark:text-white">Quantity NG <span className="text-gray-400">( Leave blank if no NG parts )</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={qtyNg}
+                        onChange={(e) => setQtyNg(e.target.value)}
+                        placeholder="Enter Quantity NG"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <button 
+                      type="submit" 
+                      className="w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90">
+                      Submit
+                    </button>
+                  </div>
                 </div>
-
-                {/* Submit Button */}
-                <button 
-                  type="submit" 
-                  className="w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
-                >
-                  Submit
-                </button>
               </div>
             </form>
           </div>
