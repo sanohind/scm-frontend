@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
-import { FaSortDown, FaSortUp, FaExclamationTriangle  } from 'react-icons/fa';
+import { FaSortDown, FaSortUp, FaExclamationTriangle } from 'react-icons/fa';
 import { API_PO_Supplier, API_Update_PO_Supplier } from '../../../../api/api';
 import SearchMonth from '../../../Table2/SearchMonth';
 import SearchBar from '../../../Table2/SearchBar';
@@ -61,7 +61,6 @@ const PurchaseOrder = () => {
         reason: po.reason || '',
         note: po.note || '-',
       }));
-      // toast.success('Purchase orders fetched successfully');
 
       setData(purchaseOrders);
       setFilteredData(purchaseOrders);
@@ -183,28 +182,28 @@ const PurchaseOrder = () => {
   };
 
   const SkeletonRow = () => (
-    <tr className="odd:bg-white even:bg-gray-50 border-b">
-        <td className="px-2 py-4 text-center">
-            <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-16 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-28 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-        </td>
-        <td className="px-2 py-4 text-center">
-            <div className="w-24 h-8 mx-auto skeleton rounded"></div>
-        </td>
+    <tr className="animate-pulse">
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
     </tr>
   );
 
@@ -213,140 +212,144 @@ const PurchaseOrder = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Purchase Order" />
       <div className="bg-white">
-        <div className="flex flex-col p-6">
-          <div className="flex justify-between items-center">
-            <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
+        <div className="flex flex-col p-2 md:p-4 lg:p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700">Filter by Month</label>
+              <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
+            </div>
             <SearchBar
-              placeholder="Search no purchase order..."
+              placeholder="Search purchase order here..."
               onSearchChange={setSearchQuery}
             />
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">No. PO
-                  </th>
-                  <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                    onClick={() => handleSort('poDate')}
-                  >
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'poDate' ? (
-                        sortConfig.direction === 'asc' ? (
-                          <FaSortUp className="mr-1" />
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[15%]">
+                      No. PO
+                    </th>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[15%]"
+                      onClick={() => handleSort('poDate')}
+                    >
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'poDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
                         ) : (
-                          <FaSortDown className="mr-1" />
-                        )
-                      ) : (
-                        <FaSortDown className="opacity-50 mr-1" />
-                      )}
-                      PO Date
-                    </span>
-                  </th>
-                  <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                    onClick={() => handleSort('planDelivery')}
-                  >
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'planDelivery' ? (
-                        sortConfig.direction === 'asc' ? (
-                          <FaSortUp className="mr-1" />
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        PO Date
+                      </span>
+                    </th>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[15%]"
+                      onClick={() => handleSort('planDelivery')}
+                    >
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'planDelivery' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
                         ) : (
-                          <FaSortDown className="mr-1" />
-                        )
-                      ) : (
-                        <FaSortDown className="opacity-50 mr-1" />
-                      )}
-                      Plan Delivery
-                    </span>
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                    Revision No.
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-70">
-                    Note
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                    Status
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-50">
-                    Response
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                      Array.from({ length: rowsPerPage }).map((_, index) => (
-                          <SkeletonRow key={index} />
-                      ))
-                ) : (
-                    paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center">
-                        <button
-                          onClick={() => handlePONavigate(row.noPO)}
-                          className="text-blue-600 underline"
-                        >
-                          {row.noPO}
-                        </button>
-                      </td>
-                      <td className="px-2 py-4 text-center">{row.poDate}</td>
-                      <td className="px-2 py-4 text-center">{row.planDelivery}</td>
-                      <td className="px-2 py-4 text-center">{row.poRevision}</td>
-                      <td className="px-2 py-4 text-center">{row.note}</td>
-                      <td className="px-2 py-4 text-center">{row.status}</td>
-                      <td className={`text-center ${
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        Plan Delivery
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[5%]">
+                      Revision No.
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]">
+                      Note
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">
+                      Status
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]">
+                      Response
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <SkeletonRow key={index} />
+                    ))
+                  ) : paginatedData.length > 0 ? (
+                    paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <button
+                            onClick={() => handlePONavigate(row.noPO)}
+                            className="text-blue-600 underline"
+                          >
+                            {row.noPO}
+                          </button>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.poDate}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.planDelivery}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.poRevision}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.note}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
+                        <td className={`px-3 py-3 text-center whitespace-nowrap ${
                           row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-600' : ''
                         }`}>
-                        {row.response === 'Accepted' ? (
-                          <span className="text-black">{row.response}</span>
-                        ) : row.response === 'Declined' ? (
-                          <div className="flex items-center justify-center">
-                            <FaExclamationTriangle
-                              className="text-white mr-2 cursor-pointer"
-                              onClick={() =>
-                                Swal.fire({
-                                  title: 'Reason for Decline',
-                                  text: row.reason,
-                                  icon: 'info',
-                                  confirmButtonColor: '#1E3A8A',
-                                })
-                              }
-                            />
-                            <span className="text-white">{row.response}</span>
-                          </div>
-                        ) : (
-                          <div className="flex gap-2 justify-center">
-                            <button
-                              className="px-4 py-2 bg-green-500 text-black rounded"
-                              onClick={() => handleResponse(row.noPO, 'Accepted')}
-                            >
-                              Accept
-                            </button>
-                            <button
-                              className="px-4 py-2 bg-red-600 text-white rounded"
-                              onClick={() => handleResponse(row.noPO, 'Declined')}
-                            >
-                              Decline
-                            </button>
-                          </div>
-                        )}
+                          {row.response === 'Accepted' ? (
+                            <span className="text-black">{row.response}</span>
+                          ) : row.response === 'Declined' ? (
+                            <div className="flex items-center justify-center">
+                              <FaExclamationTriangle
+                                className="text-white mr-2 cursor-pointer"
+                                onClick={() =>
+                                  Swal.fire({
+                                    title: 'Reason for Decline',
+                                    text: row.reason,
+                                    icon: 'info',
+                                    confirmButtonColor: '#1E3A8A',
+                                  })
+                                }
+                              />
+                              <span className="text-white">{row.response}</span>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2 justify-center">
+                              <button
+                                className="px-4 py-2 bg-green-500 text-black rounded"
+                                onClick={() => handleResponse(row.noPO, 'Accepted')}
+                              >
+                                Accept
+                              </button>
+                              <button
+                                className="px-4 py-2 bg-red-600 text-white rounded"
+                                onClick={() => handleResponse(row.noPO, 'Declined')}
+                              >
+                                Decline
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="px-3 py-4 text-center text-gray-500">
+                        No Purchase Order available for now
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={7} className="text-center py-4">
-                      No Purchase Order available for now
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Pagination

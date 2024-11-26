@@ -36,17 +36,17 @@ const DeliveryNoteDetailEdit = () => {
     statusDN: '',
     confirmUpdateAt: '',
   });
-  const [data, setData] = useState<Detail[]>([]);
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
 
   // Fetch Delivery Note Details
   const fetchDeliveryNotes = async () => {
     const token = localStorage.getItem('access_token');
-
+    setLoading(true);
     try {
       const response = await fetch(`${API_DN_Detail()}${noDN}`, {
         method: 'GET',
@@ -86,10 +86,8 @@ const DeliveryNoteDetailEdit = () => {
         }));
 
         
-
-        setData(details);
         setFilteredData(details);
-
+        setLoading(false);
       } else {
         toast.error('No Delivery Notes found.');
       }
@@ -179,88 +177,165 @@ const DeliveryNoteDetailEdit = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note Detail" />
       <div className="font-poppins bg-white text-black">
-        <div className="flex flex-col p-6 gap-4">
-          <div className="flex items-center">
-            <span className="mr-2">No. DN:</span>
-            <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.noDN}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <span className="mr-2">No. PO:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.noPO}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-2">Plan Delivery Date:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.planDelivery}</span>
-              </div>
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+          {/* Header Section */}
+          <div className="flex flex-col space-y-4 md:space-y-6">
+            {/* No. DN */}
+            <div className="flex items-center">
+              <span className="text-sm md:text-base font-medium mr-2">No. DN:</span>
+              {loading ? (
+                <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-32"></div>
+              ) : (
+                <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">
+                  {dnDetails.noDN}
+                </span>
+              )}
             </div>
-            <div className="flex gap-2 items-center">
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded"
-                onClick={handlePrintLabel}
-              >
-                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print Label</span>
-              </button>
-              <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={handlePrintDN}
-              >
-                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print DN</span>
-              </button>
+
+            {/* Details Section */}
+            <div className="flex flex-col lg:flex-row lg:justify-between space-y-4 lg:space-y-0">
+              {/* Left side details */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* No. PO */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">No. PO:</span>
+                  {loading ? (
+                    <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-32"></div>
+                  ) : (
+                    <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">
+                      {dnDetails.noPO}
+                    </span>
+                  )}
+                </div>
+                {/* Plan Delivery Date */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">Plan Delivery Date:</span>
+                  {loading ? (
+                    <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-36"></div>
+                  ) : (
+                    <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">
+                      {dnDetails.planDelivery}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Print Buttons */}
+              <div className="flex gap-2 items-center">
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-6 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handlePrintLabel}
+                >
+                  <FaPrint className="w-4 h-4" />
+                  <span>Print Label</span>
+                </button>
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-6 md:px-8 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handlePrintDN}
+                >
+                  <FaPrint className="w-4 h-4" />
+                  <span>Print DN</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-1">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th className="px-3 py-3 text-center">No</th>
-                  <th className="px-2 py-3 text-center">Part Number</th>
-                  <th className="px-2 py-3 text-center">Part Name</th>
-                  <th className="px-2 py-3 text-center">UoM</th>
-                  <th className="px-2 py-3 text-center">QTY PO</th>
-                  <th className="px-2 py-3 text-center">QTY Label</th>
-                  <th className="px-2 py-3 text-center">QTY Requested</th>
-                  <th className="px-2 py-3 text-center">QTY Confirm</th>
-                  <th className="px-2 py-3 text-center">QTY Delivered</th>
-                  <th className="px-2 py-3 text-center">QTY Minus</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((detail, index) => (
-                  <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                    <td className="px-2 py-4 text-center">{detail.no}</td>
-                    <td className="px-2 py-4 text-center">{detail.partNumber}</td>
-                    <td className="px-2 py-4 text-center">{detail.partName}</td>
-                    <td className="px-2 py-4 text-center">{detail.UoM}</td>
-                    <td className="px-2 py-4 text-center">{detail.QTY}</td>
-                    <td className="px-2 py-4 text-center">{detail.qtyLabel}</td>
-                    <td className="px-2 py-4 text-center">{detail.qtyRequested}</td>
-                    <td className="px-2 py-4 text-center">
-                      {confirmMode ? (
-                        <input
-                          type="number"
-                          className="border border-gray-300 rounded text-center"
-                          value={detail.qtyConfirm}
-                          onChange={(e) => handleQtyChange(index, e.target.value)}
-                        />
-                      ) : (
-                        detail.qtyConfirm
-                      )}
-                    </td>
-                    <td className="px-2 py-4 text-center">{detail.qtyDelivered}</td>
-                    <td className="px-2 py-4 text-center">
-                      {isNaN(Number(detail.qtyMinus)) ? '-' : detail.qtyMinus}
-                    </td>
+          {/* Table */}
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[5%]"
+                    >
+                      No
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[15%]">
+                      Part Number
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[24%]">
+                      Part Name
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      UoM
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY PO
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY Label
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY Requested
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY Confirm
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY Delivered
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[8%]">
+                      QTY Minus
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        {Array.from({ length: 10 }).map((_, idx) => (
+                          <td key={idx} className="px-3 py-3 text-center whitespace-nowrap">
+                            <div className="h-4 bg-gray-200 rounded"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : filteredData.length > 0 ? (
+                    filteredData.map((detail, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.no}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {detail.partNumber}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partName}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.UoM}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.QTY}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {detail.qtyLabel}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {detail.qtyRequested}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {confirmMode ? (
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded text-center"
+                              value={detail.qtyConfirm}
+                              onChange={(e) => handleQtyChange(index, e.target.value)}
+                            />
+                          ) : (
+                            detail.qtyConfirm
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {detail.qtyDelivered}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {isNaN(Number(detail.qtyMinus)) ? '-' : detail.qtyMinus}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={10} className="px-3 py-4 text-center text-gray-500">
+                        No details available for this delivery note
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -268,7 +343,7 @@ const DeliveryNoteDetailEdit = () => {
             {!confirmMode && (
               <button
                 onClick={handleConfirmMode}
-                className="bg-blue-900 text-white px-4 py-2 rounded"
+                className="bg-blue-900 text-white px-4 py-2 rounded-lg"
               >
                 {dnDetails.confirmUpdateAt ? 'Edit' : 'Confirm Order'}
               </button>
@@ -282,24 +357,27 @@ const DeliveryNoteDetailEdit = () => {
                   onChange={() => setIsCheckboxChecked(!isCheckboxChecked)}
                   className="mr-1"
                 />
-                <label className="text-sm">I confirm that the data I provided is correct</label>
+                <label className="text-sm">
+                  I confirm that the data I provided is correct
+                </label>
               </div>
             )}
-
           </div>
           <div className="flex items-center mb-20">
             {confirmMode && (
               <>
                 <button
                   onClick={handleSubmit}
-                  className={`bg-green-600 text-white px-6 py-2 rounded mr-2 ${!isCheckboxChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-green-600 text-white px-6 py-2 rounded-lg mr-2 ${
+                    !isCheckboxChecked ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                   disabled={!isCheckboxChecked}
                 >
                   Save
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="bg-red-600 text-white px-4 py-2 rounded"
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg"
                 >
                   Cancel
                 </button>

@@ -141,157 +141,164 @@ const PurchaseOrderDetail = () => {
     window.open(`/#/print/purchase-order?noPO=${noPO}`, '_blank');
   };
 
-  const SkeletonRow = () => (
-    <tr className="animate-pulse">
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-12 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-24 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-12 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
-      </td>
-      <td className="px-2 py-4 text-center">
-        <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
-      </td>
-    </tr>
-  );
-
   return (
     <>
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Purchase Order Detail" />
       <div className="bg-white text-black">
-        <div className="flex flex-col p-6 gap-4">
-          <div className="flex items-center">
-            <span className="mr-2">No. PO:</span>
-            {loading ? (
-              <div className="h-6 skeleton rounded w-24"></div>
-            ) : (
-              <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.noPO}</span>
-            )}
-          </div>
-          
-          <div className="flex justify-between">
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <span className="mr-2">Plan Delivery Date:</span>
-                {loading ? (
-                  <div className="h-6 skeleton rounded w-32"></div>
-                ) : (
-                  <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.planDelivery}</span>
-                )}
-              </div>
-              <div className="flex items-center">
-                <span className="mr-2">Note:</span>
-                {loading ? (
-                  <div className="h-6 skeleton rounded w-48"></div>
-                ) : (
-                  <span className="bg-stone-300 px-4 py-2 rounded">{poDetails.note}</span>
-                )}
-              </div>
-            </div>
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+            {/* Header Section */}
+            <div className="flex flex-col space-y-4 md:space-y-6">
+            {/* PO Number */}
             <div className="flex items-center">
-              <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={handlePrintPO}
-                    >
-                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print PO</span>
-              </button>
+              <span className="text-sm md:text-base font-medium mr-2">No. PO :</span>
+              {loading ? (
+              <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-32"></div>
+              ) : (
+              <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{poDetails.noPO}</span>
+              )}
+            </div>
+
+            {/* Details Section */}
+            <div className="flex flex-col lg:flex-row lg:justify-between space-y-4 lg:space-y-0">
+              {/* Left side details */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Plan Delivery Date */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">Plan Delivery Date :</span>
+                  {loading ? (
+                  <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-36"></div>
+                  ) : (
+                  <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{poDetails.planDelivery}</span>
+                  )}
+                </div>
+
+                {/* Note */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">Note :</span>
+                  {loading ? (
+                  <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-48"></div>
+                  ) : (
+                  <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{poDetails.note}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Print Button */}
+              <div className="flex items-center">
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-6 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handlePrintPO}
+                >
+                  <FaPrint className="w-4 h-4" />
+                  <span>Print PO</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex justify-end">
+              <div className="w-full">
+              <SearchBar
+                placeholder="Search part number or name..."
+                onSearchChange={setSearchQuery}
+              />
+              </div>
             </div>
           </div>
-        
-
-          <div className="flex justify-end">
-            <SearchBar
-              placeholder="Search part number or name..."
-              onSearchChange={setSearchQuery}
-            />
-          </div>
-
-
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-1">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-20"
-                    onClick={() => handleSort('no')}>
-                    <span className="flex items-center justify-center">
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th 
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[5%] cursor-pointer"
+                      onClick={() => handleSort('no')}
+                    >
+                      <span className="flex items-center justify-center">
                       {sortConfig.key === 'no' ? (
                         sortConfig.direction === 'asc' ? (
-                          <FaSortUp className="mr-1" />
+                        <FaSortUp className="mr-1" />
                         ) : (
-                          <FaSortDown className="mr-1" />
+                        <FaSortDown className="mr-1" />
                         )
                       ) : (
                         <FaSortDown className="opacity-50 mr-1" />
                       )}
                       No
-                    </span>
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-60">Part Number</th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-80">Part Name</th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">UoM</th>
-                  <th
-                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-30"
-                    onClick={() => handleSort('QTY')}
-                  >
-                    <span className="flex items-center justify-center">
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[25%]">Part Number</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]">Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">UoM</th>
+                    <th 
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%] cursor-pointer"
+                      onClick={() => handleSort('QTY')}
+                    >
+                      <span className="flex items-center justify-center">
                       {sortConfig.key === 'QTY' ? (
                         sortConfig.direction === 'asc' ? (
-                          <FaSortUp className="mr-1" />
+                        <FaSortUp className="mr-1" />
                         ) : (
-                          <FaSortDown className="mr-1" />
+                        <FaSortDown className="mr-1" />
                         )
                       ) : (
                         <FaSortDown className="opacity-50 mr-1" />
                       )}
                       QTY PO
-                    </span>
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">QTY Receipt</th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">QTY Minus</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">QTY Receipt</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">QTY Minus</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
                   Array.from({ length: rowsPerPage }).map((_, index) => (
-                      <SkeletonRow key={index} />
-                  ))
-                ) : (
-                paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center">{row.no}</td>
-                      <td className="px-2 py-4 text-center">{row.partNumber}</td>
-                      <td className="px-2 py-4 text-center">{row.partName}</td>
-                      <td className="px-2 py-4 text-center">{row.UoM}</td>
-                      <td className="px-2 py-4 text-center">{row.QTY}</td>
-                      <td className="px-2 py-4 text-center">{row.QTYReceipt}</td>
-                      <td className="px-2 py-4 text-center">{row.QTY - row.QTYReceipt}</td>
+                    <tr key={index} className="animate-pulse">
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                      </td>
                     </tr>
                   ))
-                ) : (
+                  ) : paginatedData.length > 0 ? (
+                  paginatedData.map((row, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.no}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.UoM}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTY}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTYReceipt}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTY - row.QTYReceipt}</td>
+                    </tr>
+                  ))
+                  ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-4">
-                      No data available
-                    </td>
+                    <td colSpan={7} className="px-3 py-4 text-center text-gray-500">No data available</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Pagination

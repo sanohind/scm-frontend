@@ -23,6 +23,7 @@ const DeliveryNoteDetail = () => {
   
   const [details, setDetails] = useState<Detail[]>([]);
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,10 +45,10 @@ const DeliveryNoteDetail = () => {
           'Content-Type': 'application/json',
         },
       });
-
       if (!response.ok) throw new Error('Network response was not ok');
 
       const result = await response.json();
+      setLoading(false);
 
       if (result.data && result.data) {
 
@@ -155,93 +156,150 @@ const DeliveryNoteDetail = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note Detail" />
       <div className="font-poppins bg-white text-black">
-        <div className="flex flex-col p-6 gap-4">
-          <div className="flex items-center">
-            <span className="mr-2">No. DN:</span>
-            <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.noDN}</span>
-          </div>
-          
-          <div className="flex justify-between">
-            
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <span className="mr-2">No. PO:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.noPO}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-2">Plan Delivery Date:</span>
-                <span className="bg-stone-300 px-4 py-2 rounded">{dnDetails.planDelivery}</span>
-              </div>
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+          {/* Header Section */}
+          <div className="flex flex-col space-y-4 md:space-y-6">
+            {/* No. DN */}
+            <div className="flex items-center">
+              <span className="text-sm md:text-base font-medium mr-2">No. DN:</span>
+              {loading ? (
+                <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-32"></div>
+              ) : (
+                <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{dnDetails.noDN}</span>
+              )}
             </div>
-            <div className="flex gap-2 items-center">
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-blue-900 text-white rounded"
-                onClick={handlePrintLabel}
-              >
-                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print Label</span>
-              </button>
-              <button
-                className="flex items-center gap-2 px-6 py-2 bg-blue-900 text-white rounded"
-                onClick={handlePrintDN}
-              >
-                <FaPrint className="w-4 h-4" /> {/* Print icon added here */}
-                <span>Print DN</span>
-              </button>
-            </div>
-          </div>
 
-          <div className="flex justify-end">
-            
-            <SearchBar
-              placeholder="Search part number or name..."
-              onSearchChange={setSearchQuery}
-            />
+            {/* Details Section */}
+            <div className="flex flex-col lg:flex-row lg:justify-between space-y-4 lg:space-y-0">
+              {/* Left side details */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* No. PO */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">No. PO:</span>
+                  {loading ? (
+                    <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-32"></div>
+                  ) : (
+                    <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{dnDetails.noPO}</span>
+                  )}
+                </div>
+                {/* Plan Delivery Date */}
+                <div className="flex items-center">
+                  <span className="text-sm md:text-base font-medium mr-2">Plan Delivery Date:</span>
+                  {loading ? (
+                    <div className="h-8 bg-gray-200 animate-pulse rounded-lg w-36"></div>
+                  ) : (
+                    <span className="bg-stone-200 px-4 py-2 rounded-lg text-sm md:text-base">{dnDetails.planDelivery}</span>
+                  )}
+                </div>
+              </div>
+              {/* Print Buttons */}
+              <div className="flex gap-2 items-center">
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-6 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handlePrintLabel}
+                >
+                  <FaPrint className="w-4 h-4" />
+                  <span>Print Label</span>
+                </button>
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-6 md:px-8 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handlePrintDN}
+                >
+                  <FaPrint className="w-4 h-4" />
+                  <span>Print DN</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex justify-end">
+              <div className="w-full">
+                <SearchBar
+                  placeholder="Search part number or name..."
+                  onSearchChange={setSearchQuery}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Table */}
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-1">
-            <table className="w-full text-sm text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th className="px-2 py-3 text-center border-b">No</th>
-                  <th className="px-2 py-3 text-center border-b">Part Number</th>
-                  <th className="px-2 py-3 text-center border-b">Part Name</th>
-                  <th className="px-2 py-3 text-center border-b">UoM</th>
-                  <th className="px-2 py-3 text-center border-b">QTY PO</th>
-                  <th className="px-2 py-3 text-center border-b">QTY Confirm</th>
-                  <th className="px-2 py-3 text-center border-b">QTY Label</th>
-                  <th className="px-2 py-3 text-center border-b">QTY Delivered</th>
-                  <th className="px-2 py-3 text-center border-b">QTY Received</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr
-                      key={index}
-                      className="odd:bg-white even:bg-gray-50 border-b"
-                    >
-                      <td className="px-2 py-4 text-center">{row.no}</td>
-                      <td className="px-2 py-4 text-center">{row.partNumber}</td>
-                      <td className="px-2 py-4 text-center">{row.partName}</td>
-                      <td className="px-2 py-4 text-center">{row.uom}</td>
-                      <td className="px-2 py-4 text-center">{row.QTY}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyConfirm}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyLabel}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyDelivered}</td>
-                      <td className="px-2 py-4 text-center">{row.qtyReceived}</td>
-                    </tr>
-                  ))
-                ) : (
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td colSpan={9} className="text-center py-4">
-                      No details available for this delivery note
-                    </td>
+                    <th 
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[5%]"
+                    >
+                      No
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[15%]">Part Number</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[26%]">Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[9%]">UoM</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b  w-[9%]">QTY</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[9%]">QTY Confirm</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[9%]">QTY Label</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[9%]">QTY Delivered</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[9%]">QTY Received</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : paginatedData.length > 0 ? (
+                    paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.no}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.uom}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTY}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyConfirm}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyLabel}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyDelivered}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyReceived}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={9} className="px-3 py-4 text-center text-gray-500">
+                        No details available for this delivery note
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Pagination */}

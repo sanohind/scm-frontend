@@ -11,6 +11,7 @@ const StockItems = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(6);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
   interface StockItem {
     part_number: string;
@@ -25,6 +26,7 @@ const StockItems = () => {
 
   const fetchStockItems = async () => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
     try {
       const response = await fetch(API_Item_Subcont(), {
         method: 'GET',
@@ -41,6 +43,8 @@ const StockItems = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error fetching data');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,6 +71,35 @@ const StockItems = () => {
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
+  const SkeletonRow = () => (
+    <tr className="animate-pulse">
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+      <td className="px-3 py-3 text-center whitespace-nowrap">
+        <div className="h-4 bg-gray-200 rounded"></div>
+      </td>
+    </tr>
+  );
+
   return (
     <>
       <ToastContainer />
@@ -83,45 +116,49 @@ const StockItems = () => {
           <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50">
-                <tr>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" rowSpan={2}>Part No</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" rowSpan={2}>Part Name</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" colSpan={3}>Fresh</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200" colSpan={3}>Replating</th>
-                </tr>
-                <tr>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Unprocess Incoming Stock</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Ready Delivery Stock</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Stock</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Unprocess Incoming Stock</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Ready Delivery Stock</th>
-                <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Stock</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {paginatedData.length > 0 ? (
-                paginatedData.map((row, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_fresh_stock}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_fresh_stock}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_replating_stock}</td>
-                  <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[15%]" rowSpan={2}>Part No</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[25%]" rowSpan={2}>Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Fresh</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Replating</th>
                   </tr>
-                ))
-                ) : (
-                <tr>
-                  <td colSpan={8} className="px-3 py-4 text-center text-gray-500">No data available</td>
-                </tr>
-                )}
-              </tbody>
+                  <tr>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">Unprocess Incoming Stock</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">Ready Delivery Stock</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">NG Stock</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">Unprocess Incoming Stock</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">Ready Delivery Stock</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">NG Stock</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <SkeletonRow key={index} />
+                    ))
+                  ) : paginatedData.length > 0 ? (
+                    paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_fresh_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_fresh_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_replating_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="px-3 py-4 text-center text-gray-500">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
               </table>
             </div>
-            </div>
+          </div>
 
           <Pagination
             totalRows={filteredData.length}

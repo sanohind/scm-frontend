@@ -380,7 +380,7 @@ const TransactionReport = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     {['Date', 'Delivery Note', 'Transaction Type', 'Status', 'Part Name', 'Part Number', 'Qty OK', 'Qty NG', 'Total'].map((header) => (
-                      <th key={header} className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">
+                      <th key={header} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">
                         {header}
                       </th>
                     ))}
