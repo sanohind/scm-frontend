@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { API_List_Item_Subcont, API_Transaction_Subcont } from '../../../api/api';
+import SearchBar from '../../Table2/SearchBar';
 
 const TransactionReport = () => {
   interface TransactionLog {
@@ -24,13 +25,14 @@ const TransactionReport = () => {
   const [filteredData, setFilteredData] = useState<TransactionLog[]>([]);
   const [allData, setAllData] = useState<TransactionLog[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(8);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [partOptions, setPartOptions] = useState<{ value: string; text: string }[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchPartOptions = async () => {
@@ -129,15 +131,22 @@ const TransactionReport = () => {
     if (selectedStatuses.length > 0) {
       filtered = filtered.filter((row: any) => selectedStatuses.includes(row.status));
     }
-
+    
     // Filter by part name
     if (selectedParts.length > 0) {
       filtered = filtered.filter((row: any) => selectedParts.includes(row.partName));
     }
+    
+    // Filter by delivery note
+    if (searchQuery) {
+      filtered = filtered.filter((row) =>
+        row.deliveryNote.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
     // Apply sorting
     setFilteredData(filtered);
-  }, [allData, selectedTransactionTypes, selectedStatuses, selectedParts]);
+  }, [allData, selectedTransactionTypes, selectedStatuses, selectedParts, searchQuery]);
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -277,101 +286,116 @@ const TransactionReport = () => {
       <Breadcrumb pageName="Transaction Report" />
       <div className="font-poppins bg-white text-black">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
-          {/* Filters Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {/* Start Date */}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Start Date
-              </label>
-              <input
-                type="date"
-                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={startDate ? startDate.toISOString().split('T')[0] : ''}
-                onChange={(e) => setStartDate(new Date(e.target.value))}
-              />
+          <div className='flex flex-col gap-4'>
+            {/* Filters Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Start Date */}
+              <div className="w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => setStartDate(new Date(e.target.value))}
+                />
+              </div>
+
+              {/* End Date */}
+              <div className="w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => setEndDate(new Date(e.target.value))}
+                />
+              </div>
+
+              {/* Transaction Type */}
+              <div className="w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Transaction Type
+                </label>
+                <MultiSelect
+                  id="transactionTypeSelect"
+                  label="Filter by Transaction Type"
+                  options={[
+                    { value: 'Ingoing', text: 'Ingoing' },
+                    { value: 'Process', text: 'Process' },
+                    { value: 'Outgoing', text: 'Outgoing' },
+                  ]}
+                  selectedOptions={selectedTransactionTypes}
+                  onChange={setSelectedTransactionTypes}
+                />
+              </div>
+
+              {/* Status */}
+              <div className="w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <MultiSelect
+                  id="statusSelect"
+                  label="Filter by Status"
+                  options={[
+                    { value: 'Fresh', text: 'Fresh' },
+                    { value: 'Replating', text: 'Replating' },
+                  ]}
+                  selectedOptions={selectedStatuses}
+                  onChange={setSelectedStatuses}
+                />
+              </div>
+
+              {/* Part Name */}
+              <div className="w-full">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Part Name
+                </label>
+                <MultiSelect
+                  id="partNameSelect"
+                  label="Filter by Part Name"
+                  options={partOptions}
+                  selectedOptions={selectedParts}
+                  onChange={setSelectedParts}
+                />
+              </div>
             </div>
 
-            {/* End Date */}
-            <div className="w-full">
+            {/* Search Bar */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                End Date
+                Delivery Note
               </label>
-              <input
-                type="date"
-                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={endDate ? endDate.toISOString().split('T')[0] : ''}
-                onChange={(e) => setEndDate(new Date(e.target.value))}
-              />
-            </div>
-
-            {/* Transaction Type */}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Transaction Type
-              </label>
-              <MultiSelect
-                id="transactionTypeSelect"
-                label="Filter by Transaction Type"
-                options={[
-                  { value: 'Ingoing', text: 'Ingoing' },
-                  { value: 'Process', text: 'Process' },
-                  { value: 'Outgoing', text: 'Outgoing' },
-                ]}
-                selectedOptions={selectedTransactionTypes}
-                onChange={setSelectedTransactionTypes}
-              />
-            </div>
-
-            {/* Status */}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <MultiSelect
-                id="statusSelect"
-                label="Filter by Status"
-                options={[
-                  { value: 'Fresh', text: 'Fresh' },
-                  { value: 'Replating', text: 'Replating' },
-                ]}
-                selectedOptions={selectedStatuses}
-                onChange={setSelectedStatuses}
-              />
-            </div>
-
-            {/* Part Name */}
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Part Name
-              </label>
-              <MultiSelect
-                id="partNameSelect"
-                label="Filter by Part Name"
-                options={partOptions}
-                selectedOptions={selectedParts}
-                onChange={setSelectedParts}
-              />
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                <SearchBar
+                  placeholder="Filter by Delivery Note"
+                  onSearchChange={setSearchQuery}
+                />
+                {/* Download Buttons */}
+                <div className="flex gap-2 self-center">
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
+                    onClick={handleDownloadPDF}
+                  >
+                    <FaFilePdf className="w-4 h-4" />
+                    <span>Download PDF</span>
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
+                    onClick={handleDownloadExcel}
+                  >
+                    <FaFileExcel className="w-4 h-4" />
+                    <span>Download Excel</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Download Buttons */}
-          <div className="flex flex-col sm:flex-row justify-end gap-2">
-            <button
-              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
-              onClick={handleDownloadPDF}
-            >
-              <FaFilePdf className="w-4 h-4" />
-              <span>Download PDF</span>
-            </button>
-            <button
-              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
-              onClick={handleDownloadExcel}
-            >
-              <FaFileExcel className="w-4 h-4" />
-              <span>Download Excel</span>
-            </button>
-          </div>
+          
 
           {/* Table Section */}
           <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">

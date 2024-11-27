@@ -78,9 +78,9 @@ const StockManagement = () => {
       `,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6', 
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, submit it!'
+      confirmButtonColor: '#1e3a8a', 
+      cancelButtonColor: '#dc2626',
+      confirmButtonText: 'Yes, Submit It!'
     });
 
     if (!confirm.isConfirmed) {
