@@ -9,10 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
 const PurchasingHistoryPurchaseOrder = () => {
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState<{ noPO: string; poDate: string; note: string; status: string }[]>([]);
     const [filteredData, setFilteredData] = useState<{ noPO: string; poDate: string; note: string; status: string }[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(5);
+    const [rowsPerPage] = useState(10);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof typeof data[0] | '', direction: string }>({ key: '', direction: '' });
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
@@ -46,12 +47,13 @@ const PurchasingHistoryPurchaseOrder = () => {
 
     const fetchPurchaseOrders = async (supplierCode: string) => {
         const token = localStorage.getItem('access_token');
+        setLoading(true);
         try {
-        const response = await fetch(`${API_PO_History()}${supplierCode}`, {
-            method: 'GET',
-            headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            const response = await fetch(`${API_PO_History()}${supplierCode}`, {
+                method: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
             },
         });
 
@@ -80,14 +82,16 @@ const PurchasingHistoryPurchaseOrder = () => {
             toast.error('No purchase orders found.');
         }
         } catch (error) {
-        console.error('Error fetching purchase orders:', error);
-        if (error instanceof Error) {
-            toast.error(`Failed to fetch purchase orders. ${error.message}`);
-        } else {
-            toast.error('Failed to fetch purchase orders.');
-        }
-        setData([]);
-        setFilteredData([]);
+            console.error('Error fetching purchase orders:', error);
+            if (error instanceof Error) {
+                toast.error(`Failed to fetch purchase orders. ${error.message}`);
+            } else {
+                toast.error('Failed to fetch purchase orders.');
+            }
+            setData([]);
+            setFilteredData([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -141,11 +145,12 @@ const PurchasingHistoryPurchaseOrder = () => {
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
-        fetchPurchaseOrders(selectedOption.value);
-        localStorage.setItem('selected_bp_code', selectedOption.value);
+            setLoading(true);
+            fetchPurchaseOrders(selectedOption.value);
+            localStorage.setItem('selected_bp_code', selectedOption.value);
         } else {
-        setData([]);
-        setFilteredData([]);
+            setData([]);
+            setFilteredData([]);
         }
     };
 
@@ -158,77 +163,126 @@ const PurchasingHistoryPurchaseOrder = () => {
             <ToastContainer position="top-right" />
             <Breadcrumb pageName="History Purchase Order" />
             <div className="font-poppins bg-white">
-                <div className="flex flex-col p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <Select
-                    options={suppliers}
-                    value={selectedSupplier}
-                    onChange={handleSupplierChange}
-                    placeholder="Select Supplier"
-                    className="w-80"
-                    />
-                    <SearchBar
-                    placeholder="Search no purchase order..."
-                    onSearchChange={setSearchQuery}
-                    />
-                </div>
+                <div className="p-2 md:p-4 lg:p-6 space-y-6">
+                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+                        <Select
+                        options={suppliers}
+                        value={selectedSupplier}
+                        onChange={handleSupplierChange}
+                        placeholder="Select Supplier"
+                        className="w-80"
+                        />
+                        <SearchBar
+                        placeholder="Search no purchase order..."
+                        onSearchChange={setSearchQuery}
+                        />
+                    </div>
 
-                <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-                    <table className="w-full text-sm text-left text-gray-700">
-                    <thead className="text-base text-gray-700">
-                        <tr>
-                        <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40"
-                            onClick={() => handleSort('noPO')}>No. PO
-                        </th>
-                        <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                            onClick={() => handleSort('poDate')}>
-                            <span className="flex items-center justify-center">
-                            {sortConfig.key === 'poDate' ? (
-                                sortConfig.direction === 'asc' ? <FaSortUp className="mr-1" /> : <FaSortDown className="mr-1" />
-                            ) : <FaSortDown className="opacity-50 mr-1" />}
-                            PO Date
-                            </span>
-                        </th>
-                        <th className="py-3 text-center border-b border-b-gray-400 w-70">
-                            Note
-                        </th>
-                        <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                            Status
-                        </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.length > 0 ? (
-                        paginatedData.map((row, index) => (
-                            <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                            <td className="px-2 py-4 text-center">
-                                <button
-                                onClick={() => handlePONavigate(row.noPO)}
-                                className="text-blue-600 underline"
-                                >
-                                {row.noPO}
-                                </button>
-                            </td>
-                            <td className="px-2 py-4 text-center">{row.poDate}</td>
-                            <td className="px-2 py-4 text-center">{row.note}</td>
-                            <td className="px-2 py-4 text-center">{row.status}</td>
-                            </tr>
-                        ))
-                        ) : (
-                        <tr>
-                            <td colSpan={4} className="text-center py-4">No History Purchase Order available for now</td>
-                        </tr>
-                        )}
-                    </tbody>
-                    </table>
-                </div>
+                    <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]"
+                                            onClick={() => handleSort('noPO')}
+                                        >
+                                            No. PO
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                                            onClick={() => handleSort('poDate')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'poDate' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
+                                                ) : (
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                PO Date
+                                            </span>
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[40%]"
+                                            onClick={() => handleSort('note')}
+                                        >
+                                            Note
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                                            onClick={() => handleSort('status')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'status' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
+                                                ) : (
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                Status
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {loading ? (
+                                        Array.from({ length: rowsPerPage }).map((_, index) => (
+                                            <tr key={index}>
+                                                <td className="px-3 py-4 text-center">
+                                                    <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                                                </td>
+                                                <td className="px-3 py-4 text-center">
+                                                    <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                                                </td>
+                                                <td className="px-3 py-4 text-center">
+                                                    <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                                                </td>
+                                                <td className="px-3 py-4 text-center">
+                                                    <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : paginatedData.length > 0 ? (
+                                        paginatedData.map((row, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => handlePONavigate(row.noPO)}
+                                                        className="text-blue-600 underline"
+                                                    >
+                                                        {row.noPO}
+                                                    </button>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.poDate}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.note}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={4} className="px-3 py-4 text-center text-gray-500">
+                                                No history purchase orders available for now
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                <Pagination
-                    totalRows={filteredData.length}
-                    rowsPerPage={rowsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={handlePageChange}
-                />
+                    <Pagination
+                        totalRows={filteredData.length}
+                        rowsPerPage={rowsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             </div>
         </>

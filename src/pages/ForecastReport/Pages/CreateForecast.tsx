@@ -25,6 +25,7 @@ const CreateForecast = () => {
 
     const [data, setData] = useState<ForecastReport[]>([]);
     const [filteredData, setFilteredData] = useState<ForecastReport[]>([]);
+    const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
     const [searchQuery, setSearchQuery] = useState('');
@@ -67,6 +68,7 @@ const CreateForecast = () => {
 
     const fetchForecastReport = async (supplierCode: string) => {
         const token = localStorage.getItem('access_token');
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_Forecast_Report_Purchasing()}${supplierCode}`,
@@ -103,6 +105,8 @@ const CreateForecast = () => {
             toast.error(`Error fetching forecast report: ${error}`);
             setData([]);
             setFilteredData([]);
+        } finally {
+            setLoading(false);
         }
     };
     
@@ -156,6 +160,7 @@ const CreateForecast = () => {
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
+        setLoading(true);
         if (selectedOption) {
             fetchForecastReport(selectedOption.value);
             localStorage.setItem('selected_bp_code', selectedOption.value);
@@ -220,7 +225,12 @@ const CreateForecast = () => {
                                 isLoading: false,
                                 autoClose: 3000
                             });
-                            Swal.fire('Success', 'File uploaded successfully', 'success');
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'File uploaded successfully',
+                                icon: 'success',
+                                confirmButtonColor: '#1e3a8a' // bg-blue-900 color
+                            });
                             fetchForecastReport(selectedSupplier.value);
                             resolve(result);
                         } else {
@@ -352,8 +362,8 @@ const CreateForecast = () => {
             <ToastContainer position='top-right' />
             <Breadcrumb pageName="Create Forecast Report" />
             <div className="font-poppins bg-white">
-                <div className="flex flex-col p-6">
-                    <div className="flex justify-between items-center mb-4">
+                <div className="p-2 md:p-4 lg:p-6 space-y-6">
+                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
                         <Select
                             options={suppliers}
                             value={selectedSupplier}
@@ -364,140 +374,166 @@ const CreateForecast = () => {
                         <SearchBar placeholder="Search..." onSearchChange={setSearchQuery} />
                     </div>
 
-                    <form onSubmit={handleUpload} className="flex flex-col items-center">
-                        <div className="flex mb-4 justify-start w-full">
-                            <div className='flex items-center'>
-                                <label htmlFor="description" className="mr-4 text-base">
-                                    Description
-                                </label>
-                                <textarea
-                                    id="description"
-                                    value={description}
-                                    onChange={handleDescriptionChange}
-                                    maxLength={255}
-                                    className="mr-2 p-1 border rounded-md w-80 h-20 resize-none"
-                                    required
-                                />
-                                <span className="mt-auto text-sm text-gray-400">
-                                    {255 - description.length} characters remaining
-                                </span>
+                    <form onSubmit={handleUpload} className="w-full">
+                        <div className="flex flex-col space-y-4 md:space-y-6 lg:space-y-4">
+                            {/* Description section */}
+                            <div className="w-full">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:gap-4">
+                                    <label htmlFor="description" className="text-base mb-2 sm:mb-0 sm:w-24">
+                                        Description
+                                    </label>
+                                    <div className="flex flex-col w-full">
+                                        <textarea
+                                            id="description"
+                                            value={description}
+                                            onChange={handleDescriptionChange}
+                                            maxLength={255}
+                                            className="sm:w-[50%] p-2 border rounded-md h-20 resize-none"
+                                            required
+                                        />
+                                        <span className="text-sm text-gray-400 mt-1">
+                                            {255 - description.length} characters remaining
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-4 justify-start w-full">
-                            <label className="block dark:text-white">
-                                Attach file
-                            </label>
-                            <input
-                                type="file"
-                                className="text-sm cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-2 file:px-4 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                                onChange={handleFileChange}
-                            />
-                            <button
-                                type="submit"
-                                className=" px-5 py-2 bg-blue-500 text-white text-xs rounded-md align-bottom justify-center">
-                                    Upload
-                            </button>
+                            {/* File upload section */}
+                            <div className="w-full">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                    <label className="text-base sm:w-24">
+                                        Attach file
+                                    </label>
+                                    <div className="flex flex-col sm:flex-row gap-4 w-full">
+                                        <input
+                                            type="file"
+                                            className="text-sm cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-2 file:px-4 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter"
+                                            onChange={handleFileChange}
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="w-full sm:w-auto px-5 py-2 bg-blue-900 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                                        >
+                                            Upload
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
 
-                    <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-                        <table className="w-full text-sm text-left text-gray-700">
-                            <thead className="text-base text-gray-700">
-                                <tr>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40"
-                                    >
-                                        No
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    >
-                                        Description
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    >
-                                        File Name
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    >
-                                        Attached File
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                        onClick={() => handleSort('upload_at')}
-                                    >
-                                        <span className="flex items-center justify-center">
-                                            {sortConfig.key === 'upload_at' ? (
-                                                sortConfig.direction === 'asc' ? (
-                                                    <FaSortUp className="mr-1" />
+                    <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300 mt-5">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[5%]">
+                                            No
+                                        </th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]">
+                                            Description
+                                        </th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[25%]">
+                                            File Name
+                                        </th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]">
+                                            Attached File
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                                            onClick={() => handleSort('upload_at')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'upload_at' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
                                                 ) : (
-                                                    <FaSortDown className="mr-1" />
-                                                )
-                                            ) : (
-                                                <FaSortDown className="opacity-50 mr-1" />
-                                            )}
-                                            Created At
-                                        </span>
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    >
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {paginatedData.length > 0 ? (
-                                    paginatedData.map((row, index) => (
-                                        <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                                            <td className="px-2 py-4 text-center">{index + 1}</td>
-                                            <td className="px-2 py-4 text-center">{row.description}</td>
-                                            <td className="px-2 py-4 text-center">{row.filedata}</td>
-                                            <td className="px-2 py-4 text-center">
-                                                <button
-                                                    onClick={() => downloadFile(row.attachedFile)}
-                                                    className="px-2 py-1 hover:scale-110"
-                                                >
-                                                    <FaFilePdf className="text-red-500 text-2xl" />
-                                                </button>
-                                            </td>
-                                            <td className="px-2 py-4 text-center">{row.upload_at}</td>
-                                            <td className="px-2 py-4 text-center">
-                                                <button
-                                                    onClick={() => {
-                                                        Swal.fire({
-                                                            title: 'Are you sure?',
-                                                            text: "You won't be able to revert this!",
-                                                            icon: 'warning',
-                                                            showCancelButton: true,
-                                                            confirmButtonColor: '#3085d6',
-                                                            cancelButtonColor: '#d33',
-                                                            confirmButtonText: 'Yes, delete it!'
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) {
-                                                                handleDelete(row.no);
-                                                            }
-                                                        });
-                                                    }}
-                                                    className="px-3 py-1 hover:scale-110"
-                                                >
-                                                    <FaTrash className="text-red-500 text-2xl" />
-                                                </button>
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                Created At
+                                            </span>
+                                        </th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {loading ? (
+                                        Array.from({ length: rowsPerPage }).map((_, index) => (
+                                            <tr key={index} className="animate-pulse">
+                                                <td className="px-3 py-5 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : paginatedData.length > 0 ? (
+                                        paginatedData.map((row, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{(currentPage - 1) * rowsPerPage + index + 1}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.description}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.filedata}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => downloadFile(row.attachedFile)}
+                                                        className="px-2 py-1 hover:scale-110"
+                                                    >
+                                                        <FaFilePdf className="text-red-500 text-2xl" />
+                                                    </button>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.upload_at}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => {
+                                                            Swal.fire({
+                                                                title: 'Are you sure?',
+                                                                text: "You won't be able to revert this!",
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#3085d6',
+                                                                cancelButtonColor: '#d33',
+                                                                confirmButtonText: 'Yes, delete it!'
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    handleDelete(row.no);
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="px-3 py-1 hover:scale-110"
+                                                    >
+                                                        <FaTrash className="text-red-500 text-2xl" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={6} className="px-3 py-4 text-center text-gray-500">
+                                                No data available
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={6} className="text-center py-4">
-                                            No data available
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <Pagination

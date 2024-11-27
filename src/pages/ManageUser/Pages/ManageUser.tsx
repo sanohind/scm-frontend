@@ -233,121 +233,137 @@ const ManageUser: React.FC = () => {
             <ToastContainer position="top-right" />
             <Breadcrumb pageName="Manage User" />
             <div className="bg-white">
-                <div className="flex flex-col p-6">
-                    <div className="flex justify-between items-center">
+                <div className="p-2 md:p-4 lg:p-6 space-y-6">
+
+                    {/* Header Section */}
+                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+                        {/* Search Bar */}
                         <SearchBar
                             placeholder="Search user here..."
                             onSearchChange={setSearchQuery}
                         />
-                        <MultiSelect
-                            id="roleSelect"
-                            label="Filter by Role"
-                            options={roleOptions}
-                            selectedOptions={selectedRoles}
-                            onChange={setSelectedRoles}
-                        />
+                        
+                        {/* Filters */}
+                        <div className="w-full md:w-1/2 lg:w-1/3">
+                            <MultiSelect
+                                id="roleSelect"
+                                label="Filter by Role"
+                                options={roleOptions}
+                                selectedOptions={selectedRoles}
+                                onChange={setSelectedRoles}
+                            />
+                        </div>
                     </div>
-                    
 
-
-                    <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-                        <table className="w-full text-sm text-left text-gray-700">
-                        <thead className="text-base text-gray-700">
-                            <tr>
-                                <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">Username
-                                </th>
-                                <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">Supplier Code
-                                </th>
-                                <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">Name
-                                </th>
-                                <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36">Role
-                                </th>
-                                <th
-                                    className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                    onClick={() => handleSort('Status')}
-                                >
-                                    <span className="flex items-center justify-center">
-                                    {sortConfig.key === 'Status' ? (
-                                        sortConfig.direction === 'asc' ? (
-                                        <FaSortUp className="mr-1" />
-                                        ) : (
-                                        <FaSortDown className="mr-1" />
-                                        )
-                                    ) : (
-                                        <FaSortDown className="opacity-50 mr-1" />
-                                    )}
-                                    Status
-                                    </span>
-                                </th>
-                                <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                                    Action
-                                </th>
-                                <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                                    Edit User
-                                </th>
-                            </tr>
-                        </thead>
-                            <tbody>
-                                {loading ? (
+                    {/* Table */}
+                    <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[15%]">Username</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[10%]">Supplier Code</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[20%]">Name</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[15%]">Role</th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%] cursor-pointer"
+                                            onClick={() => handleSort('Status')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'Status' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
+                                                ) : (
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                Status
+                                            </span>
+                                        </th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%]">Action</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%]">Edit User</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {loading ? (
                                         Array.from({ length: rowsPerPage }).map((_, index) => (
-                                            <SkeletonRow key={index} />
+                                            <tr key={index} className="animate-pulse">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="w-8 h-8 mx-auto bg-gray-200 rounded-full"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="w-8 h-8 mx-auto bg-gray-200 rounded-full"></div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : paginatedData.length > 0 ? (
+                                        paginatedData.map((row, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.Username}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.SupplierCode}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.Name}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.Role}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.Status}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    {row.isLoading ? (
+                                                        <div className="flex justify-center">
+                                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-900"></div>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={async () => {
+                                                                const updatedData = data.map(item =>
+                                                                    item.UserID === row.UserID ? { ...item, isLoading: true } : item
+                                                                );
+                                                                setData(updatedData);
+                                                                await handleStatusChange(row.UserID, row.Status === 'Active' ? 0 : 1, row.Username);
+                                                            }}
+                                                            className="hover:opacity-80 transition-opacity"
+                                                        >
+                                                            {row.Status === 'Active' ?
+                                                                <FaToggleOn className="text-3xl text-blue-900" /> :
+                                                                <FaToggleOff className="text-3xl text-gray-400" />
+                                                            }
+                                                        </button>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => handleEditPage(row.UserID)}
+                                                        className="hover:opacity-80 transition-opacity"
+                                                    >
+                                                        <FaUserEdit className="text-2xl text-blue-900" />
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         ))
                                     ) : (
-                                paginatedData.length > 0 ? (
-                                paginatedData.map((row, index) => (
-                                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                                        <td className="px-2 py-4 text-center">{row.Username}</td>
-                                        <td className="px-2 py-4 text-center">{row.SupplierCode}</td>
-                                        <td className="px-2 py-4 text-center">{row.Name}</td>
-                                        <td className="px-2 py-4 text-center">{row.Role}</td>
-                                        <td className="px-2 py-4 text-center">{row.Status}</td>
-                                        
-                                        <td className="px-2 py-4 text-center">
-                                            {row.isLoading ? (
-                                                <div className="flex justify-center">
-                                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-900"></div>
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={async () => {
-                                                        const updatedData = data.map(item => 
-                                                            item.UserID === row.UserID ? { ...item, isLoading: true } : item
-                                                        );
-                                                        setData(updatedData);
-                                                        await handleStatusChange(row.UserID, row.Status === 'Active' ? 0 : 1, row.Username);
-                                                    }}
-                                                    className="hover:opacity-80 transition-opacity"
-                                                >
-                                                    {row.Status === 'Active' ? 
-                                                        <FaToggleOn className="text-3xl text-blue-900" /> : 
-                                                        <FaToggleOff className="text-3xl text-gray-400" />
-                                                    }
-                                                </button>
-                                            )}
-                                        </td>
-                                        <td className="px-2 py-4 text-center">
-                                            <button
-                                                onClick={() => handleEditPage(row.UserID)}
-                                                className="hover:opacity-80 transition-opacity"
-                                            >
-                                                <FaUserEdit className="text-2xl text-blue-900" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                                ) : (
-                                <tr>
-                                    <td colSpan={7} className="text-center py-4">
-                                    No List User available for now
-                                    </td>
-                                </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                        <tr>
+                                            <td colSpan={7} className="px-3 py-4 text-center text-gray-500">
+                                                No List User available for now
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <Pagination

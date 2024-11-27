@@ -28,6 +28,7 @@ const WarehouseDeliveryNote = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
   const [suppliers, setSuppliers] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
@@ -172,8 +173,10 @@ const WarehouseDeliveryNote = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note" />
       <div className="font-poppins bg-white">
-        <div className="flex flex-col p-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+          
+          {/* Header Section */}
+          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <Select
               options={suppliers}
               value={selectedSupplier}
@@ -181,85 +184,141 @@ const WarehouseDeliveryNote = () => {
               placeholder="Select Supplier"
               className="w-80"
             />
-            <SearchBar
-              placeholder="Search no delivery note..."
-              onSearchChange={setSearchQuery}
-            />
+              <SearchBar
+                placeholder="Search no delivery note..."
+                onSearchChange={setSearchQuery}
+              />
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">
-                    No. DN
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40">
-                    No. PO
-                  </th>
-                  <th className="py-3 px-2 text-center border-b border-b-gray-400 cursor-pointer w-40" onClick={() => handleSort('createdDate')}>
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'createdDate' ? (
-                        sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />
-                      ) : (
-                        <FaSortDown className="opacity-50" />
-                      )}
-                      Created Date
-                    </span>
-                  </th>
-                  <th className="py-3 px-2 text-center border-b border-b-gray-400 cursor-pointer w-60" onClick={() => handleSort('planDNDate')}>
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'planDNDate' ? (
-                        sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />
-                      ) : (
-                        <FaSortDown className="opacity-50" />
-                      )}
-                      Plan Delivery Date
-                    </span>
-                  </th>
-                  <th className="py-3 px-2 text-center border-b border-b-gray-400 cursor-pointer w-40" onClick={() => handleSort('statusDN')}>
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'statusDN' ? (
-                        sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />
-                      ) : (
-                        <FaSortDown className="opacity-50" />
-                      )}
-                      Status DN
-                    </span>
-                  </th>
-                  <th className="py-3 px-2 text-center border-b border-b-gray-400 w-40">
-                    Progress
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center">
-                      <button
-                        onClick={() => handleDNNavigate(row.noDN)}
-                        className="text-blue-600 underline"
-                      >
-                        {row.noDN}
-                      </button>
-                    </td>
-                      <td className="px-2 py-4 text-center">{row.noPO}</td>
-                      <td className="px-2 py-4 text-center">{row.createdDate}</td>
-                      <td className="px-2 py-4 text-center">{row.planDNDate}</td>
-                      <td className="px-2 py-4 text-center">{row.statusDN}</td>
-                      <td className="px-2 py-4 text-center">{row.progress}</td>
-                    </tr>
-                  ))
-                ) : (
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300 mt-5">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td colSpan={6} className="text-center py-4">
-                      No Delivery Note available for now
-                    </td>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[15%]">
+                      No. DN
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[15%]">
+                      No. PO
+                    </th>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                      onClick={() => handleSort('createdDate')}
+                    >
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'createdDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
+                        ) : (
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        Created Date
+                      </span>
+                    </th>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                      onClick={() => handleSort('planDNDate')}
+                    >
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'planDNDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
+                        ) : (
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        Plan Delivery Date
+                      </span>
+                    </th>
+                    <th
+                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[15%]"
+                      onClick={() => handleSort('statusDN')}
+                    >
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'statusDN' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
+                        ) : (
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        Status DN
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-xs font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[15%]">
+                      Progress
+                    </th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : paginatedData.length > 0 ? (
+                    paginatedData.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <button
+                            onClick={() => handleDNNavigate(row.noDN)}
+                            className="text-blue-600 underline"
+                          >
+                            {row.noDN}
+                          </button>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {row.noPO}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {row.createdDate}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {row.planDNDate}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {row.statusDN}
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          {row.progress}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="px-3 py-4 text-center text-gray-500">
+                        No Delivery Note Available for This Supplier
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Pagination

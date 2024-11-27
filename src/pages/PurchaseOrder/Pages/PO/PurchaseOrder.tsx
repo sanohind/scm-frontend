@@ -25,7 +25,7 @@ const PurchaseOrder = () => {
   const [data, setData] = useState<PurchaseOrder[]>([]);
   const [filteredData, setFilteredData] = useState<PurchaseOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
@@ -166,7 +166,11 @@ const PurchaseOrder = () => {
       });
 
       const result = await res.json();
-      Swal.fire(result.message, '', result.status === 'success' ? 'success' : 'error');
+      Swal.fire({
+        text: result.message,
+        icon: result.status === 'success' ? 'success' : 'error',
+        confirmButtonColor: '#1E3A8A' // blue-900 color
+      });
     } catch (error) {
       console.error('Error updating response:', error);
       Swal.fire('Failed to update response', '', 'error');
@@ -301,11 +305,11 @@ const PurchaseOrder = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.poRevision}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.note}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
-                        <td className={`px-3 py-3 text-center whitespace-nowrap ${
-                          row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-600' : ''
+                        <td className={`px-3 py-3 text-center whitespace-nowrap font-semibold ${
+                          row.response === 'Accepted' ? 'bg-green-600' : row.response === 'Declined' ? 'bg-red-600' : ''
                         }`}>
                           {row.response === 'Accepted' ? (
-                            <span className="text-black">{row.response}</span>
+                            <span className="text-white">{row.response}</span>
                           ) : row.response === 'Declined' ? (
                             <div className="flex items-center justify-center">
                               <FaExclamationTriangle
@@ -324,7 +328,7 @@ const PurchaseOrder = () => {
                           ) : (
                             <div className="flex gap-2 justify-center">
                               <button
-                                className="px-4 py-2 bg-green-500 text-black rounded"
+                                className="px-4 py-2 bg-green-600 text-white rounded"
                                 onClick={() => handleResponse(row.noPO, 'Accepted')}
                               >
                                 Accept

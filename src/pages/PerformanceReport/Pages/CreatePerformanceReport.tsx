@@ -25,7 +25,8 @@ const CreatePerformanceReport = () => {
     const [data, setData] = useState<PerformanceReport[]>([]);
     const [filteredData, setFilteredData] = useState<PerformanceReport[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(6);
+    const [rowsPerPage] = useState(5);
+    const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof PerformanceReport | '', direction: 'asc' | 'desc' | '' }>({ key: '', direction: '' });
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
@@ -65,6 +66,7 @@ const CreatePerformanceReport = () => {
 
     const fetchPerformanceReport = async (supplierCode: string, selectedMonth: string | null = null) => {
         const token = localStorage.getItem('access_token');
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_Performance_Report_Purchasing()}${supplierCode}`,
@@ -117,6 +119,8 @@ const CreatePerformanceReport = () => {
             }
             setData([]);
             setFilteredData([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -176,6 +180,7 @@ const CreatePerformanceReport = () => {
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
+            setLoading(true);
             fetchPerformanceReport(selectedOption.value);
             localStorage.setItem('selected_bp_code', selectedOption.value);
         } else {
@@ -238,7 +243,12 @@ const CreatePerformanceReport = () => {
                                 isLoading: false,
                                 autoClose: 3000
                             });
-                            Swal.fire('Success', 'File uploaded successfully', 'success');
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'File uploaded successfully',
+                                icon: 'success',
+                                confirmButtonColor: '#1e3a8a'
+                            });
                             fetchPerformanceReport(selectedSupplier.value);
                             resolve(result);
                         } else {
@@ -342,8 +352,8 @@ const CreatePerformanceReport = () => {
             <ToastContainer position="top-right" />
             <Breadcrumb pageName="Create Performance Report" />
             <div className="font-poppins bg-white">
-                <div className="flex flex-col p-6">
-                    <div className="flex justify-between items-center mb-4">
+                <div className="p-2 md:p-4 lg:p-6 space-y-6">
+                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
                         <Select
                             options={suppliers}
                             value={selectedSupplier}
@@ -351,128 +361,160 @@ const CreatePerformanceReport = () => {
                             placeholder="Select Supplier"
                             className="w-80"
                         />
-                        <SearchBar placeholder="Search..." onSearchChange={setSearchQuery} />
+                        <SearchBar placeholder="Search file name here..." onSearchChange={setSearchQuery} />
                     </div>
 
-                    <form onSubmit={handleUpload} className="flex flex-col items-center">
-                        <div className="flex mb-4 justify-start w-full">
-                            <div className='gap-2'>
-                                <label htmlFor="month-picker" className="mr-4 text-base">
-                                    Periode
-                                </label>
-                                <input
-                                    type="month"
-                                    id="month-picker"
-                                    value={period}
-                                    onChange={handlePeriodChange}
-                                    className="pl-4 pr-4 border rounded-md"
-                                    required
-                                />
+                    <form onSubmit={handleUpload} className="w-full">
+                        {/* Container for form elements */}
+                        <div className="flex flex-col space-y-4 md:space-y-6 lg:space-y-4">
+                            {/* Period input section */}
+                            <div className="w-full">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                                    <label htmlFor="month-picker" className="text-base mb-2 sm:mb-0 sm:w-24">
+                                        Periode
+                                    </label>
+                                    <input
+                                        type="month"
+                                        id="month-picker"
+                                        value={period}
+                                        onChange={handlePeriodChange}
+                                        className="w-full sm:w-auto pl-4 pr-4 py-2 border rounded-md"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-4 justify-start w-full">
-                            <label className="block dark:text-white">
-                                Attach file
-                            </label>
-                            <input
-                                type="file"
-                                className="text-sm cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-2 file:px-4 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                                onChange={handleFileChange}
-                            />
-                            <button
-                                type="submit"
-                                className=" px-5 py-2 bg-blue-500 text-white text-xs rounded-md align-bottom justify-center">
-                                    Upload
-                            </button>
+                            {/* File upload section */}
+                            <div className="w-full">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                    <label className="text-base sm:w-24">
+                                        Attach file
+                                    </label>
+                                    <div className="flex flex-col sm:flex-row gap-4 w-full">
+                                        <input
+                                            type="file"
+                                            className=" text-sm cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-2 file:px-4 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter"
+                                            onChange={handleFileChange}
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="w-full sm:w-auto px-5 py-2 bg-blue-900 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                                        >
+                                            Upload
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
 
-                    <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-                        <table className="w-full text-sm text-left text-gray-700">
-                            <thead className="text-base text-gray-700">
-                                <tr>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40"
-                                        onClick={() => handleSort('no')}
-                                    >
-                                        No
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                        onClick={() => handleSort('periode')}
-                                    >
-                                        <span className="flex items-center justify-center">
-                                            {sortConfig.key === 'periode' ? (
-                                                sortConfig.direction === 'asc' ? (
-                                                    <FaSortUp className="mr-1" />
-                                                ) : (
-                                                    <FaSortDown className="mr-1" />
-                                                )
-                                            ) : (
-                                                <FaSortDown className="opacity-50 mr-1" />
-                                            )}
-                                            Periode
-                                        </span>
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                        onClick={() => handleSort('filedata')}
-                                    >
-                                        File Name
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                        onClick={() => handleSort('attachedFile')}
-                                    >
-                                        Attached File
-                                    </th>
-                                    <th
-                                        className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                                        onClick={() => handleSort('upload_at')}
-                                    >
-                                        <span className="flex items-center justify-center">
-                                            {sortConfig.key === 'upload_at' ? (
-                                                sortConfig.direction === 'asc' ? (
-                                                    <FaSortUp className="mr-1" />
-                                                ) : (
-                                                    <FaSortDown className="mr-1" />
-                                                )
-                                            ) : (
-                                                <FaSortDown className="opacity-50 mr-1" />
-                                            )}
-                                            Created At
-                                        </span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {paginatedData.length > 0 ? (
-                                    paginatedData.map((row, index) => (
-                                        <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                                            <td className="px-2 py-4 text-center">{index + 1}</td>
-                                            <td className="px-2 py-4 text-center">{row.periode}</td>
-                                            <td className="px-2 py-4 text-center">{row.filedata}</td>
-                                            <td className="px-2 py-4 text-center">
-                                                <button
-                                                    onClick={() => downloadFile(row.attachedFile)}
-                                                    className="px-2 py-1 hover:scale-110"
-                                                >
-                                                    <FaFilePdf className="text-red-500 text-2xl" />
-                                                </button>
-                                            </td>
-                                            <td className="px-2 py-4 text-center">{row.upload_at}</td>
-                                        </tr>
-                                    ))
-                                ) : (
+                    <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300 mt-5">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-gray-50">
                                     <tr>
-                                        <td colSpan={5} className="text-center py-4">
-                                            No data available
-                                        </td>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[5%]"
+                                            onClick={() => handleSort('no')}
+                                        >
+                                            No
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                                            onClick={() => handleSort('periode')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'periode' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
+                                                ) : (
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                Periode
+                                            </span>
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[35%]"
+                                            onClick={() => handleSort('filedata')}
+                                        >
+                                            File Name
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]"
+                                            onClick={() => handleSort('attachedFile')}
+                                        >
+                                            Attached File
+                                        </th>
+                                        <th
+                                            className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[20%]"
+                                            onClick={() => handleSort('upload_at')}
+                                        >
+                                            <span className="flex items-center justify-center">
+                                                {sortConfig.key === 'upload_at' ? (
+                                                    sortConfig.direction === 'asc' ? (
+                                                        <FaSortUp className="mr-1" />
+                                                    ) : (
+                                                        <FaSortDown className="mr-1" />
+                                                    )
+                                                ) : (
+                                                    <FaSortDown className="opacity-50 mr-1" />
+                                                )}
+                                                Created At
+                                            </span>
+                                        </th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {loading ? (
+                                        Array.from({ length: rowsPerPage }).map((_, index) => (
+                                            <tr key={index} className="animate-pulse">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : paginatedData.length > 0 ? (
+                                        paginatedData.map((row, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{index + 1}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.periode}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.filedata}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => downloadFile(row.attachedFile)}
+                                                        className="px-2 py-1 hover:scale-110"
+                                                    >
+                                                        <FaFilePdf className="text-red-500 text-2xl" />
+                                                    </button>
+                                                </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.upload_at}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={5} className="px-3 py-4 text-center text-gray-500">
+                                                No data available
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <Pagination

@@ -4,8 +4,9 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../Table2/SearchBar';
 import Pagination from '../../Table2/Pagination';
 import { API_DN_Detail } from '../../../api/api';
-import { FaPrint } from 'react-icons/fa';
+import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
+import * as XLSX from 'xlsx';
 
 const DeliveryNoteDetail = () => {
   interface Detail {
@@ -150,6 +151,95 @@ const DeliveryNoteDetail = () => {
     window.open(`/#/print/label/delivery-note?noDN=${noDN}`, '_blank');
   };
 
+  const handleDownloadExcel = () => {
+    // Create a new workbook
+    const wb = XLSX.utils.book_new();
+    
+    // First, create header rows with DN and PO information as array of arrays
+    const headerRows = [
+      ['Delivered To :  PT Sanoh Indonesia', '', '', '', '', '', '', '', '', ''], // Add empty cells to match column count
+      ['No. DN :  ' + dnDetails.noDN, '', '', '', '', '', '', '', '', ''],
+      ['No. PO :  ' + dnDetails.noPO, '', '', '', '', '', '', '', '', ''],
+      ['Plan Delivery Date :  ' + dnDetails.planDelivery, '', '', '', '', '', '', '', '', ''],
+      ['', '', '', '', '', '', '', '', '', ''],
+      ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Minus']
+    ];
+
+    // Add worksheet configuration to merge cells
+    const merges = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
+      { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } }
+    ];
+
+    // Convert all data to array format (including the actual data rows)
+    const dataRows = filteredData.map(row => [
+      row.no,
+      row.partNumber,
+      row.partName,
+      row.UoM,
+      Number(row.QTY) || 0,
+      Number(row.qtyLabel) || 0,
+      Number(row.qtyRequested) || 0,
+      Number(row.qtyConfirm) || 0,
+      Number(row.qtyDelivered) || 0,
+      Number(row.qtyMinus) || 0
+    ]);
+  
+    // Calculate totals
+    const totals = {
+      qtyPO: dataRows.reduce((sum, row) => sum + Number(row[4] || 0), 0),
+      qtyLabel: dataRows.reduce((sum, row) => sum + Number(row[5] || 0), 0),
+      qtyRequested: dataRows.reduce((sum, row) => sum + Number(row[6] || 0), 0),
+      qtyConfirm: dataRows.reduce((sum, row) => sum + Number(row[7] || 0), 0),
+      qtyDelivered: dataRows.reduce((sum, row) => sum + Number(row[8] || 0), 0),
+      qtyMinus: dataRows.reduce((sum, row) => sum + Number(row[9] || 0), 0)
+    };
+  
+    // Add totals row
+    const totalsRow = [
+      'Totals:',
+      '',
+      '',
+      '',
+      totals.qtyPO,
+      totals.qtyLabel,
+      totals.qtyRequested,
+      totals.qtyConfirm,
+      totals.qtyDelivered,
+      totals.qtyMinus
+    ];
+  
+    // Combine all rows
+    const allRows = [...headerRows, ...dataRows, totalsRow];
+  
+    // Create worksheet from all rows
+    const ws = XLSX.utils.aoa_to_sheet(allRows);
+    ws['!merges'] = merges;
+  
+    // Set column widths
+    const colWidths = [
+      { wch: 5 },  // No
+      { wch: 25 }, // Part Number
+      { wch: 40 }, // Part Name
+      { wch: 8 },  // UoM
+      { wch: 10 }, // QTY PO
+      { wch: 10 }, // QTY Label
+      { wch: 12 }, // QTY Requested
+      { wch: 12 }, // QTY Confirm
+      { wch: 12 }, // QTY Delivered
+      { wch: 10 }  // QTY Minus
+    ];
+    ws['!cols'] = colWidths;
+  
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Delivery Note Detail');
+  
+    // Write to file
+    XLSX.writeFile(wb, `Delivery_Note_${dnDetails.noDN}.xlsx`);
+  };
+
 
   return (
     <>
@@ -207,6 +297,13 @@ const DeliveryNoteDetail = () => {
                 >
                   <FaPrint className="w-4 h-4" />
                   <span>Print DN</span>
+                </button>
+                <button
+                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-4 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  onClick={handleDownloadExcel}
+                >
+                  <FaFileExcel className="w-4 h-4" />
+                  <span>Download Excel</span>
                 </button>
               </div>
             </div>

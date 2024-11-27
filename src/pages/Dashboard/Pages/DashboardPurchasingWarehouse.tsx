@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_Sync } from '../../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
+import { FaSyncAlt } from 'react-icons/fa';
 
 const DashboardPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -79,22 +80,22 @@ const DashboardPurchasingWarehouse: React.FC = () => {
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="border border-gray-300 dark:border-strokedark rounded-md p-2 mr-4"
               />
-              <button
+                <button
                 id="sync-button"
                 onClick={handleSync}
-                className={`flex items-center px-4 py-1 text-white rounded-md ${isSyncing ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`flex items-center px-4 py-2 text-white rounded-md ${isSyncing ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
                 disabled={isSyncing}
-              >
+                >
                 {isSyncing ? (
-                  <svg className="animate-spin w-8 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  <svg className="animate-spin w-5 h-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
                 ) : (
-                  <img src="../../../assets/icon_sync.png" className="w-8 mr-2" alt="Sync Icon" />
+                  <FaSyncAlt className="w-4 h-4 mr-2 " />
                 )}
                 {isSyncing ? 'Syncing...' : 'Sync'}
-              </button>
+                </button>
             </div>
           </div>
         </div>

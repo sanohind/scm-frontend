@@ -3,7 +3,6 @@ import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
 import { API_DN_Supplier } from '../../../../api/api';
-import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchMonth from '../../../Table2/SearchMonth';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +24,7 @@ const DeliveryNote = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   

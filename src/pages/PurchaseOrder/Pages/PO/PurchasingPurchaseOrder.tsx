@@ -25,7 +25,7 @@ const PurchasingPurchaseOrder = () => {
   const [data, setData] = useState<PurchaseOrder[]>([]);
   const [filteredData, setFilteredData] = useState<PurchaseOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof PurchaseOrder | ''; direction: string }>({ key: '', direction: '' });
   interface Supplier {
@@ -195,8 +195,8 @@ const PurchasingPurchaseOrder = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Purchase Order" />
       <div className="font-poppins bg-white">
-        <div className="flex flex-col p-6">
-          <div className="flex justify-between items-center mb-4">
+        <div className="p-2 md:p-4 lg:p-6 space-y-6">
+          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <Select
               options={suppliers}
               value={selectedSupplier}
@@ -210,84 +210,122 @@ const PurchasingPurchaseOrder = () => {
             />
           </div>
 
-          <div className="relative overflow-x-auto shadow-md rounded-lg border border-gray-300 mt-5">
-            <table className="w-full text-sm text-left text-gray-700">
-              <thead className="text-base text-gray-700">
-                <tr>
-                  <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-40"
-                    onClick={() => handleSort('noPO')}>No. PO
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                    onClick={() => handleSort('poDate')}>
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'poDate' ? (
-                        sortConfig.direction === 'asc' ? <FaSortUp className="mr-1" /> : <FaSortDown className="mr-1" />
-                      ) : <FaSortDown className="opacity-50 mr-1" />}
-                      PO Date
-                    </span>
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 cursor-pointer w-36"
-                    onClick={() => handleSort('planDelivery')}>
-                    <span className="flex items-center justify-center">
-                      {sortConfig.key === 'planDelivery' ? (
-                        sortConfig.direction === 'asc' ? <FaSortUp className="mr-1" /> : <FaSortDown className="mr-1" />
-                      ) : <FaSortDown className="opacity-50 mr-1" />}
-                      Plan Delivery
-                    </span>
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                    Revision No.
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-70">
-                    Note
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-30">
-                    Status
-                  </th>
-                  <th className="py-3 text-center border-b border-b-gray-400 w-50">
-                    Response
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((row, index) => (
-                    <tr key={index} className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-2 py-4 text-center">
-                        <button
-                          onClick={() => handlePONavigate(row.noPO)}
-                          className="text-blue-600 underline"
-                        >
-                          {row.noPO}
-                        </button>
-                      </td>
-                      <td className="px-2 py-4 text-center">{row.poDate}</td>
-                      <td className="px-2 py-4 text-center">{row.planDelivery}</td>
-                      <td className="px-2 py-4 text-center">{row.poRevision}</td>
-                      <td className="px-2 py-4 text-center">{row.note}</td>
-                      <td className="px-2 py-4 text-center">{row.status}</td>
-                      <td className={`text-center ${row.response === 'Accepted' ? 'bg-green-500' : row.response === 'Declined' ? 'bg-red-500' : ''}`}>
-                        {row.response === 'Declined' ? (
-                          <div className="flex items-center justify-center">
-                            <FaExclamationTriangle
-                              className="text-white mr-2 cursor-pointer"
-                              onClick={() => handleShowReason(row.reason)}
-                            />
-                            <span className="text-white">{row.response}</span>
-                          </div>
+          <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300 mt-5">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]" onClick={() => handleSort('noPO')}>No. PO</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[15%]" onClick={() => handleSort('poDate')}>
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'poDate' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
                         ) : (
-                          <span>{row.response}</span>
+                          <FaSortDown className="opacity-50 mr-1" />
                         )}
-                      </td>
+                        PO Date
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 cursor-pointer w-[15%]" onClick={() => handleSort('planDelivery')}>
+                      <span className="flex items-center justify-center">
+                        {sortConfig.key === 'planDelivery' ? (
+                          sortConfig.direction === 'asc' ? (
+                            <FaSortUp className="mr-1" />
+                          ) : (
+                            <FaSortDown className="mr-1" />
+                          )
+                        ) : (
+                          <FaSortDown className="opacity-50 mr-1" />
+                        )}
+                        Plan Delivery
+                      </span>
+                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[5%]">Revision No.</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[25%]"> Note</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[10%]">Status</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[20%]">Response</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {loading ? (
+                  Array.from({ length: rowsPerPage }).map((_, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="h-4 bg-gray-200 rounded mx-auto"></div>
+                    </td>
                     </tr>
                   ))
-                ) : (
+                  ) : paginatedData.length > 0 ? (
+                  paginatedData.map((row, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-3 py-3 text-center whitespace-nowrap">
+                      <button
+                      onClick={() => handlePONavigate(row.noPO)}
+                      className="text-blue-600 underline"
+                      >
+                      {row.noPO}
+                      </button>
+                    </td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.poDate}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.planDelivery}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.poRevision}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.note}</td>
+                    <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
+                    <td
+                      className={`px-3 py-3 text-center whitespace-nowrap ${
+                      row.response === 'Accepted'
+                        ? 'bg-green-500'
+                        : row.response === 'Declined'
+                        ? 'bg-red-600'
+                        : ''
+                      }`}
+                    >
+                      {row.response === 'Declined' ? (
+                      <div className="flex items-center justify-center">
+                        <FaExclamationTriangle
+                        className="text-white mr-2 cursor-pointer"
+                        onClick={() => handleShowReason(row.reason)}
+                        />
+                        <span className="text-white">{row.response}</span>
+                      </div>
+                      ) : (
+                      <span className="text-black">{row.response}</span>
+                      )}
+                    </td>
+                    </tr>
+                  ))
+                  ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-4">No Purchase Order available for now</td>
+                    <td colSpan={7} className="px-3 py-4 text-center text-gray-500">
+                    No Purchase Order available for now
+                    </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <Pagination
