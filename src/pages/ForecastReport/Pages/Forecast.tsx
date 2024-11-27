@@ -19,7 +19,7 @@ const Forecast = () => {
   const [data, setData] = useState<ForecastData[]>([]);
   const [filteredData, setFilteredData] = useState<ForecastData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof ForecastData; direction: 'asc' | 'desc' }>({ key: 'upload_at', direction: 'desc' });
@@ -40,7 +40,7 @@ const Forecast = () => {
         if (!response.ok) throw new Error('Network response was not ok');
 
         const result = await response.json();
-        setData(result.data.map((item) => ({
+        setData(result.data.map((item: any) => ({
           no: item.forecast_id,
           description: item.description,
           upload_at: item.upload_at,
@@ -249,16 +249,16 @@ const Forecast = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.description}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.filedata}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap flex items-center justify-center">
+                        <td className="px-3 py-2 text-center whitespace-nowrap flex items-center justify-center">
                           <button
                             onClick={() => downloadFile(row.attachedFile)}
-                            className="px-2 py-1 hover:scale-110"
+                            className="px-2 hover:scale-125"
                           >
                             {(() => {
                               const extension = row.attachedFile?.split('.').pop()?.toLowerCase() || '';
                               switch (extension) {
                                 case 'pdf':
-                                  return <FaFilePdf className="w-6 h-6 text-red-600" />;
+                                  return <FaFilePdf className="w-6 h-6 text-blue-900" />;
                                 case 'doc':
                                 case 'docx':
                                   return <FaFileWord className="w-6 h-6 text-blue-600" />;

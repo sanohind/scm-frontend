@@ -29,10 +29,12 @@ const TransactionReport = () => {
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const today = new Date();
+  const [startDate, setStartDate] = useState<Date>(today);
+  const [endDate, setEndDate] = useState<Date>(today);
   const [partOptions, setPartOptions] = useState<{ value: string; text: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPartOptions = async () => {
@@ -65,10 +67,11 @@ const TransactionReport = () => {
 
   const fetchTransactionLogs = async () => {
     if (!startDate || !endDate) {
-      console.error('Start Date and End Date must be selected');
       toast.warning('Start Date and End Date must be selected');
       return;
     }
+
+    setLoading(true);
 
     try {
       const token = localStorage.getItem('access_token');
@@ -110,6 +113,8 @@ const TransactionReport = () => {
     } catch (error) {
       console.error('Error fetching transaction logs:', error);
       toast.error('Error fetching transaction logs');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -403,18 +408,54 @@ const TransactionReport = () => {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    {['Date', 'Delivery Note', 'Transaction Type', 'Status', 'Part Name', 'Part Number', 'Qty OK', 'Qty NG', 'Total'].map((header) => (
-                      <th key={header} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">
-                        {header}
-                      </th>
-                    ))}
+                    <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[10%]">Date Time</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[17%]">Delivery Note</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">Transaction Type</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]">Status</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Number</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY OK</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY NG</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {paginatedData.length > 0 ? (
+                  {loading ? (
+                    Array.from({ length: rowsPerPage }).map((_, index) => (
+                      <tr key={index} className="animate-pulse">
+                        <td className="px-1 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : paginatedData.length > 0 ? (
                     paginatedData.map((row, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
+                        <td className="px-1 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.type}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>

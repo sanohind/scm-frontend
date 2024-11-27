@@ -19,7 +19,7 @@ const PerformanceReport = () => {
   const [data, setData] = useState<DataType[]>([]);
   const [filteredData, setFilteredData] = useState<DataType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(8);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof DataType; direction: 'asc' | 'desc' }>({ key: 'periode', direction: 'desc' });
@@ -283,9 +283,9 @@ const PerformanceReport = () => {
                             {row.periode ? new Date(row.periode).toLocaleString('en-US', { month: 'long', year: 'numeric' }) : 'No period'}
                           </td>
                           <td className="px-3 py-3 text-center whitespace-nowrap">{row.filedata}</td>
-                          <td className="px-3 py-3 text-center whitespace-nowrap flex items-center justify-center">
-                            <button onClick={() => downloadFile(row.attachedFile)} className="px-2 py-1 hover:scale-110">
-                              {row.attachedFile?.endsWith('.pdf') && <FaFilePdf className="w-6 h-6 text-red-500" />}
+                          <td className="px-3 py-2 text-center whitespace-nowrap flex items-center justify-center">
+                            <button onClick={() => downloadFile(row.attachedFile)} className="px-2 hover:scale-125">
+                              {row.attachedFile?.endsWith('.pdf') && <FaFilePdf className="w-6 h-6 text-blue-900" />}
                               {(row.attachedFile?.endsWith('.doc') || row.attachedFile?.endsWith('.docx')) && <FaFileWord className="w-6 h-6 text-blue-500" />}
                               {(row.attachedFile?.endsWith('.xls') || row.attachedFile?.endsWith('.xlsx')) && <FaFileExcel className="w-6 h-6 text-green-500" />}
                               {!row.attachedFile?.endsWith('.pdf') && !row.attachedFile?.endsWith('.doc') && !row.attachedFile?.endsWith('.docx') && !row.attachedFile?.endsWith('.xls') && !row.attachedFile?.endsWith('.xlsx') && <FaFile className="w-6 h-6 text-yellow-600" />}

@@ -1,6 +1,11 @@
-import { FaSearch } from 'react-icons/fa'; // Pastikan sudah menginstall react-icons dengan 'npm install react-icons'
+import { FaSearch } from 'react-icons/fa';
 
-const SearchBar = ({ placeholder, onSearchChange }) => {
+interface SearchBarProps {
+  placeholder: string;
+  onSearchChange: (value: string) => void;
+}
+
+const SearchBar = ({ placeholder, onSearchChange }: SearchBarProps) => {
   return (
     <div className="flex items-center shadow border border-gray-300 rounded-lg px-2 py-1 w-full md:w-1/3 lg:w-1/4">
       <FaSearch className="text-gray-600 mr-1 ml-2" />
