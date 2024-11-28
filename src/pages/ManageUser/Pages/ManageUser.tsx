@@ -28,7 +28,7 @@ const ManageUser: React.FC = () => {
     const [data, setData] = useState<User[]>([]);
     const [filteredData, setFilteredData] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(6);
+    const [rowsPerPage] = useState(7);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -190,6 +190,8 @@ const ManageUser: React.FC = () => {
                 return 'Warehouse';
             case '3':
                 return 'Purchasing';
+            case '6':
+                return 'Admin Subcont';
             case '1':
                 return 'Supplier';
             case '5':
@@ -199,35 +201,10 @@ const ManageUser: React.FC = () => {
         }
     };
 
-    const SkeletonRow = () => (
-        <tr className="odd:bg-white even:bg-gray-50 border-b">
-            <td className="px-2 py-4 text-center">
-                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-24 h-4 mx-auto skeleton rounded"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-16 h-4 mx-auto skeleton rounded"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-8 h-8 mx-auto skeleton rounded-full"></div>
-            </td>
-            <td className="px-2 py-4 text-center">
-                <div className="w-8 h-8 mx-auto skeleton rounded-full"></div>
-            </td>
-        </tr>
-    );
-
     const handleEditPage = (UserId: string) => {
         navigate(`/edit-user?userId=${UserId}`);
       };
+
     return (
         <>
             <ToastContainer position="top-right" />
@@ -261,9 +238,9 @@ const ManageUser: React.FC = () => {
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[15%]">Username</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[20%]">Username</th>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[10%]">Supplier Code</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[20%]">Name</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w[25%]">Name</th>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[15%]">Role</th>
                                         <th
                                             className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%] cursor-pointer"

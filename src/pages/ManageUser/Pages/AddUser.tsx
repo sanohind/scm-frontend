@@ -184,6 +184,7 @@ const AddUser = () => {
                   <option value="4">Admin</option>
                   <option value="3">Purchasing</option>
                   <option value="2">Warehouse</option>
+                  <option value="6">Admin Subcont</option>
                   <option value="1">Supplier</option>
                   <option value="5">Supplier Subcont</option>
                 </select>

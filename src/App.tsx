@@ -68,7 +68,7 @@ const App: React.FC = () => {
             <Route
               path="/"
               element={
-                <ProtectedRoute allowedRoles={['1','2','3','4','5']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5','6']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -78,7 +78,7 @@ const App: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['1','2','3','4','5']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5','6']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -198,7 +198,7 @@ const App: React.FC = () => {
             <Route
               path="/stock-items"
               element={
-                <ProtectedRoute allowedRoles={['5']}>
+                <ProtectedRoute allowedRoles={['5','6']}>
                   <PageTitle title="Stock Item | PT SANOH INDONESIA" />
                   <StockItems />
                 </ProtectedRoute>
@@ -216,7 +216,7 @@ const App: React.FC = () => {
             <Route
               path="/transactions-report"
               element={
-                <ProtectedRoute allowedRoles={['5']}>
+                <ProtectedRoute allowedRoles={['5','6']}>
                   <PageTitle title="Transactions Report | PT SANOH INDONESIA" />
                   <TransactionsReport />
                 </ProtectedRoute>

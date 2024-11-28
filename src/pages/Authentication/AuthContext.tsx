@@ -2,7 +2,7 @@ import { createContext, useState, useContext, useEffect, ReactNode } from 'react
 import { API_Logout } from '../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
 
-type Role = '1' | '2' | '3' | '4' | '5' | null;
+type Role = '1' | '2' | '3' | '4' | '5' | '6' | null;
 
 interface AuthContextProps {
     isAuthenticated: boolean;
