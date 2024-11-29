@@ -35,13 +35,13 @@ const DropdownUser = () => {
       text: 'Do you really want to log out?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: '#1e3a8a',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, log out!',
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        logout(); // Memanggil fungsi logout Anda
+      logout(); // Memanggil fungsi logout Anda
       }
     });
   };
