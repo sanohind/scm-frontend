@@ -11,7 +11,6 @@ import DefaultLayout from "./layout/DefaultLayout";
 import NotFound from "./pages/404";
 import Unauthorized from "./pages/Authentication/Pages/Unauthorized";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import StockItems from "./pages/Subcon/Pages/StockItems";
 import IndexPurchaseOrder from "./pages/PurchaseOrder/IndexPurchaseOrder";
 import DeliveryNoteDetailEdit from "./pages/DeliveryNote/Pages/DeliveryNoteDetailEdit";
 import SignIn from "./pages/Authentication/Pages/SignIn";
@@ -20,11 +19,12 @@ import IndexForeCast from "./pages/ForecastReport/IndexForeCast";
 import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchaseOrder";
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
-import TransactionsReport from "./pages/Subcon/Pages/TransactionsReport";
 import PrintPO from "./pages/Print/PrintPO";
-import Transactions from "./pages/Subcon/Pages/Transactions";
+import Transactions from "./pages/Subcon/Transactions/Transactions";
 import PrintDN from "./pages/Print/PrintDN";
 import PrintLabel from "./pages/Print/PrintLabel";
+import IndexTransactionsReport from "./pages/Subcon/TransactionsReport/IndexTransactionReport";
+import IndexStockItems from "./pages/Subcon/StockItems/IndexStockItems";
 
 const App: React.FC = () => {
   return (
@@ -200,7 +200,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['5','6']}>
                   <PageTitle title="Stock Item | PT SANOH INDONESIA" />
-                  <StockItems />
+                  <IndexStockItems />
                 </ProtectedRoute>
               }
             />
@@ -218,7 +218,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['5','6']}>
                   <PageTitle title="Transactions Report | PT SANOH INDONESIA" />
-                  <TransactionsReport />
+                  <IndexTransactionsReport />
                 </ProtectedRoute>
               }
             />

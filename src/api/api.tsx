@@ -62,8 +62,15 @@ export const API_DN_History_Warehouse = () => API + getRolePath() + `/dn/history
 
 export const API_Print_DN_Warehouse = () => API + getRolePath() + `/dn/print/`;
 
+// admin-subcont
+export const API_List_Partner_Admin_Subcont = () => API + getRolePath() + `/partner/list`;
+export const API_Create_Item = () => API + getRolePath() + `/item/store`;
+export const API_List_Item = () => API + getRolePath() + `/item/list/`;
+export const API_Stock_Item = () => API + getRolePath() + `/item/index/`;
+export const API_Transaction_Report = () => API + getRolePath() + `/transaction/index/`;
 
-// supplier
+
+// supplier marketing
 export const API_Dashboard = () => API + getRolePath() + `/dashboard`;
 
 export const API_PO_Supplier = () => API + getRolePath() + `/po/index/`;
@@ -88,7 +95,7 @@ export const API_Forecast_Report_Supplier = () => API + getRolePath() + `/foreca
 export const API_Download_Forecast_Report = () => API + getRolePath() + `/forecast/file/`;
 
 
-// Subcont
+// Supplier Subcont Marketing
 export const API_Dashboard_Subcont = () => API + getRolePath() + `/dashboard`;
 
 export const API_PO_Subcont = () => API + getRolePath() + `/po/index/`;
@@ -118,3 +125,9 @@ export const API_Download_Performance_Report_Subcont = () => API + getRolePath()
 export const API_Forecast_Report_Subcont = () => API + getRolePath() + `/forecast/index`;
 export const API_Download_Forecast_Report_Subcont = () => API + getRolePath() + `/forecast/file/`;
 
+
+// Supplier Warehouse
+
+
+
+// Supplier Subcont

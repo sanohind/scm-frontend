@@ -576,7 +576,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
                 </ul>
               </div>
             </div>
-          ) : role === 'admin_subcont' ? (
+          ) : role === 'admin-subcont' ? (
             <div>
               <div>
                 <h3 className="mb-4 ml-4 text-sm font-semibold text-black-2  dark:text-bodydark2">

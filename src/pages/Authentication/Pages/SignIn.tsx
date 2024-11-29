@@ -43,7 +43,7 @@ const SignIn: React.FC = () => {
           localStorage.setItem("role", "warehouse");          
           break;
         case '6':
-          localStorage.setItem("role", "admin_subcont");          
+          localStorage.setItem("role", "admin-subcont");          
           break;
         case '4':
           localStorage.setItem("role", "admin");          
