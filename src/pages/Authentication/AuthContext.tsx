@@ -2,14 +2,14 @@ import { createContext, useState, useContext, useEffect, ReactNode } from 'react
 import { API_Logout } from '../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
 
-type Role = '1' | '2' | '3' | '4' | '5' | '6' | null;
+type Role = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | null;
 
 interface AuthContextProps {
     isAuthenticated: boolean;
     userRole: Role;
     login: (role: Role, token: string) => void;
     logout: () => void;
-    isLoading: boolean; // Tambahkan isLoading
+    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -17,10 +17,9 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<Role>(null);
-  const [isLoading, setIsLoading] = useState(true); // Tambahkan isLoading
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Periksa apakah token ada di localStorage saat aplikasi dimuat
     const token = localStorage.getItem('access_token');
     const role = localStorage.getItem('userRole') as Role;
 
@@ -31,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUserRole(null);
       setIsAuthenticated(false);
     }
-    setIsLoading(false); // Set isLoading ke false setelah pengecekan selesai
+    setIsLoading(false);
 
     const checkTokenExpiration = () => {
       const expirationTime = localStorage.getItem('token_expiration');

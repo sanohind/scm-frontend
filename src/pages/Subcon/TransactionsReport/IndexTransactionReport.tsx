@@ -10,7 +10,7 @@ const IndexTransactionsReport: React.FC = () => {
         setUserRole(role);
     }, []);
 
-    if (userRole === 'subcont') {
+    if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
         return <TransactionReport />;
     } else if (userRole === 'admin-subcont') {
         return <AdminTransactionReport />;

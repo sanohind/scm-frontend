@@ -11,9 +11,9 @@ const IndexForeCast: React.FC = () => {
         setUserRole(role);
     }, []);
 
-    if (userRole === 'supplier' || userRole === 'subcont') {
+    if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
         return <Forecast />;
-    } else if (userRole === 'purchasing') {
+    } else if (userRole === 'admin-purchasing') {
         return <CreateForecast />;
     } else {
         return <div>No dashboard available for your role.</div>;

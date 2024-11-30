@@ -10,9 +10,9 @@ const IndexPurchaseOrder: React.FC = () => {
       setUserRole(role);
     }, []);
   
-    if (userRole === 'supplier' || userRole === 'subcont') {
+    if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
       return <PurchaseOrder />;
-    } else if (userRole === 'purchasing') {
+    } else if (userRole === 'admin-purchasing') {
       return <PurchasingPurchaseOrder />;
     } else {
       return <div>No dashboard available for your role.</div>;

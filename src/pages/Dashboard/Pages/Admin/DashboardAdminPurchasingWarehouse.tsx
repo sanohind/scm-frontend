@@ -1,30 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { API_Sync } from '../../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaSyncAlt } from 'react-icons/fa';
+import { API_Sync } from '../../../../api/api';
 
-const DashboardPurchasingWarehouse: React.FC = () => {
+const DashboardAdminPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
     const [isSyncing, setIsSyncing] = useState<boolean>(false);
-    const [notifications, setNotifications] = useState<{ message: string, type: 'success' | 'error' | 'warning' }[]>([]);
   
     useEffect(() => {
-      // Set initial value of month picker to current month
       const now = new Date();
       const year = now.getFullYear();
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
       setSelectedMonth(`${year}-${month}`);
     }, []);
   
-    const addNotification = (message: string, type: 'success' | 'error' | 'warning') => {
-      setNotifications((prev) => [...prev, { message, type }]);
-    };
   
     const handleSync = async () => {
-      if (!selectedMonth) {
-        addNotification('Please select a month before syncing.', 'warning');
-        return;
-      }
   
       const [year, month] = selectedMonth.split('-');
       const token = localStorage.getItem('access_token');
@@ -103,4 +94,4 @@ const DashboardPurchasingWarehouse: React.FC = () => {
     );
   };
 
-export default DashboardPurchasingWarehouse;
+export default DashboardAdminPurchasingWarehouse;

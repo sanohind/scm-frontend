@@ -37,7 +37,7 @@ const App: React.FC = () => {
           <Route
             path="/print/purchase-order"
             element={
-              <ProtectedRoute allowedRoles={['1','3','5']}>
+              <ProtectedRoute allowedRoles={['2','5','6']}>
                 <PageTitle title="Print Purchase Order | PT SANOH INDONESIA" />
                 <PrintPO />
               </ProtectedRoute>
@@ -46,7 +46,7 @@ const App: React.FC = () => {
           <Route
             path="/print/delivery-note"
             element={
-              <ProtectedRoute allowedRoles={['1','2','5']}>
+              <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                 <PageTitle title="Print Delivery Note | PT SANOH INDONESIA" />
                 <PrintDN />
               </ProtectedRoute>
@@ -55,7 +55,7 @@ const App: React.FC = () => {
           <Route
             path="/print/label/delivery-note"
             element={
-              <ProtectedRoute allowedRoles={['1','2','5']}>
+              <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                 <PageTitle title="Print Label Delivery Note | PT SANOH INDONESIA" />
                 <PrintLabel />
               </ProtectedRoute>
@@ -68,7 +68,7 @@ const App: React.FC = () => {
             <Route
               path="/"
               element={
-                <ProtectedRoute allowedRoles={['1','2','3','4','5','6']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5','6','7','8']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -78,7 +78,7 @@ const App: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['1','2','3','4','5','6']}>
+                <ProtectedRoute allowedRoles={['1','2','3','4','5','6','7','8']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
                 </ProtectedRoute>
@@ -87,7 +87,7 @@ const App: React.FC = () => {
             <Route
               path="/list-user"
               element={
-                <ProtectedRoute allowedRoles={['4']}>
+                <ProtectedRoute allowedRoles={['1']}>
                   <PageTitle title="Manage User | PT SANOH INDONESIA" />
                   <ManageUser />
                 </ProtectedRoute>
@@ -96,7 +96,7 @@ const App: React.FC = () => {
             <Route
               path="/add-user"
               element={
-                <ProtectedRoute allowedRoles={['4']}>
+                <ProtectedRoute allowedRoles={['1']}>
                   <PageTitle title="Add User | PT SANOH INDONESIA" />
                   <AddUser />
                 </ProtectedRoute>
@@ -105,7 +105,7 @@ const App: React.FC = () => {
             <Route
               path="/edit-user"
               element={
-                <ProtectedRoute allowedRoles={['4']}>
+                <ProtectedRoute allowedRoles={['1']}>
                   <PageTitle title="Edit User | PT SANOH INDONESIA" />
                   <EditUser />
                 </ProtectedRoute>
@@ -115,7 +115,7 @@ const App: React.FC = () => {
             <Route
               path="/purchase-order"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','5','6']}>
                   <PageTitle title="Purchase Order | PT SANOH INDONESIA" />
                   <IndexPurchaseOrder />
                 </ProtectedRoute>
@@ -124,7 +124,7 @@ const App: React.FC = () => {
             <Route
               path="/purchase-order-detail"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','5','6']}>
                   <PageTitle title="Purchase Order Detail | PT SANOH INDONESIA" />
                   <PurchaseOrderDetail />
                 </ProtectedRoute>
@@ -133,7 +133,7 @@ const App: React.FC = () => {
             <Route
               path="/history-purchase-order"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','5','6']}>
                   <PageTitle title="History Purchase Order | PT SANOH INDONESIA" />
                   <IndexHistoryPurchaseOrder />
                 </ProtectedRoute>
@@ -142,7 +142,7 @@ const App: React.FC = () => {
             <Route
               path="/performance-report"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','5','6']}>
                   <PageTitle title="Performance Report | PT SANOH INDONESIA" />
                   <IndexPerformanceReport />
                 </ProtectedRoute>
@@ -151,7 +151,7 @@ const App: React.FC = () => {
             <Route
               path="/forecast-report"
               element={
-                <ProtectedRoute allowedRoles={['3', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','5','6']}>
                   <PageTitle title="Forecast | PT SANOH INDONESIA" />
                   <IndexForeCast />
                 </ProtectedRoute>
@@ -161,7 +161,7 @@ const App: React.FC = () => {
             <Route
               path="/delivery-note"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                   <PageTitle title="Delivery Note | PT SANOH INDONESIA" />
                   <IndexDeliveryNote />
                 </ProtectedRoute>
@@ -170,7 +170,7 @@ const App: React.FC = () => {
             <Route
               path="/delivery-note-detail"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                   <PageTitle title="Delivery Note Detail | PT SANOH INDONESIA" />
                   <DeliveryNoteDetail />
                 </ProtectedRoute>
@@ -179,7 +179,7 @@ const App: React.FC = () => {
             <Route
               path="/history-delivery-note"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                   <PageTitle title="History Delivery Note | PT SANOH INDONESIA" />
                   <IndexHistoryDeliveryNote />
                 </ProtectedRoute>
@@ -188,7 +188,7 @@ const App: React.FC = () => {
             <Route
               path="/delivery-note-detail-edit"
               element={
-                <ProtectedRoute allowedRoles={['2', '1', '5']}>
+                <ProtectedRoute allowedRoles={['2','3','4','5','6','7','8']}>
                   <PageTitle title="Delivery Note Detail Edit | PT SANOH INDONESIA" />
                   <DeliveryNoteDetailEdit />
                 </ProtectedRoute>
@@ -198,7 +198,7 @@ const App: React.FC = () => {
             <Route
               path="/stock-items"
               element={
-                <ProtectedRoute allowedRoles={['5','6']}>
+                <ProtectedRoute allowedRoles={['4','5','6','8']}>
                   <PageTitle title="Stock Item | PT SANOH INDONESIA" />
                   <IndexStockItems />
                 </ProtectedRoute>
@@ -207,7 +207,7 @@ const App: React.FC = () => {
             <Route
               path="/transactions"
               element={
-                <ProtectedRoute allowedRoles={['5']}>
+                <ProtectedRoute allowedRoles={['5','6','8']}>
                   <PageTitle title="Transaksi | PT SANOH INDONESIA" />
                   <Transactions />
                 </ProtectedRoute>
@@ -216,7 +216,7 @@ const App: React.FC = () => {
             <Route
               path="/transactions-report"
               element={
-                <ProtectedRoute allowedRoles={['5','6']}>
+                <ProtectedRoute allowedRoles={['4','5','6','8']}>
                   <PageTitle title="Transactions Report | PT SANOH INDONESIA" />
                   <IndexTransactionsReport />
                 </ProtectedRoute>

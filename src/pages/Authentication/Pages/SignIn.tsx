@@ -34,28 +34,33 @@ const SignIn: React.FC = () => {
 
       switch (role) {
         case '1':
-          localStorage.setItem("role", "supplier");          
-          break;
-        case '3':
-          localStorage.setItem("role", "purchasing");
+          localStorage.setItem("role", "super-admin");          
           break;
         case '2':
-          localStorage.setItem("role", "warehouse");          
+          localStorage.setItem("role", "admin-purchasing");
           break;
-        case '6':
-          localStorage.setItem("role", "admin-subcont");          
+        case '3':
+          localStorage.setItem("role", "admin-warehouse");          
           break;
         case '4':
-          localStorage.setItem("role", "admin");          
+          localStorage.setItem("role", "admin-subcont");          
           break;
         case '5':
-          localStorage.setItem("role", "subcont");          
+          localStorage.setItem("role", "supplier-marketing");          
+          break;
+        case '6':
+          localStorage.setItem("role", "supplier-subcont-marketing");          
+          break;
+        case '7':
+          localStorage.setItem("role", "supplier-warehouse");          
+          break;
+        case '8':
+          localStorage.setItem("role", "supplier-subcont");          
           break;
         default:
           toast.error('Role not found!');
           break;
       }
-
       login(role, access_token);
       navigate('/dashboard');
     } catch (error) {

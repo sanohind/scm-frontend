@@ -107,17 +107,17 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
         <nav className="mt-2 py-4 px-4 lg:mt-2 lg:px-6">
           {/* <!-- Menu Group Berdasarkan Peran --> */}
 
-          {role === 'admin' ? (
+          {role === 'super-admin' ? (
             <SuperAdmin />
-          ) : role === 'purchasing' ? (
+          ) : role === 'admin-purchasing' ? (
             <AdminPurchasing />
-          ) : role === 'warehouse' ? (
+          ) : role === 'admin-warehouse' ? (
             <AdminWarehouse />
           ) : role === 'admin-subcont' ? (
             <AdminSubcont />
-          ) : role === 'supplier' ? (
+          ) : role === 'supplier-marketing' ? (
             <SupplierMarketing />
-          ) : role === 'subcont' ? (
+          ) : role === 'supplier-subcont-marketing' ? (
             <SupplierSubcontMarketing />
           ) : role === 'supplier-subcont' ? (
             <SupplierSubcont />

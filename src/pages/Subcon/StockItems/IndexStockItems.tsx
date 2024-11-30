@@ -11,7 +11,7 @@ const IndexStockItems: React.FC = () => {
       setUserRole(role);
     }, []);
   
-    if (userRole === 'subcont') {
+    if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
       return <StockItems />;
     } else if (userRole === 'admin-subcont') {
       return <AdminStockItems />;
