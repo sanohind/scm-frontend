@@ -112,7 +112,8 @@ const AddUser = () => {
         toast.success('User successfully created!');
         resetForm();
       } else {
-        toast.error(`Failed to create user: ${result.message}`);
+        const errorMessages = Object.values(result.errors).flat().join(', ');
+        toast.error(`Failed to create user: ${errorMessages}`);
       }
     } catch (error) {
       console.error('Error during user creation:', error);
