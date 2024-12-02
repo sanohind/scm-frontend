@@ -3,7 +3,7 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
-import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit } from 'react-icons/fa';
+import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit, FaUserPlus } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_List_User_Admin, API_Update_Status_Admin } from '../../../api/api';
@@ -217,12 +217,23 @@ const ManageUser: React.FC = () => {
                 <div className="p-2 md:p-4 lg:p-6 space-y-6">
 
                     {/* Header Section */}
-                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-                        {/* Search Bar */}
-                        <SearchBar
-                            placeholder="Search user here..."
-                            onSearchChange={setSearchQuery}
-                        />
+                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:w-full">
+                        <div className='flex items-center space-x-4 w-full '>
+                            <button
+                                onClick={() => navigate('/add-user')}
+                                className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors whitespace-nowrap flex items-center"
+                            >
+                                <FaUserPlus className="mr-2" />
+                                Add User
+                            </button>
+
+                            {/* Search Bar */}
+                            <SearchBar
+                                placeholder="Search user here..."
+                                onSearchChange={setSearchQuery}
+                            />
+                            
+                        </div>
                         
                         {/* Filters */}
                         <div className="w-full md:w-1/2 lg:w-1/3">
