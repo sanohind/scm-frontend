@@ -79,6 +79,5 @@ export const API_Forecast_Report = () => API + getRolePath() + `/forecast/index`
 // Subcont Supplier
 export const API_Item_Subcont = () => API + getRolePath() + `/item/index`;
 export const API_List_Item_Subcont = () => API + getRolePath() + `/item/list`;
-export const API_Create_Item_Subcont = () => API + getRolePath() + `/item/store`;
 export const API_Transaction_Subcont = () => API + getRolePath() + `/transaction/index`;
 export const API_Create_Transaction_Subcont = () => API + getRolePath() + `/transaction/store`;
