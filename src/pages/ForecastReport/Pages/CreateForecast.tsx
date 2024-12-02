@@ -175,8 +175,13 @@ const CreateForecast = () => {
             setFile(e.target.files[0]);
         }
         if (e.target.files && e.target.files[0] && e.target.files[0].type !== "application/pdf") {
-            Swal.fire("Error", "Only PDF files are allowed", "error");
-            setFile(null); // Reset the file input
+            Swal.fire({
+                title: "Error",
+                text: "Only PDF files are allowed",
+                icon: "error",
+                confirmButtonColor: "#1e3a8a"
+            });
+            setFile(null);
         } else if (e.target.files) {
             setFile(e.target.files[0]);
         }
@@ -189,7 +194,12 @@ const CreateForecast = () => {
     const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!file || !description || !selectedSupplier) {
-            Swal.fire('Error', 'Please fill all fields', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Please fill all fields',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
             return;
         }
 
@@ -229,7 +239,7 @@ const CreateForecast = () => {
                                 title: 'Success',
                                 text: 'File uploaded successfully',
                                 icon: 'success',
-                                confirmButtonColor: '#1e3a8a' // bg-blue-900 color
+                                confirmButtonColor: '#1e3a8a'
                             });
                             fetchForecastReport(selectedSupplier.value);
                             resolve(result);
@@ -260,7 +270,12 @@ const CreateForecast = () => {
                 isLoading: false,
                 autoClose: 3000
             });
-            Swal.fire('Error', 'Failed to upload file', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to upload file',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
         }
     };
 
@@ -325,7 +340,12 @@ const CreateForecast = () => {
                 isLoading: false,
                 autoClose: 3000
             });
-            Swal.fire('Error', 'Failed to download file', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to download file',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
         }
     }
 

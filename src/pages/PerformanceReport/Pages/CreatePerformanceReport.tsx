@@ -102,15 +102,10 @@ const CreatePerformanceReport = () => {
             }
         } catch (error) {
             console.error('Error fetching performance report:', error);
-            Swal.fire(
-                'Error',
-                'Failed to fetch performance report. Please try again later.',
-                'error'
-            );
             if (error instanceof Error) {
-                toast.error(`Failed to download file. ${error.message}`);
+                toast.error(`Failed to fetch performance report. ${error.message}`);
             } else {
-                toast.error('Failed to download file.');
+                toast.error('Failed to fetch performance report.');
             }
             setData([]);
             setFilteredData([]);
@@ -187,8 +182,13 @@ const CreatePerformanceReport = () => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             if (e.target.files[0].type !== "application/pdf") {
-                Swal.fire("Error", "Only PDF files are allowed", "error");
-                setFile(null); // Reset the file input
+                Swal.fire({
+                    title: "Error",
+                    text: "Only PDF files are allowed",
+                    icon: "error",
+                    confirmButtonColor: "#1e3a8a"
+                });
+                setFile(null);
             } else {
                 setFile(e.target.files[0]);
             }
@@ -202,7 +202,12 @@ const CreatePerformanceReport = () => {
     const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!file || !period || !selectedSupplier) {
-            Swal.fire('Error', 'Please fill all fields', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Please fill all fields',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
             return;
         }
 
@@ -273,7 +278,12 @@ const CreatePerformanceReport = () => {
                 isLoading: false,
                 autoClose: 3000
             });
-            Swal.fire('Error', 'Failed to upload file', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to upload file',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
         }
     };
 
@@ -338,7 +348,12 @@ const CreatePerformanceReport = () => {
                 isLoading: false,
                 autoClose: 3000
             });
-            Swal.fire('Error', 'Failed to download file', 'error');
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to download file',
+                icon: 'error',
+                confirmButtonColor: '#1e3a8a'
+            });
         }
     }
 
