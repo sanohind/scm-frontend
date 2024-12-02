@@ -1,6 +1,28 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 
 export const SupplierMarketing = () => {
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    const purchaseOrderPaths = [
+        '/purchase-order', 
+        '/purchase-order-detail'
+    ];
+    const deliveryNotePaths = [
+        '/delivery-note', 
+        '/delivery-note-detail', 
+        '/delivery-note-detail-edit'
+    ];
+
+    // Check if current path matches any path in the groups
+    const isPurchaseOrderActive = purchaseOrderPaths.some(path => 
+        currentPath.startsWith(path) || currentPath.includes(path)
+    );
+    
+    const isDeliveryNoteActive = deliveryNotePaths.some(path => 
+        currentPath.startsWith(path) || currentPath.includes(path)
+    );
     
     const { pathname } = location;
     return (
@@ -57,9 +79,9 @@ export const SupplierMarketing = () => {
                     <NavLink
                         to="/purchase-order"
                         end
-                        className={({ isActive }) =>
+                        className={
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isActive
+                            isPurchaseOrderActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
@@ -100,9 +122,9 @@ export const SupplierMarketing = () => {
                     <NavLink
                         to="/delivery-note"
                         end
-                        className={({ isActive }) =>
+                        className={
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isActive
+                            isDeliveryNoteActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`

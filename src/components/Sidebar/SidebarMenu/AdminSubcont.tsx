@@ -1,7 +1,16 @@
 import { FaFileInvoiceDollar, FaPlus } from "react-icons/fa"
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 
 export const AdminSubcont = () => {
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    const userManagementPaths = ['/delivery-note', '/delivery-note-detail'];
+    const isUserManagementActive = userManagementPaths.some(path => 
+        currentPath.startsWith(path) || currentPath.includes(path)
+    );
+
     return (
         <div>
             <div>
@@ -56,9 +65,9 @@ export const AdminSubcont = () => {
                         <NavLink
                         to="/delivery-note"
                         end
-                        className={({ isActive }) =>
+                        className={
                             `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isActive
+                            isUserManagementActive
                                 ? 'bg-graydark text-white'
                                 : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                             }`
