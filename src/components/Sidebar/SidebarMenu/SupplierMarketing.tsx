@@ -24,7 +24,6 @@ export const SupplierMarketing = () => {
         currentPath.startsWith(path) || currentPath.includes(path)
     );
     
-    const { pathname } = location;
     return (
         <div>
             <div>
@@ -266,9 +265,9 @@ export const SupplierMarketing = () => {
                     <li>
                     <NavLink
                         to="/performance-report"
-                        className={() =>
+                        className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('performance-report')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
@@ -309,9 +308,9 @@ export const SupplierMarketing = () => {
                     <li>
                     <NavLink
                         to="/forecast-report"
-                        className={() =>
+                        className={({ isActive}) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('forecast-report')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
