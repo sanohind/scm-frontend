@@ -548,11 +548,20 @@ const PrintPO = () => {
 
   useEffect(() => {
     if (noPO) {
-      fetchPurchaseOrderData(noPO).then((data) => {
-        if (data) {
-          setPOData(data);
-        }
-      });
+        // Create loading toast for data fetching
+        const fetchPromise = fetchPurchaseOrderData(noPO)
+            .then((data) => {
+            if (data) {
+                setPOData(data);
+                return 'Data loaded successfully';
+            }
+            throw new Error('Failed to load data');
+            });
+    
+        toast.promise(fetchPromise, {
+            pending: 'Fetching data from server...',
+            error: 'Error loading data'
+        });
     }
   }, [noPO]);
 
@@ -651,14 +660,12 @@ const PrintPO = () => {
             {({ url, loading, error }) => {
                 if (loading) {
                 const id = toast.loading("Rendering PDF, please wait...");
-                setTimeout(() => {
-                  toast.update(id, { 
+                toast.update(id, { 
                   render: "PDF Ready", 
                   type: "success", 
                   isLoading: false,
-                  autoClose: 2000 
-                  });
-                }, 1000);
+                  autoClose: 1000 
+                });
                 return <p>Rendering PDF Please Wait...</p>;
                 }
                 if (error) {

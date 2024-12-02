@@ -468,11 +468,10 @@ const PrintDN = () => {
         
             toast.promise(fetchPromise, {
                 pending: 'Fetching data from server...',
-                success: 'Data loaded successfully',
                 error: 'Error loading data'
             });
         }
-      }, [noDN]);
+    }, [noDN]);
 
     const fetchDeliveryNoteData = async (noDN: string) => {
         const token = localStorage.getItem('access_token');
@@ -534,14 +533,13 @@ const PrintDN = () => {
                 {({ url, loading, error }) => {
                     if (loading) {
                     const id = toast.loading("Rendering PDF, please wait...");
-                    setTimeout(() => {
-                        toast.update(id, { 
+                    
+                    toast.update(id, { 
                         render: "PDF Ready", 
                         type: "success", 
                         isLoading: false,
-                        autoClose: 2000 
-                        });
-                    }, 1000);
+                        autoClose: 1500 
+                    });
                     return <p>Rendering PDF Please Wait...</p>;
                     }
                     if (error) {

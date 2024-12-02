@@ -34,18 +34,18 @@ const Breadcrumb = ({ pageName, isSubMenu = false, parentMenu }: BreadcrumbProps
           </div>
 
           <nav>
-            <ol className="flex items-center gap-2">
+            <ol className="flex items-center gap-2 text-sm sm:text-base">
               <li>
                 <Link className="font-medium" to="/dashboard">
                   Dashboard /
                 </Link>
               </li>
               {isSubMenu && parentMenu && (
-                <li>
-                  <Link className="font-medium" to={parentMenu.link}>
-                    {parentMenu.name} /
-                  </Link>
-                </li>
+              <li>
+                <Link className="font-medium" to={parentMenu.link}>
+                {parentMenu.name} /
+                </Link>
+              </li>
               )}
               <li className="font-medium text-primary">{pageName}</li>
             </ol>

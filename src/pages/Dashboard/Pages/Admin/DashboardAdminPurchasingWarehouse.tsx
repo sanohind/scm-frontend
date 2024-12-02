@@ -59,9 +59,9 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
           </div>
   
           {/* Sync Section */}
-          <div className="flex flex-col gap-5.5 p-6.5">
-            <div className="flex items-center">
-              <label htmlFor="month-picker" className="mr-2 text-base font-semibold text-gray-700 dark:text-white">
+          <div className="flex flex-col gap-5.5 p-4 sm:p-6.5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0">
+              <label htmlFor="month-picker" className="text-base font-semibold text-gray-700 dark:text-white sm:mr-2">
                 Select Month:
               </label>
               <input
@@ -69,12 +69,14 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
                 id="month-picker"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="border border-gray-300 dark:border-strokedark rounded-md p-2 mr-4"
+                className="w-full sm:w-auto border border-gray-300 dark:border-strokedark rounded-md p-2 mb-4 sm:mb-0 sm:mr-4"
               />
-                <button
+              <button
                 id="sync-button"
                 onClick={handleSync}
-                className={`flex items-center px-4 py-2 text-white rounded-md ${isSyncing ? 'bg-blue-400' : 'bg-blue-500 hover:bg-blue-600'}`}
+                className={`w-full sm:w-auto flex items-center justify-center px-4 py-2 text-white rounded-md ${
+                  isSyncing ? 'bg-blue-900' : 'bg-blue-900 hover:bg-blue-800'
+                }`}
                 disabled={isSyncing}
                 >
                 {isSyncing ? (
@@ -83,10 +85,10 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                   </svg>
                 ) : (
-                  <FaSyncAlt className="w-4 h-4 mr-2 " />
+                  <FaSyncAlt className="w-4 h-4 mr-2" />
                 )}
                 {isSyncing ? 'Syncing...' : 'Sync'}
-                </button>
+              </button>
             </div>
           </div>
         </div>
