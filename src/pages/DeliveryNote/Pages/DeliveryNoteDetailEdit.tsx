@@ -298,7 +298,7 @@ const DeliveryNoteDetailEdit = () => {
             </div>
 
             {/* Details Section */}
-            <div className="flex flex-col lg:flex-row lg:justify-between space-y-4 lg:space-y-0">
+            <div className="flex flex-col lg:flex-row lg:justify-between space-y-4 lg:space-y-0 lg:gap-4">
               {/* Left side details */}
               <div className="flex flex-col md:flex-row gap-4">
                 {/* No. PO */}
