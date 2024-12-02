@@ -1,9 +1,16 @@
 import { FaUserPlus, FaUsers } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export const SuperAdmin = () => {
-    
-    const { pathname } = location;
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    // Define related paths for each main menu
+    const userManagementPaths = ['/list-user', '/edit-user'];
+    const isUserManagementActive = userManagementPaths.some(path => 
+        currentPath.startsWith(path) || currentPath.includes(path)
+    );
 
     return (
         <div>
@@ -56,16 +63,16 @@ export const SuperAdmin = () => {
 
                     {/* <!-- Menu List User --> */}
                     <li>
-                    <NavLink
-                        to="/list-user"
-                        className={({ isActive }) =>
-                        `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isActive
-                            ? 'bg-graydark text-white'
-                            : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
-                        }`
-                        }
-                    >
+                        <NavLink
+                            to="/list-user"
+                            className={
+                                `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
+                                    isUserManagementActive
+                                    ? 'bg-graydark text-white'
+                                    : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
+                                }`
+                            }
+                        >
                         <FaUsers className="fill-current" size={18} />
                         List User
                     </NavLink>

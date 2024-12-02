@@ -61,7 +61,6 @@ const EditUser = () => {
 
   const fetchUserData = async (userId: string) => {
     const token = localStorage.getItem("access_token");
-    const toastId = toast.loading("Fetching user data...");
     try {
       const response = await fetch(`${API_Edit_User_Admin()}${userId}`, {
         method: "GET",
@@ -76,20 +75,9 @@ const EditUser = () => {
       const dataResponse = await response.json();
       const userData = dataResponse.data;
       populateForm(userData);
-      toast.update(toastId, {
-        render: "User data fetched successfully",
-        type: toast.TYPE.SUCCESS,
-        isLoading: false,
-        autoClose: 500,
-      });
     } catch (error) {
       console.error("Error fetching user data:", error);
-      toast.update(toastId, {
-        render: `Error fetching user data: ${error}`,
-        type: toast.TYPE.ERROR,
-        isLoading: false,
-        autoClose: 2000,
-      });
+      toast.error(`Error fetching user data: ${error}`);
     }
   };
 
@@ -165,7 +153,7 @@ const EditUser = () => {
         toast.success('User successfully updated!');
         setTimeout(() => {
           navigate('/list-user');
-        }, 2000);
+        }, 1000);
       } else {
         toast.error(`Failed to update user: ${result.message}`);
       }
@@ -179,7 +167,14 @@ const EditUser = () => {
   return (
     <>
       <ToastContainer position="top-right" />
-      <Breadcrumb pageName="Edit User" />
+      <Breadcrumb 
+        pageName="Edit User" 
+        isSubMenu={true}
+        parentMenu={{
+          name: "Manage User",
+          link: "/list-user" // Explicit link to parent
+        }}
+      />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
           <div className="p-4 md:p-6.5">
