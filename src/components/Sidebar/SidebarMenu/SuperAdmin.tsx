@@ -58,9 +58,9 @@ export const SuperAdmin = () => {
                     <li>
                     <NavLink
                         to="/list-user"
-                        className={() =>
+                        className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('list-user')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
@@ -76,9 +76,9 @@ export const SuperAdmin = () => {
                     <li>
                     <NavLink
                         to="/add-user"
-                        className={() =>
+                        className={({ isActive }) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('add-user')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`

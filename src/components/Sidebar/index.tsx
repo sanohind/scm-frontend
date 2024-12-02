@@ -27,7 +27,7 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
   );
 
   if (!role) {
-    return null; // Jangan render jika user role belum ada
+    return null;
   }
 
   // close on click outside
