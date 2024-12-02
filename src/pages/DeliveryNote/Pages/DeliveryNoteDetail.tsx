@@ -244,7 +244,14 @@ const DeliveryNoteDetail = () => {
   return (
     <>
       <ToastContainer position="top-right" />
-      <Breadcrumb pageName="Delivery Note Detail" />
+      <Breadcrumb 
+        pageName="Delivery Note Detail" 
+        isSubMenu={true}
+        parentMenu={{
+          name: "Delivery Note",
+          link: "/delivery-note"
+        }}
+      />
       <div className="font-poppins bg-white text-black">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
           {/* Header Section */}
