@@ -10,7 +10,7 @@ const IndexDeliveryNote: React.FC = () => {
     setUserRole(role);
   }, []);
 
-  if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
+  if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing' || userRole === 'supplier-warehouse' || userRole === 'supplier-subcont') {
     return <DeliveryNote />;
   } else if (userRole === 'admin-warehouse') {
     return <WarehouseDeliveryNote />;

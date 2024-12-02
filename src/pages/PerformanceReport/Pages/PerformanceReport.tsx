@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
-import { API_Download_Performance_Report, API_Performance_Report_Supplier } from '../../../api/api';
+import { API_Download_Performance_Report, API_Performance_Report } from '../../../api/api';
 import SearchMonth from '../../Table2/SearchMonth';
 import SearchBar from '../../Table2/SearchBar';
 import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from 'react-icons/fa';
@@ -32,7 +32,7 @@ const PerformanceReport = () => {
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_Performance_Report_Supplier()}${bp_code}`, {
+        const response = await fetch(`${API_Performance_Report()}${bp_code}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

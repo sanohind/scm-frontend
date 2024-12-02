@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { API_List_User, API_Update_Status } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '../../Table2/Pagination';
@@ -7,6 +6,7 @@ import SearchBar from '../../Table2/SearchBar';
 import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_List_User_Admin, API_Update_Status_Admin } from '../../../api/api';
 
 interface User {
     UserID: string;
@@ -46,7 +46,7 @@ const ManageUser: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(API_List_User(), {
+            const response = await fetch(API_List_User_Admin(), {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -91,7 +91,7 @@ const ManageUser: React.FC = () => {
 
         try {
             const response = await toast.promise(
-                fetch(`${API_Update_Status()}${userId}`, {
+                fetch(`${API_Update_Status_Admin()}${userId}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -184,17 +184,21 @@ const ManageUser: React.FC = () => {
 
     const getRoleName = (role: string) => {
         switch (role) {
-            case '4':
-                return 'Admin';
-            case '2':
-                return 'Warehouse';
-            case '3':
-                return 'Purchasing';
-            case '6':
-                return 'Admin Subcont';
             case '1':
-                return 'Supplier';
+                return 'Super Admin';
+            case '2':
+                return 'Admin Purchasing';
+            case '3':
+                return 'Admin Warehouse';
+            case '4':
+                return 'Admin Subcont';
             case '5':
+                return 'Supplier Marketing';
+            case '6':
+                return 'Supplier Subcont Marketing';
+            case '7':
+                return 'Supplier Warehouse';
+            case '8':
                 return 'Supplier Subcont';
             default:
                 return 'Unknown Role';

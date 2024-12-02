@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import Select from 'react-select';
 import Swal from 'sweetalert2';
 import { FaFilePdf, FaSortDown, FaSortUp } from 'react-icons/fa';
-import {
-    API_Create_Performance_Report_Purchasing,
-    API_Download_Performance_Report,
-    API_List_Partner,
-    API_Performance_Report_Purchasing,
-} from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
 import SearchBar from '../../Table2/SearchBar';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_Create_Performance_Report_Admin, API_Download_Performance_Report, API_List_Partner_Admin, API_Performance_Report_Admin } from '../../../api/api';
 
 const CreatePerformanceReport = () => {
     interface PerformanceReport {
@@ -37,7 +32,7 @@ const CreatePerformanceReport = () => {
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
         try {
-            const response = await fetch(API_List_Partner(), {
+            const response = await fetch(API_List_Partner_Admin(), {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -69,7 +64,7 @@ const CreatePerformanceReport = () => {
         setLoading(true);
         try {
             const response = await fetch(
-                `${API_Performance_Report_Purchasing()}${supplierCode}`,
+                `${API_Performance_Report_Admin()}${supplierCode}`,
                 {
                     method: 'GET',
                     headers: {
@@ -263,7 +258,7 @@ const CreatePerformanceReport = () => {
                     reject(new Error('Network error occurred'));
                 };
 
-                xhr.open('POST', API_Create_Performance_Report_Purchasing(), true);
+                xhr.open('POST', API_Create_Performance_Report_Admin(), true);
                 xhr.setRequestHeader('Authorization', `Bearer ${token}`);
                 xhr.send(formData);
             });

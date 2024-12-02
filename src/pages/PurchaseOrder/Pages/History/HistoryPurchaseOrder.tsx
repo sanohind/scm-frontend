@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
-import { API_PO_History_Supplier } from '../../../../api/api';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchMonth from '../../../Table2/SearchMonth';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_PO_History } from '../../../../api/api';
 
 const HistoryPurchaseOrder = () => {
   interface PurchaseOrder {
@@ -31,7 +31,7 @@ const HistoryPurchaseOrder = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_PO_History_Supplier()}${bpCode}`, {
+      const response = await fetch(`${API_PO_History()}${bpCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

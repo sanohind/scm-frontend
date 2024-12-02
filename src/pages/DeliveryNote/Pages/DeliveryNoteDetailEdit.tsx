@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Swal from 'sweetalert2';
-import { API_DN_Detail, API_Update_DN_Supplier } from '../../../api/api';
 import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx';
+import { API_DN_Detail, API_Update_DN } from '../../../api/api';
 
 const DeliveryNoteDetailEdit = () => {
   interface Detail {
@@ -149,7 +149,7 @@ const DeliveryNoteDetailEdit = () => {
     };
 
     try {
-      const response = await fetch(`${API_Update_DN_Supplier()}`, {
+      const response = await fetch(`${API_Update_DN()}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,

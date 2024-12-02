@@ -4,9 +4,9 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
-import { API_List_Partner, API_DN_Warehouse } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_DN_Admin, API_List_Partner_Admin } from '../../../../api/api';
 
 const WarehouseDeliveryNote = () => {
   interface DeliveryNote {
@@ -33,7 +33,7 @@ const WarehouseDeliveryNote = () => {
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
     try {
-      const response = await fetch(API_List_Partner(), {
+      const response = await fetch(API_List_Partner_Admin(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -58,7 +58,7 @@ const WarehouseDeliveryNote = () => {
   const fetchDeliveryNote = async (supplierCode: string) => {
     const token = localStorage.getItem('access_token');
     try {
-      const response = await fetch(`${API_DN_Warehouse()}${supplierCode}`, {
+      const response = await fetch(`${API_DN_Admin()}${supplierCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

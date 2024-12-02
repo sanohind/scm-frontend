@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import Select from "react-select";
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import Swal from 'sweetalert2';
-import { API_Create_User, API_List_Partner } from '../../../api/api';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_Create_User_Admin, API_List_Partner_Admin } from '../../../api/api';
 
 const AddUser = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -24,7 +24,7 @@ const AddUser = () => {
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
     try {
-      const response = await fetch(API_List_Partner(), {
+      const response = await fetch(API_List_Partner_Admin(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -97,7 +97,7 @@ const AddUser = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(API_Create_User(), {
+      const response = await fetch(API_Create_User_Admin(), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -181,12 +181,14 @@ const AddUser = () => {
                   required
                 >
                   <option value="" disabled>Select a role</option>
-                  <option value="4">Admin</option>
-                  <option value="3">Purchasing</option>
-                  <option value="2">Warehouse</option>
-                  <option value="6">Admin Subcont</option>
-                  <option value="1">Supplier</option>
-                  <option value="5">Supplier Subcont</option>
+                  <option value="1">Super Admin</option>
+                  <option value="2">Admin Purchasing</option>
+                  <option value="3">Admin Warehouse</option>
+                  <option value="4">Admin Subcont</option>
+                  <option value="5">Supplier Marketing</option>
+                  <option value="6">Supplier Subcont Marketing</option>
+                  <option value="7">Supplier Warehouse</option>
+                  <option value="8">Supplier Subcont</option>
                 </select>
                     </div>
                   </div>

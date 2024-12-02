@@ -3,11 +3,11 @@ import Select from 'react-select';
 import Swal from 'sweetalert2';
 import { FaFilePdf, FaSortDown, FaSortUp, FaTrash } from 'react-icons/fa';
 import {
-    API_Create_Forecast_Report_Purchasing,
-    API_Forecast_Report_Purchasing,
-    API_Delete_Forecast_Report_Purchasing,
-    API_List_Partner,
+    API_Create_Forecast_Report_Admin,
+    API_Delete_Forecast_Report_Admin,
     API_Download_Forecast_Report,
+    API_Forecast_Report_Admin,
+    API_List_Partner_Admin,
 } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../Table2/Pagination';
@@ -43,7 +43,7 @@ const CreateForecast = () => {
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
         try {
-            const response = await fetch(API_List_Partner(), {
+            const response = await fetch(API_List_Partner_Admin(), {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const CreateForecast = () => {
         setLoading(true);
         try {
             const response = await fetch(
-                `${API_Forecast_Report_Purchasing()}${supplierCode}`,
+                `${API_Forecast_Report_Admin()}${supplierCode}`,
                 {
                     method: 'GET',
                     headers: {
@@ -245,7 +245,7 @@ const CreateForecast = () => {
                     reject(new Error('Network error occurred'));
                 };
 
-                xhr.open('POST', API_Create_Forecast_Report_Purchasing(), true);
+                xhr.open('POST', API_Create_Forecast_Report_Admin(), true);
                 xhr.setRequestHeader('Authorization', `Bearer ${token}`);
                 xhr.send(formData);
             });
@@ -332,7 +332,7 @@ const CreateForecast = () => {
     const handleDelete = async (forecastId: string) => {
         const token = localStorage.getItem('access_token');
         try {
-            const response = await fetch(`${API_Delete_Forecast_Report_Purchasing()}${forecastId}`, {
+            const response = await fetch(`${API_Delete_Forecast_Report_Admin()}${forecastId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,

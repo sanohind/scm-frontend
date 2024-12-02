@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaSyncAlt } from 'react-icons/fa';
-import { API_Sync } from '../../../../api/api';
+import { API_Sync_Admin } from '../../../../api/api';
 
 const DashboardAdminPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -24,7 +24,7 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
   
       try {
         // Construct the URL with separate month and year parameters
-        const url = `${API_Sync()}?month=${month}&year=${year}`;
+        const url = `${API_Sync_Admin()}?month=${month}&year=${year}`;
       
         const response = await fetch(url, {
           method: 'GET',

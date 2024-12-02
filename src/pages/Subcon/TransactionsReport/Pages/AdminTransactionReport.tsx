@@ -8,8 +8,8 @@ import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { API_List_Item, API_List_Partner_Admin_Subcont, API_Transaction_Report } from '../../../../api/api';
 import SearchBar from '../../../Table2/SearchBar';
+import { API_List_Item_Subcont_Admin, API_List_Partner_Admin, API_Transaction_Report_Subcont_Admin } from '../../../../api/api';
 
 const AdminTransactionReport = () => {
     interface TransactionLog {
@@ -42,7 +42,7 @@ const AdminTransactionReport = () => {
     const fetchPartOptions = async () => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_List_Item()}?bp_code=${selectedSupplier?.value}`, {
+            const response = await fetch(`${API_List_Item_Subcont_Admin()}?bp_code=${selectedSupplier?.value}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -68,7 +68,7 @@ const AdminTransactionReport = () => {
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
         try {
-        const response = await fetch(API_List_Partner_Admin_Subcont(), {
+        const response = await fetch(API_List_Partner_Admin(), {
             method: 'GET',
             headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ const AdminTransactionReport = () => {
             const endDateString = formatDate(endDateParam);
 
             const response = await fetch(
-                `${API_Transaction_Report()}?start_date=${startDateString}&end_date=${endDateString}&bp_code=${supplierCode}`,
+                `${API_Transaction_Report_Subcont_Admin()}?start_date=${startDateString}&end_date=${endDateString}&bp_code=${supplierCode}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

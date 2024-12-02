@@ -4,7 +4,7 @@ import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import SearchBar from '../../../Table2/SearchBar';
 import Pagination from '../../../Table2/Pagination';
 import Select from 'react-select';
-import { API_List_Partner_Purchasing, API_PO_History } from '../../../../api/api';
+import { API_List_Partner_Admin, API_PO_History } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -23,7 +23,7 @@ const PurchasingHistoryPurchaseOrder = () => {
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
         try {
-        const response = await fetch(API_List_Partner_Purchasing(), {
+        const response = await fetch(API_List_Partner_Admin(), {
             method: 'GET',
             headers: {
             'Authorization': `Bearer ${token}`,
