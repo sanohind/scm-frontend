@@ -178,7 +178,7 @@ const DeliveryNoteDetail = () => {
       row.no,
       row.partNumber,
       row.partName,
-      row.UoM,
+      row.uom,
       Number(row.QTY) || 0,
       Number(row.qtyLabel) || 0,
       Number(row.qtyRequested) || 0,
@@ -237,7 +237,7 @@ const DeliveryNoteDetail = () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Delivery Note Detail');
   
     // Write to file
-    XLSX.writeFile(wb, `Delivery_Note_${dnDetails.noDN}.xlsx`);
+    XLSX.writeFile(wb, `delivery_note_${dnDetails.noDN}.xlsx`);
   };
 
 
