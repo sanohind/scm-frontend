@@ -13,6 +13,7 @@ import {
 import Swal from 'sweetalert2';
 import { API_Print_DN } from '../../api/api';
 import logoSanoh from '../../images/logo-sanoh.png';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Register the Poppins font
 Font.register({
@@ -455,13 +456,23 @@ const PrintDN = () => {
 
     useEffect(() => {
         if (noDN) {
-        fetchDeliveryNoteData(noDN).then((data) => {
-            if (data) {
-            setDNData(data);
-            }
-        });
+            // Create loading toast for data fetching
+            const fetchPromise = fetchDeliveryNoteData(noDN)
+                .then((data) => {
+                if (data) {
+                    setDNData(data);
+                    return 'Data loaded successfully';
+                }
+                throw new Error('Failed to load data');
+                });
+        
+            toast.promise(fetchPromise, {
+                pending: 'Fetching data from server...',
+                success: 'Data loaded successfully',
+                error: 'Error loading data'
+            });
         }
-    }, [noDN]);
+      }, [noDN]);
 
     const fetchDeliveryNoteData = async (noDN: string) => {
         const token = localStorage.getItem('access_token');
@@ -515,32 +526,44 @@ const PrintDN = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
-        {dnData ? (
-            <BlobProvider document={<DeliveryNoteDocument data={dnData} />}>
-            {({ url, loading, error }) => {
-                if (loading) {
-                return <p>Rendering PDF Please Wait... (5 seconds)</p>;
-                }
-                if (error) {
-                return <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>;
-                }
-                return (
-                <div>
-                    <iframe
-                    src={url || ''}
-                    style={{ width: '100vw', height: '100vh' }}
-                    frameBorder="0"
-                    title={`DeliveryNote_${dnData.header.dn_number}.pdf`}
-                    />
-                </div>
-                );
-            }}
-            </BlobProvider>
-        ) : (
-            <p>Loading Data From Server...</p>
-        )}
-        </div>
+        <>
+            <ToastContainer position="top-right" />
+            <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
+            {dnData ? (
+                <BlobProvider document={<DeliveryNoteDocument data={dnData} />}>
+                {({ url, loading, error }) => {
+                    if (loading) {
+                    const id = toast.loading("Rendering PDF, please wait...");
+                    setTimeout(() => {
+                        toast.update(id, { 
+                        render: "PDF Ready", 
+                        type: "success", 
+                        isLoading: false,
+                        autoClose: 2000 
+                        });
+                    }, 1000);
+                    return <p>Rendering PDF Please Wait...</p>;
+                    }
+                    if (error) {
+                    return <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>;
+                    }
+                    return (
+                    <div>
+                        <iframe
+                        src={url || ''}
+                        style={{ width: '100vw', height: '100vh' }}
+                        frameBorder="0"
+                        title={`DeliveryNote_${dnData.header.dn_number}.pdf`}
+                        />
+                    </div>
+                    );
+                }}
+                </BlobProvider>
+            ) : (
+                <p>Loading Data From Server...</p>
+            )}
+            </div>
+        </>
     );
 };
 

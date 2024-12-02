@@ -12,6 +12,7 @@ import {
 import Swal from 'sweetalert2';
 import { API_Print_Label } from '../../api/api';
 import QRCode from 'qrcode';
+import { toast, ToastContainer } from 'react-toastify';
 
 // Register the Poppins font
 Font.register({
@@ -188,24 +189,24 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
 
                             {/* Row 5 */}
                             <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, justifyContent: 'space-between', height: '100%'}}>
-                              {item.qr_number && (
-                                <View style={{flexDirection: 'row' , alignItems: 'center'}}>
-                                  <Image
-                                      src={generateQRCode(item.qr_number)}
-                                      style={{}}
-                                  />
-                                  <Text style={{fontSize: 6, marginTop: 5}}>{item.qr_number}</Text>
-                                </View>
-                              )}
-                              {item.po_number && (
-                                  <View>
-                                      <Image
-                                          src={generateQRCode(item.po_number)}
-                                          style={{}}
-                                      />
-                                      <Text style={{fontSize: 6, margin: 2}}>{item.po_number}</Text>
-                                  </View>
-                              )}
+                                {item.qr_number && (
+                                    <View style={{flexDirection: 'row' , alignItems: 'center'}}>
+                                    <Image
+                                        src={generateQRCode(item.qr_number)}
+                                        style={{}}
+                                    />
+                                    <Text style={{fontSize: 6, marginTop: 5}}>{item.qr_number}</Text>
+                                    </View>
+                                )}
+                                {item.po_number && (
+                                    <View>
+                                        <Image
+                                            src={generateQRCode(item.po_number)}
+                                            style={{}}
+                                        />
+                                        <Text style={{fontSize: 6, margin: 2}}>{item.po_number}</Text>
+                                    </View>
+                                )}
                             </View>
                         </View>
                     </View>
@@ -223,11 +224,21 @@ const PrintLabel = () => {
 
     useEffect(() => {
         if (noDN) {
-        fetchLabelData(noDN).then((data) => {
-            if (data) {
-            setLabelData(data);
-            }
-        });
+            // Create loading toast for data fetching
+            const fetchPromise = fetchLabelData(noDN)
+                .then((data) => {
+                if (data) {
+                    setLabelData(data);
+                    return 'Data loaded successfully';
+                }
+                throw new Error('Failed to load data');
+                });
+        
+            toast.promise(fetchPromise, {
+                pending: 'Fetching data from server...',
+                success: 'Data loaded successfully',
+                error: 'Error loading data'
+            });
         }
     }, [noDN]);
 
@@ -276,34 +287,45 @@ const PrintLabel = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
-        {labelData.length > 0 ? (
-            <BlobProvider document={<LabelDocument data={labelData} />}>
-            {({ url, loading, error }) => {
-                if (loading) {
-                return <p>Rendering PDF Please Wait... (5 seconds)</p>;
-                }
-                if (error) {
-                return (
-                    <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>
-                );
-                }
-                return (
-                <div>
-                    <iframe
-                    src={url || ''}
-                    style={{ width: '100vw', height: '100vh' }}
-                    frameBorder="0"
-                    title="Labels.pdf"
-                    />
-                </div>
-                );
-            }}
-            </BlobProvider>
-        ) : (
-            <p>Loading Data From Server...</p>
-        )}
-        </div>
+        
+        <>
+            <ToastContainer position="top-right" />
+            <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
+            {labelData.length > 0 ? (
+                <BlobProvider document={<LabelDocument data={labelData} />}>
+                {({ url, loading, error }) => {
+                    if (loading) {
+                    const id = toast.loading("Rendering PDF, please wait...");
+                    setTimeout(() => {
+                        toast.update(id, { 
+                        render: "PDF Ready", 
+                        type: "success", 
+                        isLoading: false,
+                        autoClose: 2000 
+                        });
+                    }, 1000);
+                    return <p>Rendering PDF Please Wait...</p>;
+                    }
+                    if (error) {
+                    return <p>Error Rendering PDF: {error.message}. Please Try Again Later</p>;
+                    }
+                    return (
+                    <div>
+                        <iframe
+                        src={url || ''}
+                        style={{ width: '100vw', height: '100vh' }}
+                        frameBorder="0"
+                        title={`Label_${noDN}.pdf`}
+                        />
+                    </div>
+                    );
+                }}
+                </BlobProvider>
+            ) : (
+                <p>Loading Data From Server...</p>
+            )}
+            </div>
+        </>
     );
 };
 
