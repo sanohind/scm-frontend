@@ -4,9 +4,13 @@ export const AdminPurchasing = () => {
 
     const location = useLocation();
     const currentPath = location.pathname;
-    
-    const userManagementPaths = ['/purchase-order', '/purchase-order-detail'];
-    const isUserManagementActive = userManagementPaths.some(path => 
+
+    const purchaseOrderPaths = [
+        '/purchase-order', 
+        '/purchase-order-detail'
+    ];
+
+    const isPurchaseOrderActive = purchaseOrderPaths.some(path => 
         currentPath.startsWith(path) || currentPath.includes(path)
     );
     
@@ -66,7 +70,7 @@ export const AdminPurchasing = () => {
                         end
                         className={
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isUserManagementActive
+                            isPurchaseOrderActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`

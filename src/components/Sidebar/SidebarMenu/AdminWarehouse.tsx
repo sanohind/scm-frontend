@@ -4,9 +4,13 @@ export const AdminWarehouse = () => {
 
     const location = useLocation();
     const currentPath = location.pathname;
+
+    const deliveryNotePaths = [
+        '/delivery-note', 
+        '/delivery-note-detail', 
+    ];
     
-    const userManagementPaths = ['/delivery-note', '/delivery-note-detail'];
-    const isUserManagementActive = userManagementPaths.some(path => 
+    const isDeliveryNoteActive = deliveryNotePaths.some(path => 
         currentPath.startsWith(path) || currentPath.includes(path)
     );
 
@@ -66,7 +70,7 @@ export const AdminWarehouse = () => {
                         end
                         className={
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isUserManagementActive
+                            isDeliveryNoteActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
