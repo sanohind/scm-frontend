@@ -76,6 +76,11 @@ const HistoryDeliveryNote = () => {
 
   useEffect(() => {
     fetchHistoryDeliveryNotes();
+
+    const savedPage = localStorage.getItem('dn_history_current_page');
+    if (savedPage) {
+        setCurrentPage(parseInt(savedPage));
+    }
   }, []);
 
   useEffect(() => {
@@ -117,7 +122,10 @@ const HistoryDeliveryNote = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    localStorage.setItem('dn_history_current_page', page.toString());
+  };
 
   const handleSort = (key: keyof DeliveryNote) => {
     let direction = 'asc';

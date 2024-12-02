@@ -68,6 +68,11 @@ const DeliveryNote = () => {
 
   useEffect(() => {
     fetchDeliveryNotes();
+
+    const savedPage = localStorage.getItem('dn_current_page');
+    if (savedPage) {
+      setCurrentPage(parseInt(savedPage));
+    }
   }, []);
 
   useEffect(() => {
@@ -110,7 +115,10 @@ const DeliveryNote = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    localStorage.setItem('dn_current_page', page.toString());
+  };
 
   const handleSort = (key: keyof DeliveryNote) => {
     let direction = 'asc';

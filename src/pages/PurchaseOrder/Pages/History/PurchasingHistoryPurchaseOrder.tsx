@@ -170,6 +170,7 @@ const PurchasingHistoryPurchaseOrder = () => {
         } else {
             localStorage.removeItem('selected_supplier');
             localStorage.removeItem('po_history_current_page');
+            setCurrentPage(1);
             setData([]);
             setFilteredData([]);
         }
