@@ -97,7 +97,24 @@ const PurchasingHistoryPurchaseOrder = () => {
 
     useEffect(() => {
         fetchSuppliers();
+        const savedPage = localStorage.getItem('po_history_current_page');
+        if (savedPage) {
+            setCurrentPage(parseInt(savedPage));
+        }
     }, []);
+
+    useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: { value: string; label: string }) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchPurchaseOrders(savedSupplierCode);
+            }
+        }
+    }, [suppliers]);
 
     useEffect(() => {
         let filtered = [...data];
@@ -132,7 +149,10 @@ const PurchasingHistoryPurchaseOrder = () => {
         currentPage * rowsPerPage
     );
 
-    const handlePageChange = (page: number) => setCurrentPage(page);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        localStorage.setItem('po_history_current_page', page.toString());
+    };
 
     const handleSort = (key: keyof typeof data[0]) => {
         let direction = 'asc';
@@ -145,10 +165,11 @@ const PurchasingHistoryPurchaseOrder = () => {
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
-            setLoading(true);
+            localStorage.setItem('selected_supplier', selectedOption.value);
             fetchPurchaseOrders(selectedOption.value);
-            localStorage.setItem('selected_bp_code', selectedOption.value);
         } else {
+            localStorage.removeItem('selected_supplier');
+            localStorage.removeItem('po_history_current_page');
             setData([]);
             setFilteredData([]);
         }

@@ -73,6 +73,11 @@ const PurchaseOrder = () => {
 
   useEffect(() => {
     fetchPurchaseOrders();
+
+    const savedPage = localStorage.getItem('po_current_page');
+    if (savedPage) {
+        setCurrentPage(parseInt(savedPage));
+    }
   }, []);
 
   useEffect(() => {
@@ -116,7 +121,10 @@ const PurchaseOrder = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    localStorage.setItem('po_current_page', page.toString());
+  };
 
   const handleSort = (key: keyof PurchaseOrder) => {
     let direction = 'asc';

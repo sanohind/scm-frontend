@@ -34,7 +34,7 @@ const PurchasingPurchaseOrder = () => {
   }
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchSuppliers = async () => {
@@ -118,7 +118,24 @@ const PurchasingPurchaseOrder = () => {
 
   useEffect(() => {
     fetchSuppliers();
+    const savedPage = localStorage.getItem('po_current_page');
+    if (savedPage) {
+        setCurrentPage(parseInt(savedPage));
+    }
   }, []);
+
+  useEffect(() => {
+    const savedSupplierCode = localStorage.getItem('selected_supplier');
+    if (savedSupplierCode && suppliers.length > 0) {
+      const savedSupplier = suppliers.find(
+        (sup: Supplier) => sup.value === savedSupplierCode
+      );
+      if (savedSupplier) {
+        setSelectedSupplier(savedSupplier);
+        fetchPurchaseOrders(savedSupplierCode);
+      }
+    }
+  }, [suppliers]);
 
   useEffect(() => {
     let filtered = [...data];
@@ -155,7 +172,10 @@ const PurchasingPurchaseOrder = () => {
     currentPage * rowsPerPage
   );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    localStorage.setItem('po_current_page', page.toString());
+};
 
   const handleSort = (key: keyof PurchaseOrder) => {
     let direction = 'asc';
@@ -168,13 +188,16 @@ const PurchasingPurchaseOrder = () => {
   const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedSupplier(selectedOption);
     if (selectedOption) {
+      localStorage.setItem('selected_supplier', selectedOption.value);
       fetchPurchaseOrders(selectedOption.value);
-      localStorage.setItem('selected_bp_code', selectedOption.value);
     } else {
+      localStorage.removeItem('selected_supplier');
+      localStorage.removeItem('po_current_page');
       setData([]);
       setFilteredData([]);
     }
   };
+
 
   const handleShowReason = (reason: string) => {
     Swal.fire({
