@@ -57,6 +57,8 @@ const WarehouseDeliveryNote = () => {
 
   const fetchDeliveryNote = async (supplierCode: string) => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
+
     try {
       const response = await fetch(`${API_DN_Admin()}${supplierCode}`, {
         method: 'GET',
@@ -88,10 +90,12 @@ const WarehouseDeliveryNote = () => {
 
         setData(deliveryNote);
         setFilteredData(deliveryNote);
+        setLoading(false);
       } else {
         setData([]);
         setFilteredData([]);
         toast.info(`No DN data found for ${supplierCode}`);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error fetching delivery note:', error);

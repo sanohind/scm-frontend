@@ -61,6 +61,7 @@ const WarehouseHistoryDeliveryNote = () => {
 
   const fetchHistoryDeliveryNote = async (supplierCode: string) => {
     const token = localStorage.getItem('access_token');
+    setLoading(true);
     try {
       const response = await fetch(`${API_DN_History_Admin()}${supplierCode}`, {
         method: 'GET',
@@ -90,10 +91,12 @@ const WarehouseHistoryDeliveryNote = () => {
 
         setData(deliveryNote);
         setFilteredData(deliveryNote);
+        setLoading(false);
       } else {
         setData([]);
         setFilteredData([]);
-        toast.error('No History DN data found');
+        toast.info('No History DN data found');
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error fetching history delivery note:', error);
