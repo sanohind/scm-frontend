@@ -12,7 +12,7 @@ const IndexHistoryDeliveryNote: React.FC = () => {
   
     if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing' || userRole === 'supplier-warehouse' || userRole === 'supplier-subcont') {
         return <HistoryDeliveryNote />;
-    } else if (userRole === 'admin-warehouse') {
+    } else if (userRole === 'admin-warehouse' || userRole === 'admin-subcont') {
         return <WarehouseHistoryDeliveryNote />;
     } else {
         return <div>No dashboard available for your role.</div>;
