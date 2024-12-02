@@ -78,14 +78,13 @@ const DeliveryNoteDetailEdit = () => {
           partNumber: detail.part_no || '-',
           partName: detail.item_desc_a || '-',
           UoM: detail.dn_unit || '-',
-          QTY: detail.dn_qty || '-',
+          QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
           qtyLabel: detail.dn_snp || '-',
           qtyRequested: detail.dn_qty || '-',
           qtyConfirm: detail.qty_confirm ?? detail.dn_qty,
           qtyDelivered: detail.receipt_qty || '-',
           qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
         }));
-
         
         setFilteredData(details);
         setLoading(false);
@@ -275,7 +274,7 @@ const DeliveryNoteDetailEdit = () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Delivery Note Detail');
   
     // Write to file
-    XLSX.writeFile(wb, `Delivery_Note_${dnDetails.noDN}.xlsx`);
+    XLSX.writeFile(wb, `delivery_note_${dnDetails.noDN}.xlsx`);
   };
 
   return (

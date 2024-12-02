@@ -61,17 +61,17 @@ const DeliveryNoteDetail = () => {
             planDelivery: dn.plan_delivery_date || '-',
         });
         
-          const details = dn.detail.map((detail: any) => ({
-            no: detail.dn_line,
+            const details = dn.detail.map((detail: any) => ({
+            no: detail.dn_line ?? '-',
             partNumber: detail.part_no || '-',
             partName: detail.item_desc_a || '-',
-            QTY: detail.dn_qty || '-',
+            QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
             qtyLabel: detail.dn_snp || '-',
             qtyDelivered: detail.receipt_qty || '-',
             qtyReceived: detail.receipt_qty || '-',
-            qtyConfirm: detail.qty_confirm || '-',
+            qtyConfirm: detail.qty_confirm !== null ? detail.qty_confirm : '-',
             uom: detail.dn_unit || '-',
-          }));
+            }));
 
           setDetails(details);
           setFilteredData(details);
