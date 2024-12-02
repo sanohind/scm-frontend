@@ -144,7 +144,14 @@ const PurchaseOrderDetail = () => {
   return (
     <>
       <ToastContainer position="top-right" />
-      <Breadcrumb pageName="Purchase Order Detail" />
+      <Breadcrumb 
+        pageName="Purchase Order Detail" 
+        isSubMenu={true}
+        parentMenu={{
+          name: "Purchase Order",
+          link: "/purchase-order"
+        }}
+      />
       <div className="bg-white text-black">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
             {/* Header Section */}

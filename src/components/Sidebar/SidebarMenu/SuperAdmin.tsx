@@ -5,8 +5,7 @@ export const SuperAdmin = () => {
 
     const location = useLocation();
     const currentPath = location.pathname;
-
-    // Define related paths for each main menu
+    
     const userManagementPaths = ['/list-user', '/edit-user'];
     const isUserManagementActive = userManagementPaths.some(path => 
         currentPath.startsWith(path) || currentPath.includes(path)

@@ -1,7 +1,15 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export const AdminPurchasing = () => {
-    const { pathname } = location;
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+    
+    const userManagementPaths = ['/purchase-order', '/purchase-order-detail'];
+    const isUserManagementActive = userManagementPaths.some(path => 
+        currentPath.startsWith(path) || currentPath.includes(path)
+    );
+    
     return (
         <div>
             <div>
@@ -56,9 +64,9 @@ export const AdminPurchasing = () => {
                     <NavLink
                         to="/purchase-order"
                         end
-                        className={({ isActive }) =>
+                        className={
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            isActive
+                            isUserManagementActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
@@ -159,9 +167,9 @@ export const AdminPurchasing = () => {
                     <li>
                     <NavLink
                         to="/performance-report"
-                        className={() =>
+                        className={({isActive}) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('performance-report')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
@@ -202,9 +210,9 @@ export const AdminPurchasing = () => {
                     <li>
                     <NavLink
                         to="/forecast-report"
-                        className={() =>
+                        className={({ isActive}) =>
                         `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
-                            pathname.includes('forecast-report')
+                            isActive
                             ? 'bg-graydark text-white'
                             : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
                         }`
