@@ -61,6 +61,7 @@ const EditUser = () => {
 
   const fetchUserData = async (userId: string) => {
     const token = localStorage.getItem("access_token");
+    const toastId = toast.loading("Fetching user data...");
     try {
       const response = await fetch(`${API_Edit_User_Admin()}${userId}`, {
         method: "GET",
@@ -75,9 +76,20 @@ const EditUser = () => {
       const dataResponse = await response.json();
       const userData = dataResponse.data;
       populateForm(userData);
+      toast.update(toastId, {
+        render: "User data fetched successfully",
+        type: toast.TYPE.SUCCESS,
+        isLoading: false,
+        autoClose: 500,
+      });
     } catch (error) {
       console.error("Error fetching user data:", error);
-      toast.error(`Error fetching user data: ${error}`);
+      toast.update(toastId, {
+        render: `Error fetching user data: ${error}`,
+        type: toast.TYPE.ERROR,
+        isLoading: false,
+        autoClose: 2000,
+      });
     }
   };
 
