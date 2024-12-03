@@ -78,8 +78,8 @@ export const AddItems = () => {
 
             const itemData = {
                 bp_code: selectedSupplier.value,
-                part_name: partName,
-                part_number: partNumber,
+                item_name: partName,
+                item_code: partNumber,
             };
 
             const response = await fetch(API_Create_Item_Subcont_Admin(), {
