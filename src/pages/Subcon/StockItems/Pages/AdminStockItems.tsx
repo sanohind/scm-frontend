@@ -62,7 +62,7 @@ const AdminStockItems = () => {
         const token = localStorage.getItem('access_token');
         setLoading(true);
         try {
-            const response = await fetch(`${API_Stock_Item_Subcont_Admin()}?bp_code=${supplierCode}`, {
+            const response = await fetch(`${API_Stock_Item_Subcont_Admin()}${supplierCode}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
