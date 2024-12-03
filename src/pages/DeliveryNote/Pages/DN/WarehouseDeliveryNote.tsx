@@ -22,7 +22,7 @@ const WarehouseDeliveryNote = () => {
   const [data, setData] = useState<DeliveryNote[]>([]);
   const [filteredData, setFilteredData] = useState<DeliveryNote[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);

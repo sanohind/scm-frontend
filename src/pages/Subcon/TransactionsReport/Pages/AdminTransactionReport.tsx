@@ -23,6 +23,11 @@ const AdminTransactionReport = () => {
         deliveryNote: string;
     }
     
+    interface Supplier {
+        value: string;
+        label: string;
+    }
+
     const [filteredData, setFilteredData] = useState<TransactionLog[]>([]);
     const [allData, setAllData] = useState<TransactionLog[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -94,6 +99,20 @@ const AdminTransactionReport = () => {
     useEffect(() => {
         fetchSuppliers();
     }, []);
+
+    useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: Supplier) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchPartOptions(savedSupplierCode);
+                fetchTransactionLogs(savedSupplierCode, startDate, endDate);
+            }
+        }
+      }, [suppliers]);
 
     // Modified fetchTransactionLogs to include supplier
     const fetchTransactionLogs = async (

@@ -18,6 +18,11 @@ const AdminStockItems = () => {
         ng_replating_stock: number;
     }
 
+    interface Supplier {
+        value: string;
+        label: string;
+    }
+
     const [data, setData] = useState<StockItem[]>([]);
     const [filteredData, setFilteredData] = useState<StockItem[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -88,6 +93,19 @@ const AdminStockItems = () => {
     }, []);
 
     useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: Supplier) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchStockItems(savedSupplierCode);
+            }
+        }
+      }, [suppliers]);
+
+    useEffect(() => {
         let filtered = [...data];
         if (searchQuery) {
         filtered = filtered.filter((row) =>
@@ -102,11 +120,12 @@ const AdminStockItems = () => {
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
-        fetchStockItems(selectedOption.value);
-        localStorage.setItem('selected_bp_code', selectedOption.value);
+            localStorage.setItem('selected_supplier', selectedOption.value);
+            fetchStockItems(selectedOption.value);
         } else {
-        setData([]);
-        setFilteredData([]);
+            localStorage.removeItem('selected_supplier');
+            setData([]);
+            setFilteredData([]);
         }
     };
 
