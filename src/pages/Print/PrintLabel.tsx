@@ -91,19 +91,19 @@ const styles = StyleSheet.create({
 });
 
 interface LabelDataItem {
-  dn_label_no: string;
-  lot_number: string;
-  qr_number: string;
-  po_number: string;
-  dn_number: string;
-  model: string;
-  customer_name: string;
-  supplier_name: string;
-  part_number: string;
-  part_name: string;
-  quantity: string;
-  delivery_date: string;
-  printed_date: string;
+    dn_label_no: string;
+    lot_number: string;
+    qr_number: string;
+    po_number: string;
+    dn_number: string;
+    model: string;
+    customer_name: string;
+    supplier_name: string;
+    part_number: string;
+    part_name: string;
+    quantity: string;
+    delivery_date: string;
+    printed_date: string;
 }
 
 
@@ -291,7 +291,7 @@ const PrintLabel = () => {
             part_name: item.part_name || 'N/A',
             quantity: item.quantity || 'N/A',
             delivery_date: item.delivery_date || 'N/A',
-            printed_date: item.printed_date || 'N/A',
+            printed_date: item.printed_date ? item.printed_date.replace(/(\d{2})(\d{2})(\d{2}) (\d{2}:\d{2})/, '$1/$2/$3 $4') : 'N/A',
             }));
         } else {
             console.error('Failed to fetch label data:', labelData.message);
