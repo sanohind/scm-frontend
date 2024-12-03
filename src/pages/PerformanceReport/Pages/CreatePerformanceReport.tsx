@@ -24,8 +24,12 @@ const CreatePerformanceReport = () => {
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof PerformanceReport | '', direction: 'asc' | 'desc' | '' }>({ key: '', direction: '' });
-    const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
-    const [suppliers, setSuppliers] = useState([]);
+    interface Supplier {
+        value: string;
+        label: string;
+    }
+    const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+    const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [file, setFile] = useState<File | null>(null);
     const [period, setPeriod] = useState('');
 
@@ -119,6 +123,19 @@ const CreatePerformanceReport = () => {
     }, []);
 
     useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: Supplier) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchPerformanceReport(savedSupplierCode);
+            }
+        }
+    }, [suppliers]);
+
+    useEffect(() => {
         let filtered = [...data];
 
         if (searchQuery) {
@@ -170,10 +187,11 @@ const CreatePerformanceReport = () => {
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
+            localStorage.setItem('selected_supplier', selectedOption.value);
             setLoading(true);
             fetchPerformanceReport(selectedOption.value);
-            localStorage.setItem('selected_bp_code', selectedOption.value);
         } else {
+            localStorage.removeItem('selected_supplier');
             setData([]);
             setFilteredData([]);
         }
@@ -181,7 +199,10 @@ const CreatePerformanceReport = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            if (e.target.files[0].type !== "application/pdf") {
+            const file = e.target.files[0];
+            
+            // Check file type
+            if (file.type !== "application/pdf") {
                 Swal.fire({
                     title: "Error",
                     text: "Only PDF files are allowed",
@@ -189,9 +210,26 @@ const CreatePerformanceReport = () => {
                     confirmButtonColor: "#1e3a8a"
                 });
                 setFile(null);
-            } else {
-                setFile(e.target.files[0]);
+                // Clear the input
+                e.target.value = '';
+                return;
             }
+
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                Swal.fire({
+                    title: "Error",
+                    text: "File size must not exceed 5MB",
+                    icon: "error",
+                    confirmButtonColor: "#1e3a8a"
+                });
+                setFile(null);
+                // Clear the input
+                e.target.value = '';
+                return;
+            }
+    
+            setFile(file);
         }
     };
 
@@ -507,9 +545,9 @@ const CreatePerformanceReport = () => {
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">
                                                     <button
                                                         onClick={() => downloadFile(row.attachedFile)}
-                                                        className="px-2 py-1 hover:scale-110"
+                                                        className="px-2 py-1 hover:scale-125"
                                                     >
-                                                        <FaFilePdf className="text-red-500 text-2xl" />
+                                                        <FaFilePdf className="text-blue-900 text-2xl" />
                                                     </button>
                                                 </td>
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">{row.upload_at}</td>

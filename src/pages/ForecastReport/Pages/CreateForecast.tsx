@@ -36,6 +36,8 @@ const CreateForecast = () => {
     const [description, setDescription] = useState('');
 
     interface Supplier {
+        value: string;
+        label: string;
         bp_code: string;
         bp_name: string;
     }
@@ -116,6 +118,19 @@ const CreateForecast = () => {
     }, []);
 
     useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: Supplier) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchForecastReport(savedSupplierCode);
+            }
+        }
+    }, [suppliers]);
+
+    useEffect(() => {
         let filtered = [...data];
 
         if (searchQuery) {
@@ -162,9 +177,10 @@ const CreateForecast = () => {
         setSelectedSupplier(selectedOption);
         setLoading(true);
         if (selectedOption) {
+            localStorage.setItem('selected_supplier', selectedOption.value);
             fetchForecastReport(selectedOption.value);
-            localStorage.setItem('selected_bp_code', selectedOption.value);
         } else {
+            localStorage.removeItem('selected_supplier');
             setData([]);
             setFilteredData([]);
         }
@@ -172,18 +188,36 @@ const CreateForecast = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
-        }
-        if (e.target.files && e.target.files[0] && e.target.files[0].type !== "application/pdf") {
-            Swal.fire({
-                title: "Error",
-                text: "Only PDF files are allowed",
-                icon: "error",
-                confirmButtonColor: "#1e3a8a"
-            });
-            setFile(null);
-        } else if (e.target.files) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            
+            // Check file type
+            if (selectedFile.type !== "application/pdf") {
+                Swal.fire({
+                    title: "Error",
+                    text: "Only PDF files are allowed",
+                    icon: "error",
+                    confirmButtonColor: "#1e3a8a"
+                });
+                setFile(null);
+                e.target.value = ''; // Reset file input
+                return;
+            }
+    
+            // Check file size (5MB = 5 * 1024 * 1024 bytes)
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (selectedFile.size > maxSize) {
+                Swal.fire({
+                    title: "Error",
+                    text: "File size must not exceed 5MB",
+                    icon: "error",
+                    confirmButtonColor: "#1e3a8a"
+                });
+                setFile(null);
+                e.target.value = ''; // Reset file input
+                return;
+            }
+    
+            setFile(selectedFile);
         }
     };
 
@@ -514,9 +548,9 @@ const CreateForecast = () => {
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">
                                                     <button
                                                         onClick={() => downloadFile(row.attachedFile)}
-                                                        className="px-2 py-1 hover:scale-110"
+                                                        className="px-2 py-1 hover:scale-125"
                                                     >
-                                                        <FaFilePdf className="text-red-500 text-2xl" />
+                                                        <FaFilePdf className="text-blue-900 text-2xl" />
                                                     </button>
                                                 </td>
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">{row.upload_at}</td>
