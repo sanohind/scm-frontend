@@ -100,11 +100,11 @@ const PurchasingPurchaseOrder = () => {
         setData(purchaseOrder);
         setFilteredData(purchaseOrder);
         setLoading(false);
-        // toast.success('Purchase orders fetched successfully');
       } else {
         setData([]);
         setFilteredData([]);
-        toast.info(`No PO data found, ${result.message}`);
+        toast.info(`No purchase order data found in this supplier`);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error fetching purchase orders:', error);

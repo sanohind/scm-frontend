@@ -76,10 +76,12 @@ const PurchasingHistoryPurchaseOrder = () => {
 
             setData(purchaseOrder);
             setFilteredData(purchaseOrder);
+            setLoading(false);
         } else {
             setData([]);
             setFilteredData([]);
-            toast.error('No purchase orders found.');
+            toast.info('No purchase orders history found in this supplier.');
+            setLoading(false);
         }
         } catch (error) {
             console.error('Error fetching purchase orders:', error);
