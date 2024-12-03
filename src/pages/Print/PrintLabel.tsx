@@ -16,73 +16,78 @@ import { toast, ToastContainer } from 'react-toastify';
 
 // Register the Poppins font
 Font.register({
-  family: 'Poppins',
-  fonts: [
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf',
-      fontWeight: 'normal',
-      fontStyle: 'normal',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Italic.ttf',
-      fontWeight: 'normal',
-      fontStyle: 'italic',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Medium.ttf',
-      fontWeight: 'medium',
-      fontStyle: 'normal',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-SemiBold.ttf',
-      fontWeight: 'semibold',
-      fontStyle: 'normal',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-SemiBoldItalic.ttf',
-      fontWeight: 'semibold',
-      fontStyle: 'italic',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf',
-      fontWeight: 'bold',
-      fontStyle: 'normal',
-    },
-    {
-      src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-BoldItalic.ttf',
-      fontWeight: 'bold',
-      fontStyle: 'italic',
-    },
-  ],
+    family: 'Poppins',
+    fonts: [
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Regular.ttf',
+        fontWeight: 'normal',
+        fontStyle: 'normal',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Italic.ttf',
+        fontWeight: 'normal',
+        fontStyle: 'italic',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Medium.ttf',
+        fontWeight: 'medium',
+        fontStyle: 'normal',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-SemiBold.ttf',
+        fontWeight: 'semibold',
+        fontStyle: 'normal',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-SemiBoldItalic.ttf',
+        fontWeight: 'semibold',
+        fontStyle: 'italic',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-Bold.ttf',
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+        },
+        {
+        src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/Poppins-BoldItalic.ttf',
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        },
+    ],
 });
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 20,
-    fontSize: 8,
-    fontFamily: 'Poppins',
-    width: '100%',
-    height: '100%',
-  },
-  pageInfo: {
-    position: 'absolute',
-    flexDirection: 'column',
-    top: 5,
-    right: 5,
-    fontSize: 8,
-    fontWeight: 'medium',
-},
-  label: {
-    width: '50%',
-    height: '185',
-    padding: 2,
-    borderRight: '1px dashed #000',
-    borderBottom: '1px dashed #000',
-  },
-  table: {
-    width: '100%',
-    height: '100%',
-  },
+    page: {
+        padding: 20,
+        fontSize: 8,
+        fontFamily: 'Poppins',
+        width: '100%',
+        height: '100%',
+    },
+    pageInfo: {
+        position: 'absolute',
+        flexDirection: 'column',
+        top: 5,
+        right: 5,
+        fontSize: 8,
+        fontWeight: 'medium',
+    },
+    label: {
+        width: '50%',
+        height: '185',
+        padding: 2,
+        borderRight: '1px dashed #000',
+        borderBottom: '1px dashed #000',
+    },
+    table: {
+        width: '100%',
+        height: '100%',
+    },
+    downloadAt: {
+        position: 'absolute',
+        fontSize: 8,
+        fontWeight: 'medium',
+    },
 });
 
 interface LabelDataItem {
@@ -182,7 +187,7 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
                                     <Text style={{ marginLeft: 3, fontSize: 6}}>{item.printed_date || 'N/A'}</Text>
                                 </View>
                                 <View style={{width: '30%', justifyContent: 'center'}}>
-                                  <Text style={{marginLeft: 3, fontSize: 6}}> </Text>
+                                    <Text style={{marginLeft: 3, fontSize: 6}}> </Text>
                                 </View>
 
                             </View>
@@ -211,6 +216,19 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
                         </View>
                     </View>
                 ))}
+            </View>
+            {/* Page download at section */}
+            <View style={[styles.downloadAt, { bottom: 5, left: 10 }]} fixed>
+                <Text>Downloaded at: {new Date().toLocaleString('en-GB', { 
+                    year: 'numeric',
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                    }).replace(/(\d{2})\/(\d{2})\/(\d{4}),/, '$3-$2-$1')}
+                </Text>
             </View>
         </Page>
     </Document>

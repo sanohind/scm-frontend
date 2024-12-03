@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         fontSize: 8,
         fontWeight: 'medium',
-      },
+    },
 });
 
 interface DeliveryNoteData {
@@ -442,7 +442,16 @@ const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
             </View>
             {/* Page download at section */}
             <View style={[styles.downloadAt, { bottom: 10, left: 10 }]} fixed>
-                <Text>Downloaded at: {new Date().toLocaleString()}</Text>
+                <Text>Downloaded at: {new Date().toLocaleString('en-GB', { 
+                    year: 'numeric',
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                    }).replace(/(\d{2})\/(\d{2})\/(\d{4}),/, '$3-$2-$1')}
+                </Text>
             </View>
         </Page>
     </Document>

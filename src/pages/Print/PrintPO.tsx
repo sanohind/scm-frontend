@@ -69,6 +69,9 @@ const styles = StyleSheet.create({
   },
   container: {
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100%'
   },
   header: {
     flexDirection: 'row',
@@ -122,6 +125,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     border: 1,
     borderColor: '#000',
+    flexGrow: 0,
   },
   
   tableHeader: {
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
   signatureSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 50,
+    marginTop: 30,
   },
   signatureBox: {
     width: '33%',
@@ -301,193 +305,198 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
       <View style={styles.pageInfo} fixed>
         <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} / ${totalPages}`} />
       </View>
+
+      {/* Main Content Wrapper */}
       <View style={styles.container}>
+        {/* Header Group */}
+        <View wrap={false}>
+          <View style={styles.header}>
+            <Image src={logoSanohAddress} style={styles.logo} />
+          </View>
+          <View style={styles.companyInfo}>
+            <Text style={styles.title}>Purchase Order</Text>
+          </View>
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Image src={logoSanohAddress} style={styles.logo} />
-        </View>
-        <View style={styles.companyInfo}>
-          <Text style={styles.title}>Purchase Order</Text>
-        </View>
-
-        {/* Details */}
-        <View style={styles.details}>
-          <View style={styles.detailsLeft}>
-            <Text>
-              <Text style={{ fontWeight: 'semibold' }}>To</Text> :  {' '}
-              <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_name}</Text>
-            </Text>
-            <View style={{ paddingLeft: 20 }}>
-              <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_code}</Text>
-              <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_address}</Text>
+          {/* Details */}
+          <View style={styles.details}>
+            <View style={styles.detailsLeft}>
+              <Text>
+                <Text style={{ fontWeight: 'semibold' }}>To</Text> :  {' '}
+                <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_name}</Text>
+              </Text>
+              <View style={{ paddingLeft: 20 }}>
+                <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_code}</Text>
+                <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_address}</Text>
+                <Text> </Text>
+                <Text>Phone Number :   {data.header.phone_number}</Text>
+                <Text>Fax Number :   {data.header.fax_number}</Text>
+                <Text> </Text>
+              </View>
+              <Text>
+                <Text>Attn</Text> :    {data.header.attn}
+              </Text>
               <Text> </Text>
-              <Text>Phone Number :   {data.header.phone_number}</Text>
-              <Text>Fax Number :   {data.header.fax_number}</Text>
-              <Text> </Text>
+              <Text style={{ fontSize: 6 }}>Please supply the following</Text>
             </View>
-            <Text>
-              <Text>Attn</Text> :    {data.header.attn}
-            </Text>
-            <Text> </Text>
-            <Text style={{ fontSize: 6 }}>Please supply the following</Text>
-          </View>
-          <View style={styles.detailsRight}>
-            <View style={styles.row}>
-              <Text style={styles.label}>P/O NO </Text>
-              <Text style={styles.value}>:   {data.header.po_number}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Date</Text>
-              <Text style={styles.value}>:   {data.header.po_date}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>P/O Type</Text>
-              <Text style={styles.value}>:   {data.header.po_type}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>PR</Text>
-              <Text style={styles.value}>:   {data.header.pr_no}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Planned Receipt</Text>
-              <Text style={styles.value}>:   {data.header.planned_receipt_date}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Currency</Text>
-              <Text style={styles.value}>:   {data.header.currency}</Text>
+            <View style={styles.detailsRight}>
+              <View style={styles.row}>
+                <Text style={styles.label}>P/O NO </Text>
+                <Text style={styles.value}>:   {data.header.po_number}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Date</Text>
+                <Text style={styles.value}>:   {data.header.po_date}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>P/O Type</Text>
+                <Text style={styles.value}>:   {data.header.po_type}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>PR</Text>
+                <Text style={styles.value}>:   {data.header.pr_no}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Planned Receipt</Text>
+                <Text style={styles.value}>:   {data.header.planned_receipt_date}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Currency</Text>
+                <Text style={styles.value}>:   {data.header.currency}</Text>
+              </View>
             </View>
           </View>
         </View>
 
-        {/* Table Header */}
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableColNo}>No</Text>
-            <View style={styles.tableColDescription}>
-              <Text>Description</Text>
-              <Text>Part No.</Text>
-            </View>
-            <Text style={styles.tableCol}>Delivery Date</Text>
-            <Text style={styles.tableColQty}>Qty</Text>
-            <Text style={styles.tableColQty}>Unit</Text>
-            <Text style={styles.tableColPrice}>Unit Price</Text>
-            <Text style={styles.tableColAmount}>Amount</Text>
-          </View>
-          {/* Table Rows */}
-          {data.details.map((item, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableColNo}>{index + 1}</Text>
-              <View style={styles.tableRowDescription}>
-                <Text>{item.part_name}</Text>
-                <Text>{item.part_number}</Text>
+          {/* Table Header */}
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableColNo}>No</Text>
+              <View style={styles.tableColDescription}>
+                <Text>Description</Text>
+                <Text>Part No.</Text>
               </View>
-              <Text style={styles.tableCol}>{item.delivery_date}</Text>
-              <Text style={styles.tableRowQTY}>{item.quantity}</Text>
-              <Text style={[styles.tableRowUnit, {textAlign: 'center'}]}>{item.unit}</Text>
-              <Text style={styles.tableRowPrice}>{item.unit_price}</Text>
-              <Text style={styles.tableRowAmount}>{item.amount}</Text>
+              <Text style={styles.tableCol}>Delivery Date</Text>
+              <Text style={styles.tableColQty}>Qty</Text>
+              <Text style={styles.tableColQty}>Unit</Text>
+              <Text style={styles.tableColPrice}>Unit Price</Text>
+              <Text style={styles.tableColAmount}>Amount</Text>
             </View>
-          ))}
-          {/* Totals */}
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
-            <Text
-              style={[
-                styles.tableColDescription,
-                { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
-              ]}
-            >
-            </Text>
-            <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Subtotal</Text>
-            <Text style={[styles.tableRowQTY, {fontSize: 7, textAlign: 'right', fontWeight: 'bold' }]}>{calculateTotalQuantity(data.details)}</Text>
-            <Text style={[styles.tableRowQTY]}></Text>
-            <Text style={[styles.tableRowPrice]}></Text>
-            <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.total_amount}</Text>
+            {/* Table Rows */}
+            {data.details.map((item, index) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={styles.tableColNo}>{index + 1}</Text>
+                <View style={styles.tableRowDescription}>
+                  <Text>{item.part_name}</Text>
+                  <Text>{item.part_number}</Text>
+                </View>
+                <Text style={styles.tableCol}>{item.delivery_date}</Text>
+                <Text style={styles.tableRowQTY}>{item.quantity}</Text>
+                <Text style={[styles.tableRowUnit, {textAlign: 'center'}]}>{item.unit}</Text>
+                <Text style={styles.tableRowPrice}>{item.unit_price}</Text>
+                <Text style={styles.tableRowAmount}>{item.amount}</Text>
+              </View>
+            ))}
+            {/* Totals */}
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
+              <Text
+                style={[
+                  styles.tableColDescription,
+                  { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
+                ]}
+              >
+              </Text>
+              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Subtotal</Text>
+              <Text style={[styles.tableRowQTY, {fontSize: 7, textAlign: 'right', fontWeight: 'bold' }]}>{calculateTotalQuantity(data.details)}</Text>
+              <Text style={[styles.tableRowQTY]}></Text>
+              <Text style={[styles.tableRowPrice]}></Text>
+              <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.total_amount}</Text>
+            </View>
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
+              <Text
+                style={[
+                  styles.tableColDescription,
+                  { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
+                ]}
+              >
+              </Text>
+              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>PPN 11%</Text>
+              <Text style={[styles.tableRowQTY]}></Text>
+              <Text style={[styles.tableRowQTY]}></Text>
+              <Text style={[styles.tableRowPrice]}></Text>
+              <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.ppn}</Text>
+            </View>
+            <View style={[styles.tableRow, { borderBottomWidth: 0} ]}>
+              <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
+              <Text
+                style={[
+                  styles.tableColDescription,
+                  { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
+                ]}
+              >
+              </Text>
+              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Total</Text>
+              <Text style={[styles.tableRowQTY]}></Text>
+              <Text style={[styles.tableRowQTY]}></Text>
+              <Text style={[styles.tableRowPrice]}></Text>
+              <Text style={[styles.tableRowAmount, { borderBottomWidth: 0, fontSize: 7, fontWeight: 'bold' }]}>{data.header.total}</Text>
+            </View>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
-            <Text
-              style={[
-                styles.tableColDescription,
-                { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
-              ]}
-            >
-            </Text>
-            <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>PPN 11%</Text>
-            <Text style={[styles.tableRowQTY]}></Text>
-            <Text style={[styles.tableRowQTY]}></Text>
-            <Text style={[styles.tableRowPrice]}></Text>
-            <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.ppn}</Text>
-          </View>
-          <View style={[styles.tableRow, { borderBottomWidth: 0} ]}>
-            <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
-            <Text
-              style={[
-                styles.tableColDescription,
-                { borderRightWidth: 0, textAlign: 'right', fontWeight: 'bold' },
-              ]}
-            >
-            </Text>
-            <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Total</Text>
-            <Text style={[styles.tableRowQTY]}></Text>
-            <Text style={[styles.tableRowQTY]}></Text>
-            <Text style={[styles.tableRowPrice]}></Text>
-            <Text style={[styles.tableRowAmount, { borderBottomWidth: 0, fontSize: 7, fontWeight: 'bold' }]}>{data.header.total}</Text>
-          </View>
-        </View>
 
-        {/* Terms */}
-        <View style={styles.terms}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Note</Text>
-            <Text style={styles.value}>:   {data.header.note || ''}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Delivery</Text>
-            <Text style={styles.value}>:   {data.header.delivery_term || ''}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Terms</Text>
-            <Text style={styles.value}>:   {data.header.terms || ''}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Delivery Place</Text>
-            <View style={styles.value}>
-              <Text>:   PT. SANOH INDONESIA</Text>
-                <Text style={{ marginLeft: 4 }}>  JL. INTI II BLOK C4 NO. 10 KAWASAN INDUSTRI HYUNDAI,</Text>
-                <Text style={{ marginLeft: 4 }}>  LEMAH ABANG - BEKASI 17750</Text>
-                <Text style={{ marginLeft: 4 }}>  {data.header.phone_number} {data.header.fax_number}</Text>
+          {/* Terms */}
+          <View style={styles.terms}>
+            <View style={styles.row}>
+              <Text style={styles.label}>Note</Text>
+              <Text style={styles.value}>:   {data.header.note || ''}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Delivery</Text>
+              <Text style={styles.value}>:   {data.header.delivery_term || ''}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Terms</Text>
+              <Text style={styles.value}>:   {data.header.terms || ''}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.label}>Delivery Place</Text>
+              <View style={styles.value}>
+                <Text>:   PT. SANOH INDONESIA</Text>
+                  <Text style={{ marginLeft: 4 }}>  JL. INTI II BLOK C4 NO. 10 KAWASAN INDUSTRI HYUNDAI,</Text>
+                  <Text style={{ marginLeft: 4 }}>  LEMAH ABANG - BEKASI 17750</Text>
+                  <Text style={{ marginLeft: 4 }}>  {data.header.phone_number} {data.header.fax_number}</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Signature Section */}
-        <View style={styles.signatureSection} break>
-          <View style={{ width: '40%', textAlign: 'center', fontSize: 8 }}>
-            <Text>Accepted & Confirmed</Text>
-            <Text>{data.header.supplier_name || ''}</Text>
-            <Text style={{ marginTop: 90 }}>_____________________</Text>
-          </View>
-          <View style={{ width: '50%' }}>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={[styles.signatureBox, { borderWidth: 1, borderColor: '#000' }]}>
-                <Text style={styles.signatureTitle}>Prepared</Text>
-                <Image src={signatureDeniar} style={styles.signatureImage} />
-                <Text style={styles.signatureName}>DENIAR F</Text>
-                <Text>Purchasing</Text>
-              </View>
-              <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
-                <Text style={styles.signatureTitle}>Checked</Text>
-                <Image src={signatureFadli} style={styles.signatureImage} />
-                <Text style={styles.signatureName}>FADLI YUSRAL</Text>
-                <Text>Dept. Manager</Text>
-              </View>
-              <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
-                <Text style={styles.signatureTitle}>Approved</Text>
-                <Image src={signatureMisbahul} style={styles.signatureImage} />
-                <Text style={styles.signatureName}>MISBAHUL MUNIR</Text>
-                <Text>Purchasing</Text>
+        <View wrap={false}>
+          {/* Signature Section */}
+          <View style={styles.signatureSection}>
+            <View style={{ width: '40%', textAlign: 'center', fontSize: 8 }}>
+              <Text>Accepted & Confirmed</Text>
+              <Text>{data.header.supplier_name || ''}</Text>
+              <Text style={{ marginTop: 90 }}>_____________________</Text>
+            </View>
+            <View style={{ width: '50%' }}>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={[styles.signatureBox, { borderWidth: 1, borderColor: '#000' }]}>
+                  <Text style={styles.signatureTitle}>Prepared</Text>
+                  <Image src={signatureDeniar} style={styles.signatureImage} />
+                  <Text style={styles.signatureName}>DENIAR F</Text>
+                  <Text>Purchasing</Text>
+                </View>
+                <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
+                  <Text style={styles.signatureTitle}>Checked</Text>
+                  <Image src={signatureFadli} style={styles.signatureImage} />
+                  <Text style={styles.signatureName}>FADLI YUSRAL</Text>
+                  <Text>Dept. Manager</Text>
+                </View>
+                <View style={[styles.signatureBox, { borderTopWidth: 1, borderBottomWidth: 1, borderRightWidth: 1, borderColor: '#000' }]}>
+                  <Text style={styles.signatureTitle}>Approved</Text>
+                  <Image src={signatureMisbahul} style={styles.signatureImage} />
+                  <Text style={styles.signatureName}>MISBAHUL MUNIR</Text>
+                  <Text>President Director</Text>
+                </View>
               </View>
             </View>
           </View>
@@ -495,7 +504,16 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
       </View>
       {/* Page download at section */}
       <View style={[styles.downloadAt, { bottom: 10, left: 10 }]} fixed>
-        <Text>Downloaded at: {new Date().toLocaleString()}</Text>
+          <Text>Downloaded at: {new Date().toLocaleString('en-GB', { 
+            year: 'numeric',
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          }).replace(/(\d{2})\/(\d{2})\/(\d{4}),/, '$3-$2-$1')}
+          </Text>
       </View>
     </Page>
   </Document>
