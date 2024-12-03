@@ -57,10 +57,10 @@ export const API_Stock_Item_Subcont_Admin = () => API + getRolePath() + `/item/i
 export const API_Transaction_Report_Subcont_Admin = () => API + getRolePath() + `/transaction/index/`;
 
 // Purchase Order Supplier
-export const API_PO = () => API + getRolePath() + `/po/index/`;
+export const API_PO = () => API + getRolePath() + `/po/index`;
 export const API_PO_Detail = () => API + getRolePath() + `/po/detail/`;
 export const API_Update_PO = () => API + getRolePath() + `/po/update/`;
-export const API_PO_History = () => API + getRolePath() + `/po/history/`;
+export const API_PO_History = () => API + getRolePath() + `/po/history`;
 
 // Delivery Note Supplier
 export const API_DN = () => API + getRolePath() + `/dn/index`;
@@ -70,7 +70,7 @@ export const API_Update_DN = () => API + getRolePath() + `/dn/update`;
 export const API_DN_History = () => API + getRolePath() + `/dn/history/`;
 
 // Performance Report Supplier
-export const API_Performance_Report = () => API + getRolePath() + `/performance-report/index/`;
+export const API_Performance_Report = () => API + getRolePath() + `/performance-report/index`;
 
 // Forecast Report Supplier
 export const API_Forecast_Report = () => API + getRolePath() + `/forecast/index`;

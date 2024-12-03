@@ -39,7 +39,6 @@ const PurchasingPurchaseOrder = () => {
 
   const fetchSuppliers = async () => {
     const token = localStorage.getItem('access_token');
-    setLoading(true);
     try {
       const response = await fetch(API_List_Partner_Admin(), {
         method: 'GET',
@@ -58,7 +57,6 @@ const PurchasingPurchaseOrder = () => {
       }));
 
       setSuppliers(suppliersList);
-      setLoading(false);
       // toast.success('Suppliers fetched successfully');
     } catch (error) {
       console.error('Error fetching suppliers:', error);
