@@ -67,7 +67,7 @@ export const API_DN = () => API + getRolePath() + `/dn/index`;
 export const API_DN_Detail = () => API + getRolePath() + `/dn/detail/`;
 export const API_DN_Edit = () => API + getRolePath() + `/dn/edit/`;
 export const API_Update_DN = () => API + getRolePath() + `/dn/update`;
-export const API_DN_History = () => API + getRolePath() + `/dn/history/`;
+export const API_DN_History = () => API + getRolePath() + `/dn/history`;
 
 // Performance Report Supplier
 export const API_Performance_Report = () => API + getRolePath() + `/performance-report/index`;

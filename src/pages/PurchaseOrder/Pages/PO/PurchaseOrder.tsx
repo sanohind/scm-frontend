@@ -35,11 +35,10 @@ const PurchaseOrder = () => {
 
   const fetchPurchaseOrders = async () => {
     const token = localStorage.getItem('access_token');
-    const bpCode = localStorage.getItem('bp_code');
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_PO()}${bpCode}`, {
+      const response = await fetch(API_PO(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -73,7 +72,6 @@ const PurchaseOrder = () => {
 
   useEffect(() => {
     fetchPurchaseOrders();
-
     const savedPage = localStorage.getItem('po_current_page');
     if (savedPage) {
         setCurrentPage(parseInt(savedPage));

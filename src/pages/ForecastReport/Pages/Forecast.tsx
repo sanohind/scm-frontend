@@ -30,7 +30,7 @@ const Forecast = () => {
     const token = localStorage.getItem('access_token');
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_Forecast_Report()}`, {
+        const response = await fetch(API_Forecast_Report(), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

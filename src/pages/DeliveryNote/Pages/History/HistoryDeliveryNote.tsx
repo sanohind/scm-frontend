@@ -31,11 +31,10 @@ const HistoryDeliveryNote = () => {
   // Fetch Delivery Note History from API
   const fetchHistoryDeliveryNotes = async () => {
     const token = localStorage.getItem('access_token');
-    const bpCode = localStorage.getItem('bp_code');
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_DN_History()}${bpCode}`, {
+      const response = await fetch(API_DN_History(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

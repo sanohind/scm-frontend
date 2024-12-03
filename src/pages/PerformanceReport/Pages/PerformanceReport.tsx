@@ -28,11 +28,10 @@ const PerformanceReport = () => {
   // Fetch data from API
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    const bp_code = localStorage.getItem('bp_code');
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_Performance_Report()}${bp_code}`, {
+        const response = await fetch(API_Performance_Report(), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
