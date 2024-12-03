@@ -38,6 +38,10 @@ const ManageUser: React.FC = () => {
 
     useEffect(() => {
         fetchListUser();
+        const savedPage = localStorage.getItem('list_user_current_page');
+        if (savedPage) {
+            setCurrentPage(parseInt(savedPage));
+        }
     }, []);
 
 
@@ -172,7 +176,10 @@ const ManageUser: React.FC = () => {
         currentPage * rowsPerPage
     );
 
-    const handlePageChange = (page: number) => setCurrentPage(page);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        localStorage.setItem('list_user_current_page', page.toString());
+    };
 
     const handleSort = (key: keyof User) => {
         let direction = 'asc';
