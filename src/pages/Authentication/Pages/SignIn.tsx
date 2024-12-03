@@ -81,7 +81,7 @@ const SignIn: React.FC = () => {
       <div className="">
         <section className="flex h-screen w-screen overflow-y-auto flex-col p-5 bg-white max-md:pr-12 max-sm:flex max-sm:flex-col max-sm:mx-5 max-sm:mt-5">
           <div className="flex gap-5 max-md:flex-col my-auto mx-auto">
-            <div className="flex flex-col ml-auto w-6/12 max-md:ml-0 max-md:w-full">
+            <div className="flex-col ml-auto w-6/12 max-md:ml-0 max-md:w-full hidden md:flex">
               <img
                 loading="lazy"
                 src={FotoSanoh}
@@ -152,7 +152,40 @@ const SignIn: React.FC = () => {
                 <p className="self-center mt-9 text-xs font-medium text-center text-slate-800 w-[259px] max-md:mt-10 max-sm:self-center">
                   <span className="text-zinc-400">By logging in, I accept the company&apos;s</span>
                   <br />
-                  <span>Terms of Use & Privacy Policy.</span>
+                    <button
+                    onClick={() => {
+                      const modal = document.createElement('div');
+                      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+                      
+                      // Handle click outside to close
+                      modal.addEventListener('click', (e) => {
+                      if (e.target === modal) {
+                        modal.remove();
+                      }
+                      });
+
+                      modal.innerHTML = `
+                      <div class="bg-white p-8 rounded-lg relative max-w-2xl">
+                        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-800" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        </button>
+                        <h2 class="text-xl font-bold mb-4">Terms of Use & Privacy Policy</h2>
+                        <div class="text-gray-700">
+                        <h3 class="font-semibold mb-2">Terms of Use</h3>
+                        <p class="mb-4">By using our service, you agree to follow all applicable laws and regulations. You are responsible for maintaining the confidentiality of your account.</p>
+                        <h3 class="font-semibold mb-2">Privacy Policy</h3>
+                        <p>We collect and process your personal information in accordance with our privacy policy. Your data is protected and will only be used for service-related purposes.</p>
+                        </div>
+                      </div>
+                      `;
+                      document.body.appendChild(modal);
+                    }}
+                    className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                    >
+                    Terms of Use & Privacy Policy
+                    </button>
                 </p>
               </div>
             </div>
