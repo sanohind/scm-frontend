@@ -44,10 +44,10 @@ const AdminTransactionReport = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
 
-    const fetchPartOptions = async () => {
+    const fetchPartOptions = async (supplierCode?: string) => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_List_Item_Subcont_Admin()}?bp_code=${selectedSupplier?.value}`, {
+            const response = await fetch(`${API_List_Item_Subcont_Admin()}${supplierCode || selectedSupplier?.value}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -106,13 +106,14 @@ const AdminTransactionReport = () => {
             const savedSupplier = suppliers.find(
                 (sup: Supplier) => sup.value === savedSupplierCode
             );
-            if (savedSupplier) {
+            if (savedSupplier) {      
+                setLoading(true);
                 setSelectedSupplier(savedSupplier);
                 fetchPartOptions(savedSupplierCode);
                 fetchTransactionLogs(savedSupplierCode, startDate, endDate);
             }
         }
-      }, [suppliers]);
+    }, [suppliers]);
 
     // Modified fetchTransactionLogs to include supplier
     const fetchTransactionLogs = async (
@@ -120,7 +121,6 @@ const AdminTransactionReport = () => {
         startDateParam: Date, 
         endDateParam: Date
     ) => {
-        setLoading(true);
         try {
             const token = localStorage.getItem('access_token');
             const formatDate = (date: Date) => date.toLocaleDateString('en-CA');
@@ -128,7 +128,7 @@ const AdminTransactionReport = () => {
             const endDateString = formatDate(endDateParam);
 
             const response = await fetch(
-                `${API_Transaction_Report_Subcont_Admin()}?start_date=${startDateString}&end_date=${endDateString}&bp_code=${supplierCode}`,
+                `${API_Transaction_Report_Subcont_Admin()}${supplierCode}/${startDateString}/${endDateString}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -169,18 +169,15 @@ const AdminTransactionReport = () => {
     const handleSupplierChange = async (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
-            localStorage.setItem('selected_bp_code', selectedOption.value);
+            localStorage.setItem('selected_supplier', selectedOption.value);
+            setLoading(true);
             setAllData([]);
             setFilteredData([]);
-            
-            // Reset part options and fetch new ones
             setSelectedParts([]);
             await fetchPartOptions(selectedOption.value);
-            
-            // Fetch transaction logs with current date range
             await fetchTransactionLogs(selectedOption.value, startDate, endDate);
         } else {
-            // Reset everything if supplier is deselected
+            localStorage.removeItem('selected_supplier');
             setSelectedParts([]);
             setPartOptions([]);
             setAllData([]);
@@ -308,6 +305,8 @@ const AdminTransactionReport = () => {
                 filters.push(`Transaction Types: ${selectedTransactionTypes.join(', ')}`);
             if (selectedStatuses.length > 0) filters.push(`Status: ${selectedStatuses.join(', ')}`);
             if (selectedParts.length > 0) filters.push(`Parts: ${selectedParts.join(', ')}`);
+            if (searchQuery) filters.push(`Delivery Note: ${searchQuery}`);
+
             doc.setFont('helvetica', 'normal');
             if (filters.length > 0) doc.text(`Filters: ${filters.join(' | ')}`, 10, 55);
 
@@ -323,7 +322,8 @@ const AdminTransactionReport = () => {
             doc.text(`Downloaded on: ${downloadDate}`, 10, doc.internal.pageSize.getHeight() - 10);
 
             // Save the PDF
-            doc.save(`transaction_report_${selectedSupplier?.value}_${startDateString}_${endDateString}.pdf`);
+            const currentDate = new Date().toLocaleDateString('en-CA');
+            doc.save(`transaction_report_${selectedSupplier?.value}_${currentDate}.pdf`);
         };
     };
 

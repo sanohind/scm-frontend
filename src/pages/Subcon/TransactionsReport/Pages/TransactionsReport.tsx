@@ -205,7 +205,7 @@ const TransactionReport = () => {
     const img = new Image();
     img.src = '../../../src/images/logo_sanoh_address.png';
     img.onload = () => {
-      doc.addImage(img, 'PNG', 10, 10, 100, 20);
+      doc.addImage(img, 'PNG', 10, 10, 70, 15, undefined, 'FAST');
 
       // Add title
       const bpName = localStorage.getItem('bp_code') || 'All';
@@ -229,6 +229,7 @@ const TransactionReport = () => {
       if (selectedParts.length > 0) filters.push(`Parts: ${selectedParts.join(', ')}`);
       doc.setFont('helvetica', 'normal');
       if (filters.length > 0) doc.text(`Filters: ${filters.join(' | ')}`, 10, 55);
+      if (searchQuery) filters.push(`Delivery Note: ${searchQuery}`);
 
       autoTable(doc, {
         head: [tableColumn],
@@ -241,8 +242,9 @@ const TransactionReport = () => {
       const downloadDate = new Date().toLocaleString();
       doc.text(`Downloaded on: ${downloadDate}`, 10, doc.internal.pageSize.getHeight() - 10);
 
-      // Save the PDF
-      doc.save(`transaction_report_${bpName}.pdf`);
+      // Save the PDF with date range in filename
+      const currentDate = new Date().toLocaleDateString('en-CA');
+      doc.save(`transaction_report_${bpName}_${currentDate}.pdf`);
     };
   };
 
