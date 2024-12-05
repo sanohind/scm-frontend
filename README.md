@@ -1,18 +1,42 @@
-## Installation
+## System Requirements
 
-You'll need to install Node.js >=v14.16+ (Recommended Version) (NPM comes along with it) and TailAdmin uses **Vite** for frontend tooling, to peform installation and building production version, please follow these steps from below:
+- Node.js >=v14.16+ (Recommended)
+- NPM (comes with Node.js)
+- Modern web browser (Chrome, Firefox, Safari, or Edge)
 
-- Use terminal and navigate to the project (tailadmin-react) root.
+## Quick Start
 
-- Then run : <code>npm install</code>
+1. Clone the repository:
+```bash
+git clone https://github.com/mygads/react-scm-sanoh-new.git
+cd react-scm-sanoh-new
+```
 
-- Then run : <code>npm run dev</code>
+2. Install dependencies:
+```bash
+npm install
+```
 
-Now, in the browser go to <code>localhost:5173</code>
+3. Start development server:
+```bash
+npm run dev
+```
 
-**For Production Build**
-Run : <code>npm run build</code>
+4. Access the application:
+Open your browser and navigate to `http://localhost:5173`
 
-Default build output directory: /dist
+## Production Deployment
 
-This command will generate a dist as build folder in the root of your template that you can upload to your server.
+1. Build for production:
+```bash
+npm run build
+```
+
+2. The optimized build will be available in the `/dist` directory
+3. Deploy the contents of `/dist` to your hosting provider
+
+## Additional Notes
+
+- Ensure all environment variables are properly configured
+- Check `package.json` for available scripts
+- Review documentation for customization options
