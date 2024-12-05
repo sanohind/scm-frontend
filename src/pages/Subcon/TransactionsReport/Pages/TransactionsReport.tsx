@@ -3,13 +3,11 @@ import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../../../components/Table/Pagination';
 import MultiSelect from '../../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
-import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { FaFileExcel } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import { API_List_Item_Subcont, API_Transaction_Subcont } from '../../../../api/api';
 import SearchBar from '../../../../components/Table/SearchBar';
-import DatePicker from '../../../../components/Table/DatePicker';
+import DatePicker from '../../../../components/Forms/DatePicker';
 
 const TransactionReport = () => {
   interface TransactionLog {
@@ -211,33 +209,23 @@ const TransactionReport = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {/* Start Date */}
               <div className="w-full">
-                <label 
-                  className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
-                  onClick={() => (document.getElementById('startDate') as HTMLInputElement)?.showPicker()}
-                >
-                  Start Date
-                </label>
                 <DatePicker
                   id="startDate"
                   value={startDate}
                   onChange={setStartDate}
                   placeholder="Select Start Date"
+                  label="Start Date"
                 />
               </div>
 
               {/* End Date */}
               <div className="w-full">
-                <label 
-                  className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
-                  onClick={() => (document.getElementById('endDate') as HTMLInputElement)?.showPicker()}
-                >
-                  End Date
-                </label>
                 <DatePicker
                   id="endDate"
                   value={endDate}
                   onChange={setEndDate}
                   placeholder="Select End Date"
+                  label="End Date"
                 />
               </div>
 
