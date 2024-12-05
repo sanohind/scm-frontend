@@ -312,7 +312,7 @@ const PurchaseOrder = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.note}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
                         <td className={`px-3 py-3 text-center whitespace-nowrap font-semibold ${
-                          row.response === 'Accepted' ? 'bg-green-600' : row.response === 'Declined' ? 'bg-red-600' : ''
+                          row.response === 'Accepted' ? 'bg-green-700' : row.response === 'Declined' ? 'bg-red-600' : ''
                         }`}>
                           {row.response === 'Accepted' ? (
                             <span className="text-white">{row.response}</span>
@@ -334,7 +334,7 @@ const PurchaseOrder = () => {
                           ) : (
                             <div className="flex gap-2 justify-center">
                               <button
-                                className="px-4 py-2 bg-green-600 text-white rounded"
+                                className="px-4 py-2 bg-green-700 text-white rounded"
                                 onClick={() => handleResponse(row.noPO, 'Accepted')}
                               >
                                 Accept

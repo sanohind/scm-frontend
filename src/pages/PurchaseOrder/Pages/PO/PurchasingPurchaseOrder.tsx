@@ -318,20 +318,22 @@ const PurchasingPurchaseOrder = () => {
                     <td
                       className={`px-3 py-3 text-center whitespace-nowrap ${
                       row.response === 'Accepted'
-                        ? 'bg-green-500'
-                        : row.response === 'Declined'
-                        ? 'bg-red-600'
-                        : ''
+                      ? 'bg-green-700'
+                      : row.response === 'Declined'
+                      ? 'bg-red-600'
+                      : ''
                       }`}
                     >
                       {row.response === 'Declined' ? (
                       <div className="flex items-center justify-center">
-                        <FaExclamationTriangle
-                        className="text-white mr-2 cursor-pointer"
-                        onClick={() => handleShowReason(row.reason)}
-                        />
-                        <span className="text-white">{row.response}</span>
+                      <FaExclamationTriangle
+                      className="text-white mr-2 cursor-pointer"
+                      onClick={() => handleShowReason(row.reason)}
+                      />
+                      <span className="text-white font-bold">{row.response}</span>
                       </div>
+                      ) : row.response === 'Accepted' ? (
+                      <span className="text-white font-bold">{row.response}</span>
                       ) : (
                       <span className="text-black">{row.response}</span>
                       )}
