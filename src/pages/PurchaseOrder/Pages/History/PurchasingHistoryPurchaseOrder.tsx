@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import SearchBar from '../../../Table2/SearchBar';
-import Pagination from '../../../Table2/Pagination';
+import SearchBar from '../../../../components/Table/SearchBar';
+import Pagination from '../../../../components/Table/Pagination';
 import Select from 'react-select';
 import { API_List_Partner_Admin, API_PO_History_Admin } from '../../../../api/api';
 import { useNavigate } from 'react-router-dom';

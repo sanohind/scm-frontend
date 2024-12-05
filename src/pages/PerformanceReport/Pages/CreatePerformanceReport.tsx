@@ -3,8 +3,8 @@ import Select from 'react-select';
 import Swal from 'sweetalert2';
 import { FaFilePdf, FaSortDown, FaSortUp } from 'react-icons/fa';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../../Table2/Pagination';
-import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../../components/Table/Pagination';
+import SearchBar from '../../../components/Table/SearchBar';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_Performance_Report_Admin, API_Download_Performance_Report, API_List_Partner_Admin, API_Performance_Report_Admin } from '../../../api/api';
 

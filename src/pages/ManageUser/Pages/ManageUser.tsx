@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
-import Pagination from '../../Table2/Pagination';
-import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../../components/Table/Pagination';
+import SearchBar from '../../../components/Table/SearchBar';
 import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit, FaUserPlus } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';

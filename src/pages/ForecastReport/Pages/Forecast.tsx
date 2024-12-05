@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../../Table2/Pagination';
+import Pagination from '../../../components/Table/Pagination';
 import { API_Download_Forecast_Report, API_Forecast_Report } from '../../../api/api';
-import SearchMonth from '../../Table2/SearchMonth';
-import SearchBar from '../../Table2/SearchBar';
+import SearchMonth from '../../../components/Table/SearchMonth';
+import SearchBar from '../../../components/Table/SearchBar';
 import { FaFile, FaFileExcel, FaFilePdf, FaFileWord, FaSortDown, FaSortUp } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 

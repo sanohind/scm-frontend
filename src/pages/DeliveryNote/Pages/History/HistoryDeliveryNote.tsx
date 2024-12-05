@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../../../Table2/SearchBar';
-import Pagination from '../../../Table2/Pagination';
+import SearchBar from '../../../../components/Table/SearchBar';
+import Pagination from '../../../../components/Table/Pagination';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
-import SearchMonth from '../../../Table2/SearchMonth';
+import SearchMonth from '../../../../components/Table/SearchMonth';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_DN_History } from '../../../../api/api';
 

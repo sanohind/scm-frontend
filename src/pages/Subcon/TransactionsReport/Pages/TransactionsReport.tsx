@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../../../Table2/Pagination';
+import Pagination from '../../../../components/Table/Pagination';
 import MultiSelect from '../../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
@@ -8,7 +8,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { API_List_Item_Subcont, API_Transaction_Subcont } from '../../../../api/api';
-import SearchBar from '../../../Table2/SearchBar';
+import SearchBar from '../../../../components/Table/SearchBar';
+import DatePicker from '../../../../components/Table/DatePicker';
 
 const TransactionReport = () => {
   interface TransactionLog {
@@ -216,13 +217,11 @@ const TransactionReport = () => {
                 >
                   Start Date
                 </label>
-                <input
+                <DatePicker
                   id="startDate"
-                  type="date"
-                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                  value={startDate ? startDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => setStartDate(new Date(e.target.value))}
-                  onClick={(e) => e.currentTarget.showPicker()}
+                  value={startDate}
+                  onChange={setStartDate}
+                  placeholder="Select Start Date"
                 />
               </div>
 
@@ -234,13 +233,11 @@ const TransactionReport = () => {
                 >
                   End Date
                 </label>
-                <input
+                <DatePicker
                   id="endDate"
-                  type="date"
-                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                  value={endDate ? endDate.toISOString().split('T')[0] : ''}
-                  onChange={(e) => setEndDate(new Date(e.target.value))}
-                  onClick={(e) => e.currentTarget.showPicker()}
+                  value={endDate}
+                  onChange={setEndDate}
+                  placeholder="Select End Date"
                 />
               </div>
 

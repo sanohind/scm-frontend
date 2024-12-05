@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Breadcrumb from "../../../../components/Breadcrumbs/Breadcrumb";
-import SearchBar from '../../../Table2/SearchBar';
-import Pagination from '../../../Table2/Pagination';
+import SearchBar from '../../../../components/Table/SearchBar';
+import Pagination from '../../../../components/Table/Pagination';
 import Select from 'react-select';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_List_Partner_Admin, API_Stock_Item_Subcont_Admin } from '../../../../api/api';

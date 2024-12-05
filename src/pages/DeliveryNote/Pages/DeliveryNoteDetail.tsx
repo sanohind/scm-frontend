@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../../Table2/SearchBar';
-import Pagination from '../../Table2/Pagination';
+import SearchBar from '../../../components/Table/SearchBar';
+import Pagination from '../../../components/Table/Pagination';
 import { API_DN_Detail } from '../../../api/api';
 import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';

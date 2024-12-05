@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import SearchBar from '../../Table2/SearchBar';
-import Pagination from '../../Table2/Pagination';
+import SearchBar from '../../../components/Table/SearchBar';
+import Pagination from '../../../components/Table/Pagination';
 import { API_PO_Detail } from '../../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaPrint } from 'react-icons/fa';

@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../../../Table2/Pagination';
+import Pagination from '../../../../components/Table/Pagination';
 import MultiSelect from '../../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import SearchBar from '../../../Table2/SearchBar';
+import SearchBar from '../../../../components/Table/SearchBar';
 import { API_List_Item_Subcont_Admin, API_List_Partner_Admin, API_Transaction_Report_Subcont_Admin } from '../../../../api/api';
+import DatePicker from '../../../../components/Table/DatePicker';
 
 const AdminTransactionReport = () => {
     interface TransactionLog {
@@ -298,27 +299,33 @@ const AdminTransactionReport = () => {
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {/* Start Date */}
                             <div className="w-full">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Start Date
+                                <label 
+                                    className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
+                                    onClick={() => (document.getElementById('startDate') as HTMLInputElement)?.showPicker()}
+                                >
+                                    Start Date
                                 </label>
-                                <input
-                                type="date"
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value={startDate ? startDate.toISOString().split('T')[0] : ''}
-                                onChange={handleStartDateChange}
+                                <DatePicker
+                                    id="startDate"
+                                    value={startDate}
+                                    onChange={setStartDate}
+                                    placeholder="Select Start Date"
                                 />
                             </div>
 
                             {/* End Date */}
                             <div className="w-full">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                End Date
+                                <label 
+                                    className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
+                                    onClick={() => (document.getElementById('endDate') as HTMLInputElement)?.showPicker()}
+                                >
+                                    End Date
                                 </label>
-                                <input
-                                type="date"
-                                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value={endDate ? endDate.toISOString().split('T')[0] : ''}
-                                onChange={handleEndDateChange}
+                                <DatePicker
+                                    id="endDate"
+                                    value={endDate}
+                                    onChange={setEndDate}
+                                    placeholder="Select End Date"
                                 />
                             </div>
 

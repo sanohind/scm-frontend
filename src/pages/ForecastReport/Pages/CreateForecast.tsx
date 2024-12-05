@@ -10,8 +10,8 @@ import {
     API_List_Partner_Admin,
 } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
-import Pagination from '../../Table2/Pagination';
-import SearchBar from '../../Table2/SearchBar';
+import Pagination from '../../../components/Table/Pagination';
+import SearchBar from '../../../components/Table/SearchBar';
 import { toast, ToastContainer } from 'react-toastify';
 
 const CreateForecast = () => {
