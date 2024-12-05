@@ -224,26 +224,27 @@ const ManageUser: React.FC = () => {
                 <div className="p-2 md:p-4 lg:p-6 space-y-6">
 
                     {/* Header Section */}
-                    <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:w-full">
-                        <div className='flex items-center space-x-4 w-full '>
+                    <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+                        <div className='flex flex-col sm:flex-row gap-4 w-full lg:w-1/2'>
                             <button
                                 onClick={() => navigate('/add-user')}
-                                className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors whitespace-nowrap flex items-center"
+                                className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors whitespace-nowrap flex items-center justify-center"
                             >
                                 <FaUserPlus className="mr-2" />
                                 Add User
                             </button>
 
                             {/* Search Bar */}
-                            <SearchBar
-                                placeholder="Search user here..."
-                                onSearchChange={setSearchQuery}
-                            />
-                            
+                            <div className="w-full">
+                                <SearchBar
+                                    placeholder="Search user here..."
+                                    onSearchChange={setSearchQuery}
+                                />
+                            </div>
                         </div>
                         
                         {/* Filters */}
-                        <div className="w-full md:w-1/2 lg:w-1/3">
+                        <div className="w-full lg:w-1/3">
                             <MultiSelect
                                 id="roleSelect"
                                 label="Filter by Role"

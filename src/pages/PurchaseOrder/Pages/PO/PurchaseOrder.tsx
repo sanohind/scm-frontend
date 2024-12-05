@@ -223,16 +223,18 @@ const PurchaseOrder = () => {
       <Breadcrumb pageName="Purchase Order" />
       <div className="bg-white">
         <div className="flex flex-col p-2 md:p-4 lg:p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700">Filter by Month</label>
-              <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 w-full">
+              <div className="flex flex-col w-full lg:w-1/3">
+                <label className="text-sm font-medium text-gray-700 mb-2">Filter by Month</label>
+                <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
+              </div>
+              <div className="w-full lg:w-1/3">
+                <SearchBar
+                placeholder="Search purchase order here..."
+                onSearchChange={setSearchQuery}
+                />
+              </div>
             </div>
-            <SearchBar
-              placeholder="Search purchase order here..."
-              onSearchChange={setSearchQuery}
-            />
-          </div>
 
           <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
             <div className="overflow-x-auto">

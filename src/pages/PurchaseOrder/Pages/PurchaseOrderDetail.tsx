@@ -204,12 +204,12 @@ const PurchaseOrderDetail = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="flex justify-end">
-              <div className="w-full">
-              <SearchBar
-                placeholder="Search part number or name..."
-                onSearchChange={setSearchQuery}
-              />
+            <div className="flex justify-end w-full">
+              <div className="w-full md:w-1/2 lg:w-1/3">
+                <SearchBar
+                  placeholder="Search part number or name..."
+                  onSearchChange={setSearchQuery}
+                />
               </div>
             </div>
           </div>

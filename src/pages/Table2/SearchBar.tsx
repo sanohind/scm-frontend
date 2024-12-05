@@ -7,7 +7,7 @@ interface SearchBarProps {
 
 const SearchBar = ({ placeholder, onSearchChange }: SearchBarProps) => {
   return (
-    <div className="flex items-center shadow border border-gray-300 rounded-lg px-2 py-1 w-full md:w-1/3 lg:w-1/4">
+    <div className="flex items-center shadow border border-gray-300 rounded-lg px-2 py-1 w-full">
       <FaSearch className="text-gray-600 mr-1 ml-2" />
       <input
         type="text"

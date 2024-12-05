@@ -143,15 +143,17 @@ const DeliveryNote = () => {
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Delivery Note" />
       <div className="font-poppins bg-white text-black p-2 md:p-4 lg:p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700">Filter by Month</label>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="w-full md:w-1/3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Month</label>
             <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           </div>
-          <SearchBar
-          placeholder="Search delivery note here..."
-          onSearchChange={setSearchQuery}
-          />
+          <div className="w-full md:w-1/3">
+            <SearchBar
+              placeholder="Search delivery note here..."
+              onSearchChange={setSearchQuery}
+            />
+          </div>
         </div>
 
         <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">

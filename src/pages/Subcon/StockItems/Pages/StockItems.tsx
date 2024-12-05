@@ -106,7 +106,7 @@ const StockItems = () => {
       <Breadcrumb pageName="Stock Items" />
       <div className="font-poppins bg-white text-black">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
-          <div className="flex justify-end">
+          <div className="flex justify-end md:w-1/2 lg:w-1/3">
             <SearchBar
               placeholder="Search part number or name..."
               onSearchChange={setSearchQuery}

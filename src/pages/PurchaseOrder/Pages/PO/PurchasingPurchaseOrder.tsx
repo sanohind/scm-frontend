@@ -218,19 +218,23 @@ const PurchasingPurchaseOrder = () => {
       <Breadcrumb pageName="Purchase Order" />
       <div className="font-poppins bg-white">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
-          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-            <Select
-              options={suppliers}
-              value={selectedSupplier}
-              onChange={handleSupplierChange}
-              placeholder="Select Supplier"
-              className="w-80"
-            />
-            <SearchBar
-              placeholder="Search no purchase order..."
-              onSearchChange={setSearchQuery}
-            />
-          </div>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div className="w-full sm:w-80">
+                <Select
+                options={suppliers}
+                value={selectedSupplier}
+                onChange={handleSupplierChange}
+                placeholder="Select Supplier"
+                className="w-full"
+                />
+              </div>
+              <div className="md:w-1/2 lg:w-1/3">
+                <SearchBar
+                placeholder="Search no purchase order..."
+                onSearchChange={setSearchQuery}
+                />
+              </div>
+            </div>
 
           <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300 mt-5">
             <div className="overflow-x-auto">

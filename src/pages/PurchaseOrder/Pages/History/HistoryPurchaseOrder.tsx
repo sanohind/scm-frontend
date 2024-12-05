@@ -150,10 +150,12 @@ const HistoryPurchaseOrder = () => {
             <label className="text-sm font-medium text-gray-700">Filter by Month</label>
             <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           </div>
-          <SearchBar
-            placeholder="Search purchase order here..."
-            onSearchChange={setSearchQuery}
-          />
+          <div className='md:w-1/2 lg:w-1/3'>
+            <SearchBar
+              placeholder="Search purchase order here..."
+              onSearchChange={setSearchQuery}
+            />
+          </div>
         </div>
 
         <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">

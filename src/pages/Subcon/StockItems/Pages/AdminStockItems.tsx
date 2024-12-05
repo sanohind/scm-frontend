@@ -160,10 +160,12 @@ const AdminStockItems = () => {
                 placeholder="Select Supplier"
                 className="w-80"
                 />
-                <SearchBar
-                placeholder="Search part number or name..."
-                onSearchChange={setSearchQuery}
-                />
+                <div className='md:w-1/2 lg:w-1/3'>
+                    <SearchBar
+                        placeholder="Search part number or name..."
+                        onSearchChange={setSearchQuery}
+                    />
+                </div>
             </div>
 
             <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">

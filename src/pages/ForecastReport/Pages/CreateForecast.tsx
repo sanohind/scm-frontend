@@ -425,7 +425,9 @@ const CreateForecast = () => {
                             placeholder="Select Supplier"
                             className="w-80"
                         />
-                        <SearchBar placeholder="Search..." onSearchChange={setSearchQuery} />
+                        <div className='md:w-1/2 lg:w-1/3'>
+                            <SearchBar placeholder="Search..." onSearchChange={setSearchQuery} />
+                        </div>
                     </div>
 
                     <form onSubmit={handleUpload} className="w-full">

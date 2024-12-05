@@ -290,10 +290,12 @@ const TransactionReport = () => {
                 Delivery Note
               </label>
               <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
-                <SearchBar
-                  placeholder="Filter by Delivery Note"
-                  onSearchChange={setSearchQuery}
-                />
+                <div className="md:w-1/2 lg:w-1/3">
+                  <SearchBar
+                    placeholder="Filter by Delivery Note"
+                    onSearchChange={setSearchQuery}
+                  />
+                </div>
                 {/* Download Buttons */}
                 <div className="flex gap-2 self-center">
                   <button

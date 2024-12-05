@@ -409,7 +409,9 @@ const CreatePerformanceReport = () => {
                             placeholder="Select Supplier"
                             className="w-80"
                         />
-                        <SearchBar placeholder="Search file name here..." onSearchChange={setSearchQuery} />
+                        <div className='md:w-1/2 lg:w-1/3'>
+                            <SearchBar placeholder="Search file name here..." onSearchChange={setSearchQuery} />
+                        </div>
                     </div>
 
                     <form onSubmit={handleUpload} className="w-full">

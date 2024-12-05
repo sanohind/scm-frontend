@@ -316,12 +316,12 @@ const DeliveryNoteDetail = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="flex justify-end">
-              <div className="w-full">
-                <SearchBar
-                  placeholder="Search part number or name..."
-                  onSearchChange={setSearchQuery}
-                />
+            <div className="w-full flex flex-col sm:flex-row justify-end">
+              <div className="w-full md:w-1/2 lg:w-1/3">
+              <SearchBar
+                placeholder="Search part number or name..."
+                onSearchChange={setSearchQuery}
+              />
               </div>
             </div>
           </div>
