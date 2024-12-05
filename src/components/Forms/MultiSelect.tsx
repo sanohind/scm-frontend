@@ -63,7 +63,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
           <div className="relative z-20 inline-block w-full">
             <div className="relative flex flex-col items-center">
               <div ref={trigger} onClick={open} className="w-full">
-                <div className="mb-2 flex rounded border border-stroke py-2 pl-3 pr-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input">
+                <div className="mb-2 flex rounded border border-stroke py-2 pl-3 pr-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input min-h-[42px] max-h-[120px] overflow-y-auto">
                   <div className="flex flex-auto flex-wrap gap-3">
                     {selectedOptions.map((value) => {
                       const option = options.find((opt) => opt.value === value);
@@ -102,7 +102,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
                       ) : null;
                     })}
                     {selectedOptions.length === 0 && (
-                      <div className="flex-1">
+                      <div className="flex-1 flex items-center min-h-[28px]">
                         <input
                           placeholder={label}
                           className="h-full w-full appearance-none bg-transparent p-1 px-2 outline-none"
