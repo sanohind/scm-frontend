@@ -160,94 +160,6 @@ const TransactionReport = () => {
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = [
-      'Date',
-      'Transaction Type',
-      'Status',
-      'Part Name',
-      'Part Number',
-      'Quantity OK',
-      'Quantity NG',
-      'Total',
-    ];
-    const tableRows: (string | number)[][] = [];
-
-    filteredData.forEach((row) => {
-      const rowData = [
-        new Date(row.timestamp).toLocaleString(),
-        row.type,
-        row.status,
-        row.partName,
-        row.partNumber,
-        row.qtyOk,
-        row.qtyNg,
-        row.qtyOk + row.qtyNg,
-      ];
-      tableRows.push(rowData);
-    });
-
-    // Add totals row
-    const totalsRow = [
-      'Totals:',
-      '',
-      '',
-      '',
-      '',
-      filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
-      filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
-      filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0),
-    ];
-    tableRows.push(totalsRow);
-
-    // Add logo
-    const img = new Image();
-    img.src = '../../../src/images/logo_sanoh_address.png';
-    img.onload = () => {
-      doc.addImage(img, 'PNG', 10, 10, 70, 15, undefined, 'FAST');
-
-      // Add title
-      const bpName = localStorage.getItem('bp_code') || 'All';
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Transaction Report ${bpName}`, doc.internal.pageSize.getWidth() / 2, 38, {
-        align: 'center',
-      });
-
-      // Add date range
-      const startDateString = startDate ? startDate.toLocaleDateString() : 'All';
-      const endDateString = endDate ? endDate.toLocaleDateString() : 'All';
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Date Range: ${startDateString} - ${endDateString}`, 10, 45);
-
-      // Add filters
-      const filters = [];
-      if (selectedTransactionTypes.length > 0)
-        filters.push(`Transaction Types: ${selectedTransactionTypes.join(', ')}`);
-      if (selectedStatuses.length > 0) filters.push(`Status: ${selectedStatuses.join(', ')}`);
-      if (selectedParts.length > 0) filters.push(`Parts: ${selectedParts.join(', ')}`);
-      doc.setFont('helvetica', 'normal');
-      if (filters.length > 0) doc.text(`Filters: ${filters.join(' | ')}`, 10, 55);
-      if (searchQuery) filters.push(`Delivery Note: ${searchQuery}`);
-
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: filters.length > 0 ? 60 : 50,
-        styles: { fontSize: 8 },
-      });
-
-      // Add download date
-      const downloadDate = new Date().toLocaleString();
-      doc.text(`Downloaded on: ${downloadDate}`, 10, doc.internal.pageSize.getHeight() - 10);
-
-      // Save the PDF with date range in filename
-      const currentDate = new Date().toLocaleDateString('en-CA');
-      doc.save(`transaction_report_${bpName}_${currentDate}.pdf`);
-    };
-  };
-
   const handleDownloadExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
       filteredData.map((row) => ({
@@ -384,13 +296,6 @@ const TransactionReport = () => {
                 />
                 {/* Download Buttons */}
                 <div className="flex gap-2 self-center">
-                  <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
-                    onClick={handleDownloadPDF}
-                  >
-                    <FaFilePdf className="w-4 h-4" />
-                    <span>Download PDF</span>
-                  </button>
                   <button
                     className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
                     onClick={handleDownloadExcel}
