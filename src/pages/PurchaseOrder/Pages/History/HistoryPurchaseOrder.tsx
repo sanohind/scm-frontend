@@ -147,7 +147,7 @@ const HistoryPurchaseOrder = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700">Filter by Month</label>
+            <label className="text-sm font-medium text-gray-700 mb-2">Filter by Month</label>
             <SearchMonth selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
           </div>
           <div className='md:w-1/2 lg:w-1/3'>

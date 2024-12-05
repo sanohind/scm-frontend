@@ -210,27 +210,37 @@ const TransactionReport = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {/* Start Date */}
               <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
+                  onClick={() => (document.getElementById('startDate') as HTMLInputElement)?.showPicker()}
+                >
                   Start Date
                 </label>
                 <input
+                  id="startDate"
                   type="date"
-                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
                   value={startDate ? startDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => setStartDate(new Date(e.target.value))}
+                  onClick={(e) => e.currentTarget.showPicker()}
                 />
               </div>
 
               {/* End Date */}
               <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium text-gray-700 mb-2 cursor-pointer"
+                  onClick={() => (document.getElementById('endDate') as HTMLInputElement)?.showPicker()}
+                >
                   End Date
                 </label>
                 <input
+                  id="endDate"
                   type="date"
-                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
                   value={endDate ? endDate.toISOString().split('T')[0] : ''}
                   onChange={(e) => setEndDate(new Date(e.target.value))}
+                  onClick={(e) => e.currentTarget.showPicker()}
                 />
               </div>
 

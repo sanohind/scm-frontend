@@ -51,7 +51,7 @@ const StockManagement = () => {
   // Transform API data to match react-select format
   const partOptions = apiData.map(item => ({
     value: item.partNumber,
-    label: item.partName
+    label: `${item.partName} | ${item.partNumber}`
   }));
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -72,7 +72,7 @@ const StockManagement = () => {
       <br>
       <p><strong>Status:</strong> ${status}</p>
       <p><strong>Transaction Type:</strong> ${value === 0 ? 'In' : value === 1 ? 'Process' : 'Out'}</p>
-      <p><strong>Part Name:</strong> ${selectedPart?.label}</p>
+      <p><strong>Part List:</strong> ${selectedPart?.label}</p>
       <p><strong>Quantity OK:</strong> ${qtyOk}</p>
       <p><strong>Quantity NG:</strong> ${qtyNg ? qtyNg : 0}</p>
       `,
