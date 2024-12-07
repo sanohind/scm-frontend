@@ -4,6 +4,7 @@ import DashboardAdminPurchasingWarehouse from './Pages/Admin/DashboardAdminPurch
 import DashboardAdminSubcont from './Pages/Admin/DashboardAdminSubcont';
 import DashboardSupplierMarketing from './Pages/Customer/DashboardSupplierMarketing';
 import DashboardSupplierWarehouseSubcont from './Pages/Customer/DashboardSupplierWarehouseSubcont';
+import DashboardSupplierSubcontMarketing from './Pages/Customer/DashboardSuplierSubcontMarketing';
 
 const Dashboard: React.FC = () => {
   const [userRole, setUserRole] = useState<string>('');
@@ -19,8 +20,10 @@ const Dashboard: React.FC = () => {
     return <DashboardAdminPurchasingWarehouse />;
   } else if (userRole === 'admin-subcont') {
     return <DashboardAdminSubcont />;
-  } else if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
+  } else if (userRole === 'supplier-marketing') {
     return <DashboardSupplierMarketing />;
+  } else if (userRole === 'supplier-subcont-marketing') {
+    return <DashboardSupplierSubcontMarketing />;
   } else if (userRole === 'supplier-warehouse' || userRole === 'supplier-subcont') {
     return <DashboardSupplierWarehouseSubcont />;
   } else {

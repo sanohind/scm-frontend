@@ -5,6 +5,16 @@ import CardDataStats from '../../../../components/CardDataStats';
 import { FaFileAlt, FaFileInvoiceDollar } from 'react-icons/fa';
 import ChartOne from '../../../../components/Charts/ChartOne';
 import { useNavigate } from 'react-router-dom';
+import Calendar from '../../../../components/Calendar';
+
+type Event = {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+  color: string;
+  type: string;
+};
 
 const DashboardSupplierMarketing: React.FC = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -21,7 +31,6 @@ const DashboardSupplierMarketing: React.FC = () => {
     po_done: [],
     po_canceled: [],
   });
-
   const [dnData, setDnData] = useState<{
     dn_done: number[];
     dn_canceled: number[];
@@ -99,6 +108,33 @@ const DashboardSupplierMarketing: React.FC = () => {
     fetchDashboardData();
   }, []);
 
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    // Data dummy untuk events
+    const dummyEvents: Event[] = [
+      {
+        id: 1,
+        title: 'PO: Event 1',
+        start: new Date('2024-11-10'),
+        end: new Date('2024-11-10'),
+        color: '#FF0000', // Warna untuk event PO
+        type: 'PO',
+      },
+      {
+        id: 2,
+        title: 'DN: Event 2',
+        start: new Date('2024-11-15'),
+        end: new Date('2024-11-15'),
+        color: '#3C50E0', // Warna untuk event DN
+        type: 'DN',
+      },
+      // Tambahkan events lainnya sesuai kebutuhan
+    ];
+
+    setEvents(dummyEvents);
+  }, []);
+
   return (
     <>
       <div className='space-y-6'>
@@ -165,25 +201,31 @@ const DashboardSupplierMarketing: React.FC = () => {
             }
             return (
               <>
-          <ChartOne
-            titleOne="PO Closed"
-            titleTwo="PO Cancelled"
-            dataOne={poData.po_done}
-            dataTwo={poData.po_canceled}
-            categories={months}
-            dateRange={`${new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toLocaleDateString()} - ${today.toLocaleDateString()}`}
-          />
-          <ChartOne
-            titleOne="DN Confirmed"
-            titleTwo="DN Cancelled"
-            dataOne={dnData.dn_done}
-            dataTwo={dnData.dn_canceled}
-            categories={months}
-            dateRange={`${new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toLocaleDateString()} - ${today.toLocaleDateString()}`}
-          />
+                <ChartOne
+                  titleOne="PO Closed"
+                  titleTwo="PO Cancelled"
+                  dataOne={poData.po_done}
+                  dataTwo={poData.po_canceled}
+                  categories={months}
+                  dateRange={`${new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toLocaleDateString()} - ${today.toLocaleDateString()}`}
+                />
+                <ChartOne
+                  titleOne="DN Confirmed"
+                  titleTwo="DN Cancelled"
+                  dataOne={dnData.dn_done}
+                  dataTwo={dnData.dn_canceled}
+                  categories={months}
+                  dateRange={`${new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toLocaleDateString()} - ${today.toLocaleDateString()}`}
+                />
               </>
             );
           })()}
+        </div>
+        <div className="mt-6">
+          <Calendar
+            events={events}
+            defaultView="month"
+          />
         </div>
       </div>
     </>
