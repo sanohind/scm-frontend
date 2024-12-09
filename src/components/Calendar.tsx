@@ -49,9 +49,9 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
     }).then((result) => {
       if (result.isConfirmed) {
         if (event.type === 'PO') {
-          navigate(`/purchase-order-detail/${event.id}`);
+          navigate(`/purchase-order-detail?noPO=${event.title.split(': ')[1]}`);
         } else if (event.type === 'DN') {
-          navigate(`/delivery-note-detail/${event.id}`);
+          navigate(`/delivery-note-detail?noDN=${event.title.split(': ')[1]}`);
         }
       }
     });
@@ -103,7 +103,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         startAccessor="start"
         endAccessor="end"
         style={{ 
-          height: 700,
+          height: 800,
           padding: '20px'
         }}
         eventPropGetter={eventStyleGetter}
@@ -118,6 +118,47 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         popup
         selectable
         className="custom-calendar"
+        components={{
+          eventWrapper: (props: any) => props.children,
+          dateCellWrapper: ({ value, children }) => {
+            const dayEvents = events.filter(
+              event => moment(event.start).format('YYYY-MM-DD') === moment(value).format('YYYY-MM-DD')
+            );
+            
+            if (dayEvents.length > 2) {
+              return (
+                <div className="rbc-day-bg relative h-full w-full" style={{ borderRight: '1px solid #e2e8f0' }}>
+                  {children}
+                  <div className="absolute bottom-0 left-0 right-0 px-1 pb-1 text-center">
+                    <button
+                      className="more-events-btn"
+                      onClick={() => {
+                        Swal.fire({
+                          title: `Events on ${moment(value).format('MMMM D, YYYY')}`,
+                          html: `
+                            <div class="events-popup">
+                              ${dayEvents.map(event => `
+                                <div class="event-item-popup ${event.type === 'PO' ? 'po-event' : 'dn-event'}">
+                                  <strong>${event.title}</strong><br>
+                                  ${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}
+                                </div>
+                              `).join('')}
+                            </div>
+                          `,
+                          confirmButtonColor: '#3C50E0',
+                          width: '600px',
+                        });
+                      }}
+                    >
+                      +{dayEvents.length - 1} more
+                    </button>
+                  </div>
+                </div>
+              );
+            }
+            return children;
+          }
+        }}
       />
       <style>
         {`
@@ -128,7 +169,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
           .custom-calendar .rbc-toolbar-label {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #3C50E0;
+            color: #1e293b;
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 10px 0;
@@ -141,7 +182,9 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             font-size: 0.875rem;
             transition: all 0.2s ease;
           }
-          .custom-calendar .rbc-toolbar button.rbc-active {
+          .custom-calendar .rbc-toolbar button.rbc-active,
+          .custom-calendar .rbc-toolbar button:focus,
+          .custom-calendar .rbc-toolbar button:hover {
             background: #3C50E0;
             color: white;
           }
@@ -152,17 +195,34 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             background: #3C50E0;
             color: white;
           }
+          .custom-calendar .rbc-header:contains('DECEMBER 2024') {
+            background: #1e3a8a;
+          }
           .custom-calendar .rbc-month-view {
             border: 1px solid #e2e8f0;
           }
-          .custom-calendar .rbc-day-bg {
-            transition: background-color 0.2s ease;
+          .custom-calendar .rbc-event {
+            padding: 4px 8px;
+            height: auto !important;
+            min-height: 24px;
+            position: relative;
+            z-index: 1;
           }
-          .custom-calendar .rbc-day-bg:hover {
-            background-color: #f1f5f9;
+          .custom-calendar .event-item {
+            padding: 2px 4px;
+            margin: 2px 0;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+          .custom-calendar .event-item {
+            padding: 2px 4px;
+            margin: 2px 0;
+            background: rgba(60, 80, 224, 0.1);
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
-          .custom-calendar .rbc-off-range-bg {
-            background-color: #f8fafc;
           }
           .custom-calendar .rbc-today {
             background-color: #e0e7ff;
@@ -174,6 +234,29 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             padding: 8px;
             font-weight: 500;
             color: #1e293b;
+          }
+          .more-events-btn {
+            background: rgba(60, 80, 224, 0.1);
+            color: #3C50E0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+          }
+          .event-item-popup {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 4px;
+          }
+          .event-item-popup.po-event {
+            background-color: #4285F4;
+            color: white;
+          }
+          .event-item-popup.dn-event {
+            background-color: #0B8043;
+            color: white;
           }
         `}
       </style>

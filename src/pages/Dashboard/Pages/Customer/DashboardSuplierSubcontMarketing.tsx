@@ -62,8 +62,8 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
             {
                 id: 2,
                 title: 'DN: 12324',
-                start: new Date('2024-11-15'),
-                end: new Date('2024-11-15'),
+                start: new Date('2024-12-10'),
+                end: new Date('2024-12-10'),
                 type: 'DN',
             },
             // Tambahkan events lainnya...
