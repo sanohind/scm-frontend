@@ -8,12 +8,11 @@ import ChartOne from '../../../../components/Charts/ChartOne';
 import Calendar from '../../../../components/Calendar';
 
 type Event = {
-  id: number;
-  title: string;
-  start: Date;
-  end: Date;
-  color: string;
-  type: string;
+    id: number;
+    title: string;
+    start: Date;
+    end: Date;
+    type: string;
 };
 
 const DashboardSupplierSubcontMarketing: React.FC = () => {
@@ -48,20 +47,26 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
         const dummyEvents: Event[] = [
             {
                 id: 1,
-                title: 'PO: Event 1',
-                start: new Date('2024-11-10'),
-                end: new Date('2024-11-10'),
-                color: '#FF0000', // Warna untuk event PO
+                title: 'PO: 1239',
+                start: new Date('2024-12-10'),
+                end: new Date('2024-12-10'),
                 type: 'PO',
             },
             {
+                id: 3,
+                title: 'DN: 132',
+                start: new Date('2024-12-10'),
+                end: new Date('2024-12-13'),
+                type: 'DN',
+            },
+            {
                 id: 2,
-                title: 'DN: Event 2',
+                title: 'DN: 12324',
                 start: new Date('2024-11-15'),
                 end: new Date('2024-11-15'),
-                color: '#3C50E0', // Warna untuk event DN
                 type: 'DN',
-        },
+            },
+            // Tambahkan events lainnya...
         ];
 
         setEvents(dummyEvents);

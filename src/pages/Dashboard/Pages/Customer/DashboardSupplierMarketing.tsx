@@ -116,9 +116,9 @@ const DashboardSupplierMarketing: React.FC = () => {
       {
         id: 1,
         title: 'PO: Event 1',
-        start: new Date('2024-11-10'),
-        end: new Date('2024-11-10'),
-        color: '#FF0000', // Warna untuk event PO
+        start: new Date('2024-12-10'),
+        end: new Date('2024-12-10'),
+        color: '#0000FF', // blue-900
         type: 'PO',
       },
       {
@@ -126,7 +126,23 @@ const DashboardSupplierMarketing: React.FC = () => {
         title: 'DN: Event 2',
         start: new Date('2024-11-15'),
         end: new Date('2024-11-15'),
-        color: '#3C50E0', // Warna untuk event DN
+        color: '#1E3A8A', // blue-900
+        type: 'DN',
+      },
+      {
+        id: 3,
+        title: 'DN: Event 3',
+        start: new Date('2024-12-15'),
+        end: new Date('2024-12-15'),
+        color: '#1E3A8A', // blue-900
+        type: 'DN',
+      },
+      {
+        id: 4,
+        title: 'DN: Event 4',
+        start: new Date('2024-12-15'),
+        end: new Date('2024-12-25'),
+        color: '#1E3A8A', // blue-900
         type: 'DN',
       },
       // Tambahkan events lainnya sesuai kebutuhan
