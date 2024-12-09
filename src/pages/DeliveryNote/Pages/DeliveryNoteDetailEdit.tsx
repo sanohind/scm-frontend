@@ -81,7 +81,7 @@ const DeliveryNoteDetailEdit = () => {
           QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
           qtyLabel: detail.dn_snp || '-',
           qtyRequested: detail.dn_qty || '-',
-          qtyConfirm: detail.qty_confirm ?? detail.dn_qty,
+          qtyConfirm: detail.qty_confirm || '', 
           qtyDelivered: detail.receipt_qty || '-',
           qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
         }));
@@ -108,6 +108,12 @@ const DeliveryNoteDetailEdit = () => {
   }, [noDN]);
 
   const handleConfirmMode = () => {
+    // Saat tombol Confirm Order diklik, isi qtyConfirm dengan qtyRequested jika qtyConfirm kosong
+    const updatedData = filteredData.map((detail) => ({
+      ...detail,
+      qtyConfirm: detail.qtyConfirm || detail.qtyRequested,
+    }));
+    setFilteredData(updatedData);
     setConfirmMode(true);
     setIsCheckboxChecked(false);
   };
@@ -436,7 +442,7 @@ const DeliveryNoteDetailEdit = () => {
                               max={detail.qtyRequested}
                             />
                           ) : (
-                            detail.qtyConfirm
+                            detail.qtyConfirm || '-'
                           )}
                         </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
