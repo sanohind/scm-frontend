@@ -22,7 +22,7 @@ const HistoryDeliveryNote = () => {
   const [filteredData, setFilteredData] = useState<DeliveryNote[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [loading, setLoading] = useState(true);

@@ -25,7 +25,7 @@ const PurchaseOrder = () => {
   const [data, setData] = useState<PurchaseOrder[]>([]);
   const [filteredData, setFilteredData] = useState<PurchaseOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(8);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });

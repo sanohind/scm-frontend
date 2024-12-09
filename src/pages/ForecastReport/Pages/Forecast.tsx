@@ -19,7 +19,7 @@ const Forecast = () => {
   const [data, setData] = useState<ForecastData[]>([]);
   const [filteredData, setFilteredData] = useState<ForecastData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(8);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof ForecastData; direction: 'asc' | 'desc' }>({ key: 'upload_at', direction: 'desc' });

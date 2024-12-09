@@ -26,7 +26,7 @@ const DeliveryNoteDetail = () => {
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage] = useState(6);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig] = useState({ key: '', direction: 'asc' });
   const location = useLocation();

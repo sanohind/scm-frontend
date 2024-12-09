@@ -26,7 +26,7 @@ const AdminStockItems = () => {
     const [data, setData] = useState<StockItem[]>([]);
     const [filteredData, setFilteredData] = useState<StockItem[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(6);
+    const [rowsPerPage] = useState(10);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);

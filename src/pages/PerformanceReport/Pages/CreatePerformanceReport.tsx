@@ -20,7 +20,7 @@ const CreatePerformanceReport = () => {
     const [data, setData] = useState<PerformanceReport[]>([]);
     const [filteredData, setFilteredData] = useState<PerformanceReport[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(5);
+    const [rowsPerPage] = useState(10);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof PerformanceReport | '', direction: 'asc' | 'desc' | '' }>({ key: '', direction: '' });

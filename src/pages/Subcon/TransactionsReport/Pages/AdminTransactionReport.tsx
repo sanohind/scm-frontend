@@ -30,7 +30,7 @@ const AdminTransactionReport = () => {
     const [filteredData, setFilteredData] = useState<TransactionLog[]>([]);
     const [allData, setAllData] = useState<TransactionLog[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(8);
+    const [rowsPerPage] = useState(10);
     const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
     const [selectedParts, setSelectedParts] = useState<string[]>([]);

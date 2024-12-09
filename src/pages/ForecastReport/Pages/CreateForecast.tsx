@@ -27,7 +27,7 @@ const CreateForecast = () => {
     const [filteredData, setFilteredData] = useState<ForecastReport[]>([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 5;
+    const rowsPerPage = 10;
     const [searchQuery, setSearchQuery] = useState('');
     const [sortConfig, setSortConfig] = useState<{ key: keyof ForecastReport | '', direction: 'asc' | 'desc' | '' }>({ key: '', direction: '' });
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);

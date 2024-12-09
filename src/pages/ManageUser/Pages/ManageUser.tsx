@@ -28,7 +28,7 @@ const ManageUser: React.FC = () => {
     const [data, setData] = useState<User[]>([]);
     const [filteredData, setFilteredData] = useState<User[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage] = useState(7);
+    const [rowsPerPage] = useState(10);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);

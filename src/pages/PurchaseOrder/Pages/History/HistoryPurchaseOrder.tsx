@@ -19,7 +19,7 @@ const HistoryPurchaseOrder = () => {
   const [filteredData, setFilteredData] = useState<PurchaseOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [loading, setLoading] = useState(true);
