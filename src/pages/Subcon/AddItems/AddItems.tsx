@@ -1,6 +1,11 @@
 import { useEffect, useState, ChangeEvent, useRef } from 'react';
 import Select from 'react-select';
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
+
+interface SupplierOption {
+    value: string;
+    label: string;
+}
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_Item_Subcont_Admin,  API_List_Partner_Admin } from '../../../api/api';
 import Swal from 'sweetalert2';
@@ -21,6 +26,27 @@ export const AddItems = () => {
     useEffect(() => {
         fetchSuppliers();
     }, []);
+
+    useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+            if (savedSupplierCode && suppliers.length > 0) {
+                const savedSupplier = suppliers.find(
+                    (sup: SupplierOption) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+            }
+        }
+    }, [suppliers]);
+
+    const handleSupplierChange = (selectedOption: SupplierOption | null) => {
+        setSelectedSupplier(selectedOption);
+        if (selectedOption) {
+            localStorage.setItem('selected_supplier', selectedOption.value);
+        } else {
+            localStorage.removeItem('selected_supplier');
+        }
+    };
 
     const fetchSuppliers = async () => {
         const token = localStorage.getItem('access_token');
@@ -251,7 +277,7 @@ export const AddItems = () => {
                                     <Select
                                         options={suppliers}
                                         value={selectedSupplier}
-                                        onChange={setSelectedSupplier}
+                                        onChange={handleSupplierChange}
                                         placeholder="Select Supplier"
                                         className="w-full"
                                         isClearable
@@ -310,7 +336,7 @@ export const AddItems = () => {
                             </button>
                         </div>
                         <div className="max-w-[1024px] mx-auto space-y-4">
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex items-center gap-4">
                                 <button
                                     onClick={downloadTemplate}
                                     className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition flex items-center gap-2"

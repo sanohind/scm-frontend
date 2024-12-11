@@ -1,4 +1,5 @@
 import { FaFileInvoiceDollar, FaPlus } from "react-icons/fa"
+import { FaBoxesStacked } from "react-icons/fa6"
 import { NavLink, useLocation } from "react-router-dom"
 
 export const AdminSubcont = () => {
@@ -118,6 +119,23 @@ export const AdminSubcont = () => {
                 </h3>
 
                 <ul className="mb-6 flex flex-col gap-1.5">
+                    {/* <!-- Menu Item Manage Items --> */}
+                    <li>
+                        <NavLink
+                            to="/manage-items"
+                            end
+                            className={({ isActive }) =>
+                                `group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out ${
+                                isActive
+                                    ? 'bg-graydark text-white'
+                                    : 'text-black-2 dark:text-bodydark2 hover:bg-graydark hover:text-white dark:hover:bg-meta-4'
+                                }`
+                            }
+                        >
+                            <FaBoxesStacked className="fill-current" size={18} />
+                            Manage Items
+                        </NavLink>
+                    </li>
                     {/* <!-- Menu Item Add Items --> */}
                     <li>
                         <NavLink

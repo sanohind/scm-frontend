@@ -26,6 +26,7 @@ import PrintLabel from "./pages/Print/PrintLabel";
 import IndexTransactionsReport from "./pages/Subcon/TransactionsReport/IndexTransactionReport";
 import IndexStockItems from "./pages/Subcon/StockItems/IndexStockItems";
 import { AddItems } from "./pages/Subcon/AddItems/AddItems";
+import ManageItems from "./pages/Subcon/ManageItems.tsx/MangeItems";
 
 const App: React.FC = () => {
   return (
@@ -202,6 +203,15 @@ const App: React.FC = () => {
                 <ProtectedRoute allowedRoles={['4']}>
                   <PageTitle title="Add Item | PT SANOH INDONESIA" />
                   <AddItems />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manage-items"
+              element={
+                <ProtectedRoute allowedRoles={['4']}>
+                  <PageTitle title="Manage Item | PT SANOH INDONESIA" />
+                  <ManageItems />
                 </ProtectedRoute>
               }
             />
