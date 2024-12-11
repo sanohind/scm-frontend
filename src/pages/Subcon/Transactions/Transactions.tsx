@@ -3,19 +3,22 @@ import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Select from 'react-select';
+import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../api/api';
 import Swal from 'sweetalert2';
+import DatePicker from '../../../components/Forms/DatePicker';
+import { FaPlus } from 'react-icons/fa';
 
 const StockManagement = () => {
   const [value, setValue] = useState(0);
   const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
-  const [qtyOk, setQtyOk] = useState('');
-  const [qtyNg, setQtyNg] = useState('');
   const [status, setStatus] = useState('');
   const [deliveryNote, setDeliveryNote] = useState('');
   const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
+  const [transactionDate, setTransactionDate] = useState<Date>(new Date());
+  const [partList, setPartList] = useState<any[]>([]);
 
   interface ApiItem {
     part_number: string;
@@ -28,15 +31,14 @@ const StockManagement = () => {
         const token = localStorage.getItem('access_token');
         const response = await fetch(API_List_Item_Subcont(), {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         const result = await response.json();
         if (result.status) {
-          // Transform the data structure to match our needs
           const transformedData = result.data.map((item: ApiItem) => ({
             partNumber: item.part_number,
-            partName: item.part_name
+            partName: item.part_name,
           }));
           setApiData(transformedData);
         }
@@ -48,39 +50,98 @@ const StockManagement = () => {
     fetchData();
   }, []);
 
-  // Transform API data to match react-select format
-  const partOptions = apiData.map(item => ({
+  const partOptions = apiData.map((item) => ({
     value: item.partNumber,
-    label: `${item.partName} | ${item.partNumber}`
+    label: `${item.partName} | ${item.partNumber}`,
   }));
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    // Reset form when tab changes
+    setPartList([]);
+    setSelectedPart(null);
+    setStatus('');
+    setDeliveryNote('');
+    setTransactionDate(new Date());
   };
 
   const handlePartChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedPart(selectedOption);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleAddPart = () => {
+    if (!selectedPart) {
+      toast.error('Please select a part');
+      return;
+    }
+    // Cek apakah part sudah ada di partList
+    const partExists = partList.some(
+      (part) => part.partNumber === selectedPart.value
+    );
+
+    if (partExists) {
+      toast.error('Part already exists in the list');
+      setSelectedPart(null);
+      return;
+    }
+
+    // Lanjutkan menambahkan part jika tidak duplikat
+    setPartList([
+      ...partList,
+      {
+        partName: selectedPart.label.split(' | ')[0],
+        partNumber: selectedPart.value,
+        qtyOk: '',
+        qtyNg: '',
+      },
+    ]);
+    setSelectedPart(null);
+  };
+
+  const handlePartListChange = (index: number, field: 'qtyOk' | 'qtyNg', value: string) => {
+    const updatedPartList = [...partList];
+    updatedPartList[index][field] = value;
+    setPartList(updatedPartList);
+  };
+
+  const handleDeletePart = (index: number) => {
+    const updatedPartList = partList.filter((_, i) => i !== index);
+    setPartList(updatedPartList);
+  };
+
+  const handleSubmit = async () => {
+    if (partList.length === 0) {
+      toast.error('Please add at least one part');
+      return;
+    }
 
     const confirm = await Swal.fire({
       title: 'Confirm Submission',
       html: `
-      <p>Are you sure the data entered is correct?</p>
-      <br>
-      <p><strong>Status:</strong> ${status}</p>
-      <p><strong>Transaction Type:</strong> ${value === 0 ? 'In' : value === 1 ? 'Process' : 'Out'}</p>
-      <p><strong>Part List:</strong> ${selectedPart?.label}</p>
-      <p><strong>Quantity OK:</strong> ${qtyOk}</p>
-      <p><strong>Quantity NG:</strong> ${qtyNg ? qtyNg : 0}</p>
+        <p>Apakah Anda yakin data yang dimasukkan sudah benar?</p>
+        <br>
+        <p><strong>Tanggal:</strong> ${transactionDate.toLocaleDateString()}</p>
+        <p><strong>Status:</strong> ${status}</p>
+        <p><strong>Tipe Transaksi:</strong> ${
+          value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing'
+        }</p>
+        <p><strong>Delivery Note:</strong> ${deliveryNote}</p>
+        <p><strong>Parts:</strong></p>
+        ${partList
+          .map(
+            (part) => `
+            <p>${part.partNumber} | Qty OK: ${part.qtyOk}, Qty NG: ${
+              part.qtyNg || 0
+            }</p>
+          `
+          )
+          .join('')}
       `,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#1e3a8a', 
+      confirmButtonColor: '#1e3a8a',
       cancelButtonColor: '#dc2626',
-      confirmButtonText: 'Yes, Submit It!'
+      confirmButtonText: 'Ya, Submit!',
     });
 
     if (!confirm.isConfirmed) {
@@ -89,40 +150,55 @@ const StockManagement = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      if (!token) {
-        toast.error('Authentication token not found');
-        return;
-      }
 
-      const transactionData = {
-        transaction_type: value === 0 ? 'In' : value === 1 ? 'Process' : 'Out',
-        status: status,
-        delivery_note: deliveryNote,
-        item_code: selectedPart?.value,
-        qty_ok: qtyOk,
-        qty_ng: qtyNg ? qtyNg : 0,
-      };
+      const transactions = partList.map((part) => {
+        const transactionDateTime = new Date(transactionDate);
+        const now = new Date();
+        transactionDateTime.setHours(
+          now.getHours(),
+          now.getMinutes(),
+          now.getSeconds(),
+        );
+
+        const formattedDate = `${String(transactionDateTime.getDate()).padStart(2, '0')}/${String(
+          transactionDateTime.getMonth() + 1,
+        ).padStart(2, '0')}/${transactionDateTime.getFullYear()} ${String(
+          transactionDateTime.getHours(),
+        ).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(
+          transactionDateTime.getSeconds(),
+        ).padStart(2, '0')}`;
+
+        return {
+          transaction_type: value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing',
+          status: status,
+          delivery_note: deliveryNote || null,
+          item_code: part.partNumber,
+          qty_ok: part.qtyOk || '0',
+          qty_ng: part.qtyNg || '0',
+          date: formattedDate,
+        };
+      });
 
       const response = await fetch(API_Create_Transaction_Subcont(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(transactionData)
+        body: JSON.stringify({ transactions }),
       });
 
       if (!response.ok) throw new Error('Failed to submit');
 
-      toast.success('Transaction recorded successfully');
-      
-      // Clear form
-      setSelectedPart(null);
-      setQtyOk('');
-      setQtyNg('');
-      
+      toast.success('Data submitted successfully!');
+
+      // Reset form
+      setPartList([]);
+      setStatus('');
+      setDeliveryNote('');
+      setTransactionDate(new Date());
     } catch (error) {
-      toast.error('Failed to record transaction');
+      toast.error('Error submitting data');
       console.error(error);
     }
   };
@@ -131,118 +207,154 @@ const StockManagement = () => {
     <>
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Transactions" />
-      <div className='mx-auto p-2 md:p-4 lg:p-6 space-y-6'>
+      <div className="mx-auto p-2 md:p-4 lg:p-6 space-y-6">
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs value={value} onChange={handleChange} centered>
             <Tab label="Record Incoming" />
             <Tab label="Record Process" />
             <Tab label="Record Outgoing" />
           </Tabs>
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ">
-            <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
-              <div className="p-4 md:p-6.5">
-                <div className="grid grid-cols-1 md:grid-cols-2 md:gap-6">
-                  {/* Left Column */}
-                  <div>
-                    {/* Status Selection */}
-                    <div className="mb-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">Status <span className="text-meta-1">*</span>
+          <div className="rounded-sm border border-stroke bg-white shadow-default">
+            <div className="max-w-[1024px] mx-auto">
+              {(value === 0 || value === 1 || value === 2) && (
+                <div className="p-4 md:p-6.5 gap-4">
+                  {/* Date Picker */}
+                  <div className="mb-4">
+                    <DatePicker
+                      id="transactionDate"
+                      value={transactionDate}
+                      onChange={(date: Date) => date && setTransactionDate(date)}
+                      className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
+                      placeholder='Select Date'
+                      label='Date'
+                    />
+                  </div>
+                  {/* Status Selection */}
+                  {(value === 0 || value === 1 || value === 2) && (
+                    <div className="mb-4">
+                      <label className="mb-2 block text-black">
+                        Status <span className="text-meta-1">*</span>
                       </label>
                       <select
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                         required
-                          >
-                        <option value="" disabled>Select Status</option>
+                      >
+                        <option value="">Select Status</option>
                         <option value="Fresh">Fresh</option>
                         <option value="Replating">Replating</option>
                       </select>
                     </div>
-
-                    {/* Delivery Note Input */}
-                    {value !== 1 && (
-                      <div className="mb-4.5">
-                        <label className="mb-2.5 block text-black dark:text-white">
-                          Delivery Note <span className="text-meta-1">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={deliveryNote}
-                          onChange={(e) => setDeliveryNote(e.target.value)}
-                          placeholder="Enter Delivery Note"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          required
-                        />
-                      </div>
-                    )}
-
-                    {/* Part Name Selection */}
-                    <div className="mb-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">Part Name <span className="text-meta-1">*</span>
-                      </label>
-                      <Select
-                        options={partOptions}
-                        value={selectedPart}
-                        onChange={handlePartChange}
-                        placeholder="Select Part Name"
-                        className="w-full"
-                        isClearable
-                        required
-                      />
-                    </div>
-
-                    {/* Part Number Display */}
-                    <div className="mb-4.5 w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">Part Number
+                  )}
+                  {/* Delivery Note Input */}
+                  {(value === 0 || value === 2) && (
+                    <div className="mb-4">
+                      <label className="mb-2 block text-black">
+                        Delivery Note <span className="text-meta-1">*</span>
                       </label>
                       <input
                         type="text"
-                        value={selectedPart ? selectedPart.value : ''}
-                        readOnly
-                        className="w-full rounded border-[1.5px] border-stroke bg-gray-100 py-3 px-5 text-black outline-none transition disabled:cursor-default dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          />
-                    </div>
-                  </div>
-                  {/* Right Column */}
-                  <div>
-                    {/* Quantity OK */}
-                    <div className="mb-4.5 w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">Quantity OK <span className="text-meta-1">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={qtyOk}
-                        onChange={(e) => setQtyOk(e.target.value)}
-                        placeholder="Enter Quantity OK"
+                        value={deliveryNote}
+                        onChange={(e) => setDeliveryNote(e.target.value)}
+                        placeholder="Enter Delivery Note"
+                        className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                         required
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
                     </div>
-
-                    {/* Quantity NG */}
-                    <div className="mb-4.5 w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">Quantity NG <span className="text-gray-400">( Leave blank if no NG parts )</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={qtyNg}
-                        onChange={(e) => setQtyNg(e.target.value)}
-                        placeholder="Enter Quantity NG"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-
-                    {/* Submit Button */}
-                    <button 
-                      type="submit" 
-                      className="w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90">
-                      Submit
-                    </button>
+                  )}
+                  {/* Part List Selection */}
+                  <div className="mb-4">
+                    <label className="mb-2 block text-black">
+                      Part List <span className="text-meta-1">*</span>
+                    </label>
+                    <Select
+                      options={partOptions}
+                      value={selectedPart}
+                      onChange={handlePartChange}
+                      placeholder="Select Part Name"
+                      className="w-full"
+                      isClearable
+                    />
                   </div>
+                  {/* Add Button */}
+                  <button
+                    onClick={handleAddPart}
+                    className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90"
+                  >
+                    <FaPlus className="mr-2" />
+                    Add Part
+                  </button>
+
+                  {/* Preview List */}
+                  {partList.length > 0 && (
+                    <div className="mt-6 overflow-auto">
+                      <table className="w-full text-sm text-center">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                              PART NUMBER
+                            </th>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[30%]">
+                              PART NAME
+                            </th>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                              QTY OK
+                            </th>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                              QTY NG
+                            </th>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
+                              ACTION
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {partList.map((part, index) => (
+                            <tr key={index} className="hover:bg-gray-50">
+                              <td className="px-3 py-3 text-center border">{part.partNumber}</td>
+                              <td className="px-3 py-3 text-center border">{part.partName}</td>
+                              <td className="px-3 py-3 text-center border">
+                                <input
+                                  type="number"
+                                  value={part.qtyOk}
+                                  onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
+                                  className="border border-gray-300 rounded p-1 w-full"
+                                />
+                              </td>
+                              <td className="px-3 py-3 text-center border">
+                                <input
+                                  type="number"
+                                  value={part.qtyNg}
+                                  onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
+                                  className="border border-gray-300 rounded p-1 w-full"
+                                />
+                              </td>
+                              <td className="px-3 py-3 text-center border">
+                                <button
+                                  onClick={() => handleDeletePart(index)}
+                                  className="bg-red-600 text-white px-2 py-1 rounded"
+                                >
+                                Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <button
+                        onClick={handleSubmit}
+                        className="mt-4 w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
                 </div>
-              </div>
-            </form>
+              )}
+            </div>
           </div>
         </Box>
       </div>
