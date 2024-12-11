@@ -7,10 +7,10 @@ import { FaUserCheck, FaUserClock, FaUsers, FaUserTimes } from 'react-icons/fa';
 const DashboardSuperAdmin: React.FC = () => {
     // State untuk menyimpan data dashboard
     const [dashboardData, setDashboardData] = useState({
-        user_online: 0,
-        total_user: 0,
-        user_active: 0,
-        user_deactive: 0,
+        user_online: '-',
+        total_user: '-',
+        user_active: '-',
+        user_deactive: '-',
     });
 
     useEffect(() => {
@@ -32,10 +32,10 @@ const DashboardSuperAdmin: React.FC = () => {
                     if (result.success) {
                         const data = result.data;
                         setDashboardData({
-                        user_online: data.user_online || 0,
-                        total_user: data.total_user || 0,
-                        user_active: data.user_active || 0,
-                        user_deactive: data.user_deactive || 0,
+                        user_online: data.active_tokens,
+                        total_user: data.total_users,
+                        user_active: data.active_users,
+                        user_deactive: data.deactive_users,
                         });
                     } else {
                         console.error('Failed to load dashboard data:', result.message);
@@ -44,13 +44,6 @@ const DashboardSuperAdmin: React.FC = () => {
                 } else {
                     console.error('Failed to fetch data:', response.status);
                     toast.error(`Failed to fetch data: ${response.status}`);
-
-                    setDashboardData({
-                        user_online: 5,
-                        total_user: 100,
-                        user_active: 80,
-                        user_deactive: 20,
-                    });
                 }
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -59,14 +52,6 @@ const DashboardSuperAdmin: React.FC = () => {
                 } else {
                     toast.error('Error fetching dashboard data');
                 }
-
-                // Menggunakan data dummy jika terjadi error
-                setDashboardData({
-                    user_online: 5,
-                    total_user: 100,
-                    user_active: 80,
-                    user_deactive: 20,
-                });
             }
         };
 
