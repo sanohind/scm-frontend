@@ -130,9 +130,10 @@ const EditUser = () => {
 
     const payload = {
       bp_code: selectedSupplier.value,
+      username: username,
       name: firstName,
       role,
-      password: password || null,  // Keep password if left blank
+      password: password || null,
       email,
     };
 
@@ -155,7 +156,11 @@ const EditUser = () => {
           navigate('/list-user');
         }, 1000);
       } else {
-        toast.error(`Failed to update user: ${result.message}`);
+        if (result.errors?.username) {
+          toast.error(result.errors.username[0]);
+        } else {
+          toast.error(result.message || 'Failed to update user');
+        }
       }
     } catch (error) {
       console.error('Error during user update:', error);

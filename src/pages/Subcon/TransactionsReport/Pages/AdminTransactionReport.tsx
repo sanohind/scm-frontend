@@ -324,7 +324,7 @@ const AdminTransactionReport = () => {
                                 id="transactionTypeSelect"
                                 label="Filter by Transaction Type"
                                 options={[
-                                    { value: 'Ingoing', text: 'Ingoing' },
+                                    { value: 'Incoming', text: 'Incoming' },
                                     { value: 'Process', text: 'Process' },
                                     { value: 'Outgoing', text: 'Outgoing' },
                                 ]}
