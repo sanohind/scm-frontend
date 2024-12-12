@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Dashboard,  API_User_Logout_Admin, API_User_Online_Admin } from '../../../../api/api';
+import { API_Dashboard,  API_User_Login_Performance__Admin,  API_User_Logout_Admin, API_User_Online_Admin } from '../../../../api/api';
 import CardDataStats from '../../../../components/CardDataStats';
 import { FaUserCheck, FaUserClock, FaUsers, FaUserTimes } from 'react-icons/fa';
 import UserOnline from '../../../../components/UserOnline';
+import Chart from '../../../Chart';
+import ChartTwo from '../../../../components/Charts/BarChart';
+import BarChart from '../../../../components/Charts/BarChart';
 
+interface LoginData {
+  username: string;
+  login_count: number;
+}
 const DashboardSuperAdmin: React.FC = () => {
   // State untuk menyimpan data dashboard
   const [dashboardData, setDashboardData] = useState({
@@ -13,6 +20,9 @@ const DashboardSuperAdmin: React.FC = () => {
     user_active: '-',
     user_deactive: '-',
   });
+
+  const [loginData, setLoginData] = useState<LoginData[]>([]);
+
 
   // State untuk menyimpan data user online
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
@@ -145,7 +155,53 @@ const DashboardSuperAdmin: React.FC = () => {
     }
   };
 
+  // Add new state for monthly data
+  const [dailyLoginData, setDailyLoginData] = useState<LoginData[]>([]);
+  const [monthlyLoginData, setMonthlyLoginData] = useState<LoginData[]>([]);
+
+  const fetchLoginData = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(API_User_Login_Performance__Admin(), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Sort daily data by login_count in descending order and take top 10
+          const sortedDailyData = result.data.daily
+            .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
+            .slice(0, 10);
+          
+          // Sort monthly data by login_count in descending order and take top 10
+          const sortedMonthlyData = result.data.monthly
+            .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
+            .slice(0, 10);
+
+          setDailyLoginData(sortedDailyData);
+          setMonthlyLoginData(sortedMonthlyData);
+        } else {
+          console.error('Gagal memuat data login user:', result.message);
+        }
+      } else {
+        console.error('Gagal mengambil data login user:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching login data:', error);
+    }
+  };
+
   useEffect(() => {
+    
+  }, []);
+
+  useEffect(() => {
+    fetchLoginData();
     fetchDashboardData();
     fetchOnlineUsers();
 
@@ -156,6 +212,11 @@ const DashboardSuperAdmin: React.FC = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  const categoriesDaily = dailyLoginData.map(item => item.username);
+  const dataDaily = dailyLoginData.map(item => item.login_count);
+  const categoriesMonthly = monthlyLoginData.map(item => item.username);
+  const dataMonthly = monthlyLoginData.map(item => item.login_count);
 
   return (
     <>
@@ -201,12 +262,30 @@ const DashboardSuperAdmin: React.FC = () => {
           </CardDataStats>
         </div>
 
+        <div className='flex flex-col md:flex-row w-full gap-4 md:gap-6 2xl:gap-7'>
+          <BarChart
+            title="Login Performance"
+            categories={categoriesDaily}
+            data={dataDaily}
+            subTitle='24 Hours'
+            footer='User Login Daily Performance'
+          />
+          <BarChart
+            title="Login Performance"
+            categories={categoriesMonthly}
+            data={dataMonthly}
+            subTitle='Monthly'
+            footer='User Login Monthly Performance'
+          />
+        </div>
+
         {/* Tabel User Online */}
         <UserOnline
           onlineUsers={onlineUsers}
           handleLogoutUser={handleLogoutUser}
           getRoleName={getRoleName}
         />
+
       </div>
     </>
   );
