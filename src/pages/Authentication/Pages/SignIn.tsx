@@ -25,12 +25,13 @@ const SignIn: React.FC = () => {
         username,
         password,
       });
-      const { access_token, role, bp_code, name } = response.data;
+      const { access_token, role, bp_code, name, supplier_name } = response.data;
       // toast.success('Login berhasil!');
       
       // Simpan token ke localStorage
       localStorage.setItem('name', name);
       localStorage.setItem('bp_code', bp_code);
+      localStorage.setItem('supplier_name', supplier_name);
 
       switch (role) {
         case '1':

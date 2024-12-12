@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CardDataStats from '../../../../components/CardDataStats';
 import { useNavigate } from 'react-router-dom';
 import { FaFileAlt, FaFileInvoiceDollar } from 'react-icons/fa';
-import { API_Dashboard } from '../../../../api/api';
+import { API_Dashboard, API_PO_DN_Year_Data } from '../../../../api/api';
 import { toast } from 'react-toastify';
 import ChartOne from '../../../../components/Charts/ChartOne';
 import Calendar from '../../../../components/Calendar';
@@ -74,8 +74,7 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
 
     useEffect(() => {
         fetchDashboardData();
-        fetchPoData();
-        fetchDnData();
+        fetchPODNData();
     }, []);
 
     
@@ -123,20 +122,42 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
         }
     };
 
-    const fetchPoData = async () => {
-        // Fetch data from API and set state
-        setPoData({
-            po_done: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-            po_canceled: [3, 5, 3, 0, 5, 5, 6, 2, 5, 6, 1, 45],
-        });
-    };
+    const fetchPODNData = async () => {
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(API_PO_DN_Year_Data(), {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-    const fetchDnData = async () => {
-        // Fetch data from API and set state
-        setDnData({
-            dn_done: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
-            dn_canceled: [3, 5, 3, 0, 5, 5, 6, 2, 5, 6, 1, 45],
-        });
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data;
+                    
+                    setPoData({
+                        // Get last 11 items from the arrays
+                        po_done: data.po_closed.map(item => item.count).slice(-12),
+                        po_canceled: data.po_cancelled.map(item => item.count).slice(-12)
+                    });
+
+                    setDnData({
+                        // Get last 12 items from the arrays
+                        dn_done: data.dn_confirmed.map(item => item.count).slice(-12),
+                        dn_canceled: data.dn_cancelled.map(item => item.count).slice(-12)
+                    });
+                } else {
+                    console.error('Failed to load PO/DN data:', result.message);
+                }
+            } else {
+                console.error('Failed to fetch PO/DN data:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching PO/DN data:', error);
+        }
     };
 
     
@@ -158,7 +179,7 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                     
                     <div onClick={() => navigate('/purchase-order')} className="cursor-pointer">
                         <CardDataStats
-                        title="Purchase Order In Progress"
+                        title="Purchase Order In Process"
                         total={dashboardData.po_in_progress.toString()}
                         rate=""
                         levelUp={dashboardData.po_in_progress > 0}
@@ -182,7 +203,7 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                     
                     <div onClick={() => navigate('/delivery-note')} className="cursor-pointer">
                         <CardDataStats
-                        title="Delivery Note In Progress"
+                        title="Delivery Note In Process"
                         total={dashboardData.dn_in_progress.toString()}
                         rate=""
                         levelUp={dashboardData.dn_in_progress > 0}
