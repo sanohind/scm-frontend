@@ -26,6 +26,9 @@ export const API_List_Partner_Admin = () => API + getRolePath() + `/partner/list
 export const API_Sync_Admin = () => API + getRolePath() + `/sync`;
 
 // Manage User Admin
+export const API_User_Online_Admin = () => API + getRolePath() + `/user/online`;
+export const API_User_Logout_Admin = () => API + getRolePath() + `/user/logout`;
+
 export const API_Create_User_Admin = () => API + getRolePath() + '/user/store';
 export const API_Edit_User_Admin = () => API + getRolePath() + '/user/edit/';
 export const API_Update_User_Admin = () => API + getRolePath() + '/user/update/';
