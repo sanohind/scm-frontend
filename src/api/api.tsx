@@ -14,6 +14,7 @@ export const API_Logout = () => API + getRolePath() + `/logout`;
 // Global User API
 export const API_Dashboard = () => API + getRolePath() + `/dashboard`;
 export const API_PO_DN_Year_Data = () => API + getRolePath() + `/yearData`;
+export const API_Event = () => API + getRolePath() + `/event`;
 
 
 export const API_Print_PO = () => API + getRolePath() + `/po/print/`;

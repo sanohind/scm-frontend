@@ -143,13 +143,12 @@ const ChartOne: React.FC<ChartProps> = ({ titleOne, titleTwo, dataOne, dataTwo, 
           </div>
         </div>
         <div className="flex w-full max-w-45 justify-end">
-          <div className="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4">
             <div
-              className={`rounded py-1 px-3 text-xs font-medium text-black hover:shadow-card dark:text-white dark:hover:bg-boxdark bg-white`}
+              className={`rounded py-1 px-3 text-xs font-medium text-black hover:shadow-card dark:text-white dark:hover:bg-boxdark bg-gray-100 hover:bg-primary-100 cursor-pointer transition-colors duration-200 ease-in-out`}
             >
-              Month
+              Yearly
             </div>
-          </div>
+          
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CardDataStats from '../../../../components/CardDataStats';
 import { useNavigate } from 'react-router-dom';
 import { FaFileAlt, FaFileInvoiceDollar } from 'react-icons/fa';
-import { API_Dashboard, API_PO_DN_Year_Data } from '../../../../api/api';
+import { API_Dashboard, API_Event, API_PO_DN_Year_Data } from '../../../../api/api';
 import { toast } from 'react-toastify';
 import ChartOne from '../../../../components/Charts/ChartOne';
 import Calendar from '../../../../components/Calendar';
@@ -34,52 +34,14 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
 
     const [dnData, setDnData] = useState<{
         dn_done: number[];
-        dn_canceled: number[];
+        dn_overtime: number[];
     }>({
         dn_done: [],
-        dn_canceled: [],
+        dn_overtime: [],
     });
 
     const [events, setEvents] = useState<Event[]>([]);
 
-    useEffect(() => {
-        const dummyEvents: Event[] = [
-            {
-                title: 'PO: 1239',
-                start: new Date('2024-12-10'),
-                end: new Date('2024-12-10'),
-                type: 'PO',
-            },
-            {
-                title: 'DN: 132',
-                start: new Date('2024-12-10'),
-                end: new Date('2024-12-13'),
-                type: 'DN',
-            },
-            {
-                title: 'PO: 12324',
-                start: new Date('2024-12-10'),
-                end: new Date('2024-12-12'),
-                type: 'PO',
-            },
-            {
-                title: 'DN: asd',
-                start: new Date('2024-12-10'),
-                end: new Date('2024-12-15'),
-                type: 'DN',
-            },
-            // Tambahkan events lainnya...
-        ];
-
-        setEvents(dummyEvents);
-    }, []);
-
-    useEffect(() => {
-        fetchDashboardData();
-        fetchPODNData();
-    }, []);
-
-    
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('access_token');
@@ -147,7 +109,7 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
 
                     setDnData({
                         dn_done: data.dn_confirmed.map((item: { count: number }) => item.count).slice(-12),
-                        dn_canceled: data.dn_cancelled.map((item: { count: number }) => item.count).slice(-12)
+                        dn_overtime: data.dn_overtime.map((item: { count: number }) => item.count).slice(-12)
                     });
                 } else {
                     console.error('Failed to load PO/DN data:', result.message);
@@ -159,6 +121,44 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
             console.error('Error fetching PO/DN data:', error);
         }
     };
+
+    const fetchEventData = async () => {
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(API_Event(), {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data.map((event: any) => ({
+                        title: event.type === 'DN' ? `DN : ${event.title}` : event.type === 'PO' ? `PO : ${event.title}` : event.title,
+                        start: new Date(event.start),
+                        end: new Date(event.end),
+                        type: event.type,
+                    }));
+                    setEvents(data);
+                } else {
+                    console.error('Failed to load event data:', result.message);
+                }
+            } else {
+                console.error('Failed to fetch event data:', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching event data:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchDashboardData();
+        fetchPODNData();
+        fetchEventData();
+    }, []);
 
     
     return (
@@ -236,9 +236,9 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                             />
                             <ChartOne
                                 titleOne="DN Confirmed"
-                                titleTwo="DN Cancelled"
+                                titleTwo="DN Over Time"
                                 dataOne={dnData.dn_done}
-                                dataTwo={dnData.dn_canceled}
+                                dataTwo={dnData.dn_overtime}
                                 categories={months}
                                 dateRange={`${new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toLocaleDateString()} - ${today.toLocaleDateString()}`}
                             />

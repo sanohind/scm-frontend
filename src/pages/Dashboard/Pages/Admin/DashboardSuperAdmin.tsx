@@ -4,8 +4,6 @@ import { API_Dashboard,  API_User_Login_Performance__Admin,  API_User_Logout_Adm
 import CardDataStats from '../../../../components/CardDataStats';
 import { FaUserCheck, FaUserClock, FaUsers, FaUserTimes } from 'react-icons/fa';
 import UserOnline from '../../../../components/UserOnline';
-import Chart from '../../../Chart';
-import ChartTwo from '../../../../components/Charts/BarChart';
 import BarChart from '../../../../components/Charts/BarChart';
 
 interface LoginData {
@@ -13,7 +11,6 @@ interface LoginData {
   login_count: number;
 }
 const DashboardSuperAdmin: React.FC = () => {
-  // State untuk menyimpan data dashboard
   const [dashboardData, setDashboardData] = useState({
     user_online: '-',
     total_user: '-',
@@ -21,11 +18,8 @@ const DashboardSuperAdmin: React.FC = () => {
     user_deactive: '-',
   });
 
-  const [loginData, setLoginData] = useState<LoginData[]>([]);
-
-
-  // State untuk menyimpan data user online
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+  const [errorCount, setErrorCount] = useState(0);
 
   const fetchDashboardData = async () => {
     try {
@@ -51,15 +45,18 @@ const DashboardSuperAdmin: React.FC = () => {
             user_deactive: data.deactive_users,
           });
         } else {
-          console.error('Gagal memuat data dashboard:', result.message);
-          toast.error(`Gagal memuat data dashboard: ${result.message}`);
+          console.error('Error fetching dashboard data:', result.message);
+          toast.error(`Error fetching dashboard data: ${result.message}`);
+          setErrorCount((prevCount) => prevCount + 1);
         }
       } else {
         console.error('Gagal mengambil data:', response.status);
         toast.error(`Gagal mengambil data: ${response.status}`);
+        setErrorCount((prevCount) => prevCount + 1);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setErrorCount((prevCount) => prevCount + 1);
       if (error instanceof Error) {
         toast.error(`Error fetching dashboard data: ${error.message}`);
       } else {
@@ -72,7 +69,6 @@ const DashboardSuperAdmin: React.FC = () => {
   const fetchOnlineUsers = async () => {
     try {
       const token = localStorage.getItem('access_token');
-
       const response = await fetch(API_User_Online_Admin(), {
         method: 'GET',
         headers: {
@@ -88,12 +84,15 @@ const DashboardSuperAdmin: React.FC = () => {
           setOnlineUsers(result.data);
         } else {
           console.error('Error fetching online users:', result.message);
+          setErrorCount((prevCount) => prevCount + 1);
         }
       } else {
         console.error('Error fetching online users:', response.status);
+        setErrorCount((prevCount) => prevCount + 1);
       }
     } catch (error) {
       console.error('Error fetching online users:', error);
+      setErrorCount((prevCount) => prevCount + 1);
     }
   };
 
@@ -155,7 +154,6 @@ const DashboardSuperAdmin: React.FC = () => {
     }
   };
 
-  // Add new state for monthly data
   const [dailyLoginData, setDailyLoginData] = useState<LoginData[]>([]);
   const [monthlyLoginData, setMonthlyLoginData] = useState<LoginData[]>([]);
 
@@ -186,19 +184,17 @@ const DashboardSuperAdmin: React.FC = () => {
           setDailyLoginData(sortedDailyData);
           setMonthlyLoginData(sortedMonthlyData);
         } else {
-          console.error('Gagal memuat data login user:', result.message);
+          console.error('Error fetching login data:', result.message);
         }
       } else {
-        console.error('Gagal mengambil data login user:', response.status);
+        console.error('Error fetching login data:', response.status);
       }
     } catch (error) {
       console.error('Error fetching login data:', error);
     }
   };
 
-  useEffect(() => {
-    
-  }, []);
+
 
   useEffect(() => {
     fetchLoginData();
@@ -206,8 +202,13 @@ const DashboardSuperAdmin: React.FC = () => {
     fetchOnlineUsers();
 
     const intervalId = setInterval(() => {
-      fetchDashboardData();
-      fetchOnlineUsers();
+      if (errorCount < 3) {
+        fetchOnlineUsers();
+        fetchDashboardData();
+        fetchLoginData();
+      } else {
+        clearInterval(intervalId);
+      }
     }, 2000);
 
     return () => clearInterval(intervalId);
@@ -285,7 +286,6 @@ const DashboardSuperAdmin: React.FC = () => {
           handleLogoutUser={handleLogoutUser}
           getRoleName={getRoleName}
         />
-
       </div>
     </>
   );

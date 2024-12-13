@@ -35,7 +35,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
           Start Date: <strong>${moment(event.start).format('MMMM D, YYYY')}</strong>
         </p>
         <p>
-          End Date: <strong>${moment(event.end).format('MMMM D, YYYY HH:mm')}</strong>
+          End Date: <strong>${moment(event.end).format('MMMM D, YYYY')}</strong>
         </p>
         <p>Type: ${event.type}</p>
       </div>
@@ -186,8 +186,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
           .custom-calendar .rbc-toolbar button.rbc-active,
           .custom-calendar .rbc-toolbar button:focus,
           .custom-calendar .rbc-toolbar button:hover {
-            background: #3C50E0;
-            color: white;
+            background: #f3f4f6;
+            color: black;
           }
           .custom-calendar .rbc-header {
             padding: 12px;
@@ -206,14 +206,14 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             position: relative;
             z-index: 1;
             border-radius: 4px;
-            background-color: rgba(60, 80, 224, 0.1);
+            background-color: rgba(75, 85, 99, 0.1);
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
           }
           .custom-calendar .rbc-today {
-            background-color: #e0e7ff;
+            background-color: #F3F4F6;
           }
           .custom-calendar .rbc-month-row {
             border-color: #e2e8f0;
@@ -224,8 +224,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             color: #1e293b;
           }
           .more-events-btn {
-            background: rgba(60, 80, 224, 0.1);
-            color: #3C50E0;
+            background: rgba(75, 85, 99, 0.1);
+            color: #4B5563;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 11px;
@@ -239,11 +239,11 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             border-radius: 4px;
           }
           .event-item-popup.po-event {
-            background-color: #4285F4;
+            background-color: #6B7280;
             color: white;
           }
           .event-item-popup.dn-event {
-            background-color: #0B8043;
+            background-color: #4B5563;
             color: white;
           }
         `}

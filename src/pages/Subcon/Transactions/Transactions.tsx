@@ -225,7 +225,7 @@ const StockManagement = () => {
             <Tab label="Record Process" />
             <Tab label="Record Outgoing" />
           </Tabs>
-          <div className="rounded-sm border border-stroke bg-white shadow-default">
+          <div className="rounded-sm border-t-2 border-stroke bg-white">
             <div className="max-w-[1024px] mx-auto">
               {(value === 0 || value === 1 || value === 2) && (
                 <div className="p-4 md:p-6.5 gap-4">
