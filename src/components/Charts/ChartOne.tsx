@@ -103,8 +103,8 @@ const ChartOne: React.FC<ChartProps> = ({ titleOne, titleTwo, dataOne, dataTwo, 
           fontSize: '0px',
         },
       },
-      min: 0,
-      max: 100,
+      min: Math.min(0),
+      max: Math.max(...dataOne, ...dataTwo) + 10,
     },
   };
 
