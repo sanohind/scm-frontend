@@ -137,7 +137,10 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                 const result = await response.json();
                 if (result.success) {
                     const data = result.data.map((event: any) => ({
-                        title: event.type === 'DN' ? `DN : ${event.title}` : event.type === 'PO' ? `PO : ${event.title}` : event.title,
+                        title: event.type === 'DN' ? `DN : ${event.title}` : 
+                            event.type === 'DN History' ? `DN : ${event.title}` :
+                            event.type === 'PO' ? `PO : ${event.title}` : 
+                            event.title,
                         start: new Date(event.start),
                         end: new Date(event.end),
                         type: event.type,
