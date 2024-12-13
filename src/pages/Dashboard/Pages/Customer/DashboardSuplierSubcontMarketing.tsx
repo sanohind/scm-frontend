@@ -8,7 +8,6 @@ import ChartOne from '../../../../components/Charts/ChartOne';
 import Calendar from '../../../../components/Calendar';
 
 type Event = {
-    id: number;
     title: string;
     start: Date;
     end: Date;
@@ -46,24 +45,27 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
     useEffect(() => {
         const dummyEvents: Event[] = [
             {
-                id: 1,
                 title: 'PO: 1239',
                 start: new Date('2024-12-10'),
                 end: new Date('2024-12-10'),
                 type: 'PO',
             },
             {
-                id: 3,
                 title: 'DN: 132',
                 start: new Date('2024-12-10'),
                 end: new Date('2024-12-13'),
                 type: 'DN',
             },
             {
-                id: 2,
-                title: 'DN: 12324',
+                title: 'PO: 12324',
                 start: new Date('2024-12-10'),
-                end: new Date('2024-12-10'),
+                end: new Date('2024-12-12'),
+                type: 'PO',
+            },
+            {
+                title: 'DN: asd',
+                start: new Date('2024-12-10'),
+                end: new Date('2024-12-15'),
                 type: 'DN',
             },
             // Tambahkan events lainnya...
@@ -140,14 +142,14 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                     
                     setPoData({
                         // Get last 11 items from the arrays
-                        po_done: data.po_closed.map(item => item.count).slice(-12),
-                        po_canceled: data.po_cancelled.map(item => item.count).slice(-12)
+                        po_done: data.po_closed.map((item: { count: number }) => item.count).slice(-12),
+                        po_canceled: data.po_cancelled.map((item: { count: number }) => item.count).slice(-12)
                     });
 
                     setDnData({
                         // Get last 12 items from the arrays
-                        dn_done: data.dn_confirmed.map(item => item.count).slice(-12),
-                        dn_canceled: data.dn_cancelled.map(item => item.count).slice(-12)
+                        dn_done: data.dn_confirmed.map((item: { count: number }) => item.count).slice(-12),
+                        dn_canceled: data.dn_cancelled.map((item: { count: number }) => item.count).slice(-12)
                     });
                 } else {
                     console.error('Failed to load PO/DN data:', result.message);

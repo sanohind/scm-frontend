@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 const localizer = momentLocalizer(moment);
 
 interface Event {
-  id: number;
   title: string;
   start: Date;
   end: Date;
@@ -41,7 +40,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         <p>Type: ${event.type}</p>
       </div>
       `,
-      confirmButtonColor: '#1e3a8a', 
+      confirmButtonColor: '#1e3a8a',
       confirmButtonText: 'Go to Details',
       showCancelButton: true,
       cancelButtonText: 'Close',
@@ -61,9 +60,9 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
     let backgroundColor = '#039BE5'; // Default blue color like Google Calendar
 
     if (event.type === 'PO') {
-      backgroundColor = '#4285F4'; // Google Calendar-like blue
+      backgroundColor = '#4F46E5'; // Deep indigo
     } else if (event.type === 'DN') {
-      backgroundColor = '#0B8043'; // Google Calendar-like green
+      backgroundColor = '#059669'; // Rich emerald
     }
 
     const style = {
@@ -94,7 +93,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
   };
 
   return (
-    <div className="w-full max-w-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div className="w-full max-w-full rounded-lg bg-white shadow-md">
       <BigCalendar
         localizer={localizer}
         events={events}
@@ -102,9 +101,9 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         views={['month', 'week', 'day']}
         startAccessor="start"
         endAccessor="end"
-        style={{ 
-          height: 800,
-          padding: '20px'
+        style={{
+          height: 900,
+          padding: '20px',
         }}
         eventPropGetter={eventStyleGetter}
         onSelectEvent={onSelectEventHandler}
@@ -112,7 +111,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         formats={{
           monthHeaderFormat: (date: Date) => moment(date).format('MMMM YYYY').toUpperCase(),
           dayHeaderFormat: (date: Date) => moment(date).format('dddd, MMMM D'),
-          dayRangeHeaderFormat: ({ start, end }: { start: Date, end: Date }) => 
+          dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) =>
             `${moment(start).format('MMM D')} – ${moment(end).format('MMM D, YYYY')}`,
         }}
         popup
@@ -124,7 +123,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             const dayEvents = events.filter(
               event => moment(event.start).format('YYYY-MM-DD') === moment(value).format('YYYY-MM-DD')
             );
-            
+
             if (dayEvents.length > 2) {
               return (
                 <div className="rbc-day-bg relative h-full w-full" style={{ borderRight: '1px solid #e2e8f0' }}>
@@ -150,7 +149,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
                         });
                       }}
                     >
-                      +{dayEvents.length - 1} more
+                      +{dayEvents.length - 2} more
                     </button>
                   </div>
                 </div>
@@ -165,6 +164,8 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
           .custom-calendar .rbc-toolbar {
             padding: 15px;
             margin-bottom: 10px;
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
           }
           .custom-calendar .rbc-toolbar-label {
             font-size: 1.5rem;
@@ -192,14 +193,11 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             padding: 12px;
             font-weight: 500;
             color: #1e293b;
-            background: #3C50E0;
-            color: white;
-          }
-          .custom-calendar .rbc-header:contains('DECEMBER 2024') {
-            background: #1e3a8a;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
           }
           .custom-calendar .rbc-month-view {
-            border: 1px solid #e2e8f0;
+            border: 1px solid #e0e0e0;
           }
           .custom-calendar .rbc-event {
             padding: 4px 8px;
@@ -207,22 +205,12 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             min-height: 24px;
             position: relative;
             z-index: 1;
-          }
-          .custom-calendar .event-item {
-            padding: 2px 4px;
-            margin: 2px 0;
-            background: rgba(255, 255, 255, 0.9);
             border-radius: 4px;
-          .custom-calendar .event-item {
-            padding: 2px 4px;
-            margin: 2px 0;
-            background: rgba(60, 80, 224, 0.1);
-            border-radius: 4px;
+            background-color: rgba(60, 80, 224, 0.1);
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-          }
           }
           .custom-calendar .rbc-today {
             background-color: #e0e7ff;

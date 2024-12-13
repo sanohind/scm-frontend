@@ -115,14 +115,25 @@ const StockManagement = () => {
       return;
     }
 
+    for (const part of partList) {
+      if (parseInt(part.qtyOk) <= 0) {
+        toast.error(`Qty OK for part ${part.partNumber} must be greater than 0`);
+        return;
+      }
+      if (parseInt(part.qtyNg) < 0) {
+        toast.error(`Qty NG for part ${part.partNumber} cannot be negative`);
+        return;
+      }
+    }
+
     const confirm = await Swal.fire({
       title: 'Confirm Submission',
       html: `
-        <p>Apakah Anda yakin data yang dimasukkan sudah benar?</p>
+        <p>Are you sure the data entered is correct?</p>
         <br>
-        <p><strong>Tanggal:</strong> ${transactionDate.toLocaleDateString()}</p>
+        <p><strong>Date:</strong> ${transactionDate.toLocaleDateString()}</p>
         <p><strong>Status:</strong> ${status}</p>
-        <p><strong>Tipe Transaksi:</strong> ${
+        <p><strong>Type:</strong> ${
           value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing'
         }</p>
         <p><strong>Delivery Note:</strong> ${deliveryNote}</p>
@@ -130,7 +141,7 @@ const StockManagement = () => {
         ${partList
           .map(
             (part) => `
-            <p>${part.partNumber} | Qty OK: ${part.qtyOk}, Qty NG: ${
+            <p>${part.partNumber} | Qty OK: ${part.qtyOk} | Qty NG: ${
               part.qtyNg || 0
             }</p>
           `
@@ -141,7 +152,7 @@ const StockManagement = () => {
       showCancelButton: true,
       confirmButtonColor: '#1e3a8a',
       cancelButtonColor: '#dc2626',
-      confirmButtonText: 'Ya, Submit!',
+      confirmButtonText: 'Yes, Submit!',
     });
 
     if (!confirm.isConfirmed) {
@@ -207,7 +218,7 @@ const StockManagement = () => {
     <>
       <ToastContainer position="top-right" />
       <Breadcrumb pageName="Transactions" />
-      <div className="mx-auto p-2 md:p-4 lg:p-6 space-y-6">
+      <div className="mx-auto space-y-6">
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs value={value} onChange={handleChange} centered>
             <Tab label="Record Incoming" />
@@ -280,7 +291,7 @@ const StockManagement = () => {
                   {/* Add Button */}
                   <button
                     onClick={handleAddPart}
-                    className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90"
+                    className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90 mb-4"
                   >
                     <FaPlus className="mr-2" />
                     Add Part
