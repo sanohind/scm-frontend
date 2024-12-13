@@ -104,22 +104,22 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                 dn_in_progress: data.dn_confirmed || 0,
                 });
                 if (data.po_active > 0) {
-                toast.warning(`You have ${data.po_active} PO active`);
+                toast.warning(`You have ${data.po_active} Purchase Order Open now`);
                 }
             } else {
                 console.error('Failed to load dashboard data:', result.message);
-                // toast.error(`Failed to load dashboard data: ${result.message}`);
+                toast.error(`Failed to load dashboard data: ${result.message}`);
             }
             } else {
             console.error('Failed to fetch data:', response.status);
-            // toast.error(`Failed to fetch data: ${response.status}`);
+            toast.error(`Failed to fetch data: ${response.status}`);
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
             if (error instanceof Error) {
-                // toast.error(`Error fetching dashboard data: ${error.message}`);
+                toast.error(`Error fetching dashboard data: ${error.message}`);
             } else {
-                // toast.error('Error fetching dashboard data');
+                toast.error('Error fetching dashboard data');
             }
         }
     };
@@ -141,13 +141,11 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                     const data = result.data;
                     
                     setPoData({
-                        // Get last 11 items from the arrays
                         po_done: data.po_closed.map((item: { count: number }) => item.count).slice(-12),
                         po_canceled: data.po_cancelled.map((item: { count: number }) => item.count).slice(-12)
                     });
 
                     setDnData({
-                        // Get last 12 items from the arrays
                         dn_done: data.dn_confirmed.map((item: { count: number }) => item.count).slice(-12),
                         dn_canceled: data.dn_cancelled.map((item: { count: number }) => item.count).slice(-12)
                     });
