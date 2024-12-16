@@ -20,6 +20,7 @@ const DeliveryNoteDetailEdit = () => {
     qtyConfirm: string;
     qtyDelivered: string;
     qtyMinus: string;
+    outstandings: { [wave: string]: string | number };
   }
 
   interface DNDetails {
@@ -39,8 +40,10 @@ const DeliveryNoteDetailEdit = () => {
   });
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
+  const [outstandingMode, setOutstandingMode] = useState(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
 
@@ -71,21 +74,46 @@ const DeliveryNoteDetailEdit = () => {
           confirmUpdateAt: dn.confirm_update_at,
         });
         
+        const waveNumberSet = new Set<number>();
 
-        const details = dn.detail.map((detail: any, index: number) => ({
-          no: (index + 1).toString(),
-          dnDetailNo: detail.dn_detail_no || '',
-          partNumber: detail.part_no || '-',
-          partName: detail.item_desc_a || '-',
-          UoM: detail.dn_unit || '-',
-          QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
-          qtyLabel: detail.dn_snp || '-',
-          qtyRequested: detail.dn_qty || '-',
-          qtyConfirm: detail.qty_confirm || '', 
-          qtyDelivered: detail.receipt_qty || '-',
-          qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
-        }));
-        
+        const details = dn.detail.map((detail: any, index: number) => {
+          const outstandings: { [wave: string]: string | number } = {};
+
+          if (detail.outstanding && typeof detail.outstanding === 'object') {
+            for (const key in detail.outstanding) {
+              const qtyArray = detail.outstanding[key]; // e.g., [50]
+              if (qtyArray && qtyArray.length > 0) {
+                const qty = qtyArray[0]; // Assuming the first element
+                outstandings[key] = qty;
+
+                // Extract wave number
+                const waveMatch = key.match(/wave_(\d+)/);
+                if (waveMatch && waveMatch[1]) {
+                  const waveNumber = parseInt(waveMatch[1], 10);
+                  waveNumberSet.add(waveNumber);
+                }
+              }
+            }
+          }
+
+          return {
+            no: (index + 1).toString(),
+            dnDetailNo: detail.dn_detail_no || '',
+            partNumber: detail.part_no || '-',
+            partName: detail.item_desc_a || '-',
+            UoM: detail.dn_unit || '-',
+            QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
+            qtyLabel: detail.dn_snp || '-',
+            qtyRequested: detail.dn_qty || '-',
+            qtyConfirm: detail.qty_confirm || '', 
+            qtyDelivered: detail.receipt_qty || '-',
+            qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
+            outstandings,
+          };
+        });
+
+        const waveNumbersArray = Array.from(waveNumberSet).sort((a, b) => a - b);
+        setWaveNumbers(waveNumbersArray);
         setFilteredData(details);
         setLoading(false);
       } else {
@@ -108,7 +136,6 @@ const DeliveryNoteDetailEdit = () => {
   }, [noDN]);
 
   const handleConfirmMode = () => {
-    // Saat tombol Confirm Order diklik, isi qtyConfirm dengan qtyRequested jika qtyConfirm kosong
     const updatedData = filteredData.map((detail) => ({
       ...detail,
       qtyConfirm: detail.qtyConfirm || detail.qtyRequested,
@@ -118,8 +145,27 @@ const DeliveryNoteDetailEdit = () => {
     setIsCheckboxChecked(false);
   };
 
+  const handleAddOutstanding = () => {
+    const newWaveNumber = waveNumbers.length > 0 ? Math.max(...waveNumbers) + 1 : 1;
+    setWaveNumbers([...waveNumbers, newWaveNumber]);
+
+    const updatedData = filteredData.map(detail => {
+      return {
+        ...detail,
+        outstandings: {
+          ...detail.outstandings,
+          [`wave_${newWaveNumber}`]: ''
+        }
+      };
+    });
+    setFilteredData(updatedData);
+    setOutstandingMode(true);
+    setIsCheckboxChecked(false);
+  };
+
   const handleCancel = () => {
     setConfirmMode(false);
+    setOutstandingMode(false);
     fetchDeliveryNotes();
   };
 
@@ -142,49 +188,104 @@ const DeliveryNoteDetailEdit = () => {
     setFilteredData(updatedData);
   };
 
+  const handleOutstandingQtyChange = (index: number, waveKey: string, value: string) => {
+    const updatedData = [...filteredData];
+    updatedData[index].outstandings[waveKey] = value;
+    setFilteredData(updatedData);
+  };
+
   const handleSubmit = async () => {
-    const updates = filteredData.map(detail => ({
-      dn_detail_no: detail.dnDetailNo,
-      qty_confirm: parseInt(detail.qtyConfirm),
-    }));
-
-    const payload = {
-      no_dn: dnDetails.noDN,
-      updates: updates,
-    };
-
-    try {
-      const response = await fetch(`${API_Update_DN()}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) throw new Error('Failed to update DN details');
-
-      toast.success('Data submitted successfully!');
-      Swal.fire({
-        title: 'Success',
-        text: 'Data submitted successfully!', 
-        icon: 'success',
-        confirmButtonColor: '#1e3a8a'
-      });
-      setConfirmMode(false);
-      setIsCheckboxChecked(false);
-      fetchDeliveryNotes();
-    } catch (error) {
-      console.error('Failed to update DN details:', error);
-      if (error instanceof Error) {
-        toast.error(`Failed to update DN details: ${error.message}`);
-      } else {
-        toast.error('Failed to update DN details');
+    if (confirmMode) {
+      const updates = filteredData.map(detail => ({
+        dn_detail_no: detail.dnDetailNo,
+        qty_confirm: parseInt(detail.qtyConfirm || '0', 10),
+      }));
+  
+      const payload = {
+        no_dn: dnDetails.noDN,
+        updates: updates,
+      };
+  
+      try {
+        const response = await fetch(`${API_Update_DN()}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) throw new Error('Failed to update DN details');
+  
+        toast.success('Data submitted successfully!');
+        Swal.fire({
+          title: 'Success',
+          text: 'Data submitted successfully!', 
+          icon: 'success',
+          confirmButtonColor: '#1e3a8a'
+        });
+        setConfirmMode(false);
+        setIsCheckboxChecked(false);
+        fetchDeliveryNotes();
+      } catch (error) {
+        console.error('Failed to update DN details:', error);
+        if (error instanceof Error) {
+          toast.error(`Failed to update DN details: ${error.message}`);
+        } else {
+          toast.error('Failed to update DN details');
+        }
+        Swal.fire('Error', 'Failed to update DN details.', 'error');
       }
-      Swal.fire('Error', 'Failed to update DN details.', 'error');
+    } else if (outstandingMode) {
+      const latestWaveNumber = Math.max(...waveNumbers);
+      const updates = filteredData.map(detail => {
+        const waveKey = `wave_${latestWaveNumber}`;
+        return {
+          dn_detail_no: detail.dnDetailNo,
+          qty_confirm: parseInt(detail.outstandings[waveKey] as string || '0', 10)
+        };
+      });
+
+      const payload = {
+        no_dn: dnDetails.noDN,
+        updates: updates,
+      };
+
+      try {
+        const response = await fetch(`${API_Update_DN()}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) throw new Error('Failed to update DN details');
+
+        Swal.fire({
+          title: 'Success',
+          text: 'Data submitted successfully!', 
+          icon: 'success',
+          confirmButtonColor: '#1e3a8a'
+        });
+        setOutstandingMode(false);
+        setIsCheckboxChecked(false);
+        fetchDeliveryNotes();
+      } catch (error) {
+        console.error('Failed to update DN details:', error);
+        if (error instanceof Error) {
+          toast.error(`Failed to update DN details: ${error.message}`);
+        } else {
+          toast.error('Failed to update DN details');
+        }
+        Swal.fire('Error', 'Failed to update DN details.', 'error');
+      }
     }
   };
+
+  const allQtyConfirmMatch = filteredData.every(detail => detail.qtyConfirm === detail.qtyRequested);
 
   const handlePrintDN = () => {
     window.open(`/#/print/delivery-note?noDN=${noDN}`, '_blank');
@@ -208,6 +309,12 @@ const DeliveryNoteDetailEdit = () => {
       ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Minus']
     ];
 
+    // Add wave headers if any
+    if (waveNumbers.length > 0) {
+      const waveHeaders = waveNumbers.map(num => `QTY Outstanding ${num}`);
+      headerRows[5] = [...headerRows[5], ...waveHeaders];
+    }
+
     // Add worksheet configuration to merge cells
     const merges = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
@@ -217,41 +324,52 @@ const DeliveryNoteDetailEdit = () => {
     ];
 
     // Convert all data to array format (including the actual data rows)
-    const dataRows = filteredData.map(row => [
-      row.no,
-      row.partNumber,
-      row.partName,
-      row.UoM,
-      Number(row.QTY) || 0,
-      Number(row.qtyLabel) || 0,
-      Number(row.qtyRequested) || 0,
-      Number(row.qtyConfirm) || 0,
-      Number(row.qtyDelivered) || 0,
-      Number(row.qtyMinus) || 0
-    ]);
+    const dataRows = filteredData.map(row => {
+      const baseData = [
+        row.no,
+        row.partNumber,
+        row.partName,
+        row.UoM,
+        Number(row.QTY) || 0,
+        Number(row.qtyLabel) || 0,
+        Number(row.qtyRequested) || 0,
+        Number(row.qtyConfirm) || 0,
+        Number(row.qtyDelivered) || 0,
+        Number(row.qtyMinus) || 0
+      ];
+      const waveData = waveNumbers.map(num => Number(row.outstandings[`wave_${num}`]) || 0);
+      return [...baseData, ...waveData];
+    });
   
     // Calculate totals
-    const totals = {
-      qtyPO: dataRows.reduce((sum, row) => sum + Number(row[4] || 0), 0),
-      qtyLabel: dataRows.reduce((sum, row) => sum + Number(row[5] || 0), 0),
-      qtyRequested: dataRows.reduce((sum, row) => sum + Number(row[6] || 0), 0),
-      qtyConfirm: dataRows.reduce((sum, row) => sum + Number(row[7] || 0), 0),
-      qtyDelivered: dataRows.reduce((sum, row) => sum + Number(row[8] || 0), 0),
-      qtyMinus: dataRows.reduce((sum, row) => sum + Number(row[9] || 0), 0)
-    };
-  
+    const totalsBase = dataRows.reduce((acc, row) => {
+      return {
+        qtyPO: acc.qtyPO + Number(row[4] || 0),
+        qtyLabel: acc.qtyLabel + Number(row[5] || 0),
+        qtyRequested: acc.qtyRequested + Number(row[6] || 0),
+        qtyConfirm: acc.qtyConfirm + Number(row[7] || 0),
+        qtyDelivered: acc.qtyDelivered + Number(row[8] || 0),
+        qtyMinus: acc.qtyMinus + Number(row[9] || 0)
+      };
+    }, { qtyPO: 0, qtyLabel: 0, qtyRequested: 0, qtyConfirm: 0, qtyDelivered: 0, qtyMinus: 0 });
+
+    const totalsWaves = waveNumbers.map((num, idx) => {
+      return dataRows.reduce((sum, row) => sum + Number(row[10 + idx] || 0), 0);
+    });
+
     // Add totals row
     const totalsRow = [
       'Totals:',
       '',
       '',
       '',
-      totals.qtyPO,
-      totals.qtyLabel,
-      totals.qtyRequested,
-      totals.qtyConfirm,
-      totals.qtyDelivered,
-      totals.qtyMinus
+      totalsBase.qtyPO,
+      totalsBase.qtyLabel,
+      totalsBase.qtyRequested,
+      totalsBase.qtyConfirm,
+      totalsBase.qtyDelivered,
+      totalsBase.qtyMinus,
+      ...totalsWaves
     ];
   
     // Combine all rows
@@ -261,8 +379,8 @@ const DeliveryNoteDetailEdit = () => {
     const ws = XLSX.utils.aoa_to_sheet(allRows);
     ws['!merges'] = merges;
   
-    // Set column widths
-    const colWidths = [
+    // Set column widths (need to adjust based on dynamic columns)
+    const baseColWidths = [
       { wch: 5 },  // No
       { wch: 25 }, // Part Number
       { wch: 40 }, // Part Name
@@ -274,7 +392,8 @@ const DeliveryNoteDetailEdit = () => {
       { wch: 12 }, // QTY Delivered
       { wch: 10 }  // QTY Minus
     ];
-    ws['!cols'] = colWidths;
+    const waveColWidths = waveNumbers.map(() => ({ wch: 12 }));
+    ws['!cols'] = [...baseColWidths, ...waveColWidths];
   
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Delivery Note Detail');
@@ -370,45 +489,29 @@ const DeliveryNoteDetailEdit = () => {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th
-                      className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]"
-                    >
-                      No
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">
-                      Part Number
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[24%]">
-                      Part Name
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      UoM
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY PO
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY Label
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY Requested
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY Confirm
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY Delivered
-                    </th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      QTY Minus
-                    </th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">No</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Number</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[24%]">Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">UoM</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY PO</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Label</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Requested</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Confirm</th>
+                    {waveNumbers.map((waveNumber) => (
+                      <th key={`qtyOutstanding${waveNumber}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b">
+                        {'Outstanding ' + waveNumber}
+                      </th>
+                    ))}
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
+                    
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {loading ? (
                     Array.from({ length: 5 }).map((_, index) => (
                       <tr key={index} className="animate-pulse">
-                        {Array.from({ length: 10 }).map((_, idx) => (
+                        {Array.from({ length: 10 + waveNumbers.length }).map((_, idx) => (
                           <td key={idx} className="px-3 py-3 text-center whitespace-nowrap">
                             <div className="h-4 bg-gray-200 rounded"></div>
                           </td>
@@ -445,17 +548,36 @@ const DeliveryNoteDetailEdit = () => {
                             detail.qtyConfirm || '-'
                           )}
                         </td>
+                        {waveNumbers.map((waveNumber) => {
+                          const waveKey = `wave_${waveNumber}`;
+                          const qtyValue = detail.outstandings[waveKey] ?? '-';
+                          return (
+                            <td key={`qtyOutstanding${waveNumber}`} className="px-3 py-3 text-center whitespace-nowrap">
+                              {outstandingMode && waveNumber === Math.max(...waveNumbers) ? (
+                                <input
+                                  type="number"
+                                  className="border border-gray-300 rounded text-center"
+                                  value={qtyValue}
+                                  onChange={(e) => handleOutstandingQtyChange(index, waveKey, e.target.value)}
+                                />
+                              ) : (
+                                qtyValue
+                              )}
+                            </td>
+                          );
+                        })}
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           {detail.qtyDelivered}
                         </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           {isNaN(Number(detail.qtyMinus)) ? '-' : detail.qtyMinus}
                         </td>
+                        
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={10} className="px-3 py-4 text-center text-gray-500">
+                      <td colSpan={10 + waveNumbers.length} className="px-3 py-4 text-center text-gray-500">
                         No details available for this delivery note
                       </td>
                     </tr>
@@ -467,16 +589,31 @@ const DeliveryNoteDetailEdit = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center">
-            {!confirmMode && (
-              <button
-                onClick={handleConfirmMode}
-                className="bg-blue-900 text-white px-4 py-2 rounded-lg"
-              >
-                {dnDetails.confirmUpdateAt ? 'Edit' : 'Confirm Order'}
-              </button>
+            {!confirmMode && !outstandingMode && (
+              <>
+                {dnDetails.confirmUpdateAt ? (
+                  <button
+                    onClick={handleAddOutstanding}
+                    className={`px-4 py-2 rounded-lg ${
+                      allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'
+                    }`}
+                    disabled={allQtyConfirmMatch}
+                    title={allQtyConfirmMatch ? 'QTY Confirm Exactly Matched' : ''}
+                  >
+                    Add Outstanding
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleConfirmMode}
+                    className="bg-blue-900 text-white px-4 py-2 rounded-lg"
+                  >
+                    Confirm Order
+                  </button>
+                )}
+              </>
             )}
 
-            {confirmMode && (
+            {(confirmMode || outstandingMode) && (
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -493,12 +630,12 @@ const DeliveryNoteDetailEdit = () => {
             )}
           </div>
           <div className="flex items-center mb-20">
-            {confirmMode && (
+            {(confirmMode || outstandingMode) && (
               <>
                 <button
                   onClick={handleSubmit}
                   className={`bg-green-600 text-white px-6 py-2 rounded-lg mr-2 ${
-                    !isCheckboxChecked ? 'opacity-50 cursor-not-allowed' : ''
+                    !isCheckboxChecked ? 'opacity-40 cursor-not-allowed' : ''
                   }`}
                   disabled={!isCheckboxChecked}
                 >
