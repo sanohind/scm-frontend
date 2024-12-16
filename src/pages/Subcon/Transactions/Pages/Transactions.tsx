@@ -4,14 +4,14 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
-import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../api/api';
+import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../../api/api';
 import Swal from 'sweetalert2';
-import DatePicker from '../../../components/Forms/DatePicker';
+import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
 
-const StockManagement = () => {
+const Transactions = () => {
   const [value, setValue] = useState(0);
   const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
   const [status, setStatus] = useState('');
@@ -370,4 +370,4 @@ const StockManagement = () => {
   );
 };
 
-export default StockManagement;
+export default Transactions;

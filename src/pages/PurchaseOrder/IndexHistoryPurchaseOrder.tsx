@@ -12,7 +12,7 @@ const IndexHistoryPurchaseOrder: React.FC = () => {
   
     if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
       return <HistoryPurchaseOrder />;
-    } else if (userRole === 'admin-purchasing') {
+    } else if (userRole === 'admin-purchasing' || userRole === 'super-user') {
       return <PurchasingHistoryPurchaseOrder />;
     } else {
       return <div>No dashboard available for your role.</div>;

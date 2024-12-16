@@ -20,13 +20,14 @@ import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchas
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
 import PrintPO from "./pages/Print/PrintPO";
-import Transactions from "./pages/Subcon/Transactions/Transactions";
+import Transactions from "./pages/Subcon/Transactions/Pages/Transactions";
 import PrintDN from "./pages/Print/PrintDN";
 import PrintLabel from "./pages/Print/PrintLabel";
 import IndexTransactionsReport from "./pages/Subcon/TransactionsReport/IndexTransactionReport";
 import IndexStockItems from "./pages/Subcon/StockItems/IndexStockItems";
 import { AddItems } from "./pages/Subcon/AddItems/AddItems";
 import ManageItems from "./pages/Subcon/ManageItems.tsx/MangeItems";
+import IndexTransactions from "./pages/Subcon/Transactions/IndexTransactions";
 
 const App: React.FC = () => {
   return (
@@ -229,7 +230,7 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['5','6','8','9']}>
                   <PageTitle title="Transaksi | PT SANOH INDONESIA" />
-                  <Transactions />
+                  <IndexTransactions />
                 </ProtectedRoute>
               }
             />

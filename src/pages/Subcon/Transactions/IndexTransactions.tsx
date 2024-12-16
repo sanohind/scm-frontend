@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import TransactionReport from "./Pages/TransactionsReport";
-import AdminTransactionReport from "./Pages/AdminTransactionReport";
+import Transactions from "./Pages/Transactions";
+import AdminTransactions from "./Pages/AdminTransactions";
 
-const IndexTransactionsReport: React.FC = () => {
+const IndexTransactions: React.FC = () => {
     const [userRole, setUserRole] = useState<string>('');
 
     useEffect(() => {
@@ -11,12 +11,12 @@ const IndexTransactionsReport: React.FC = () => {
     }, []);
 
     if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
-        return <TransactionReport />;
-    } else if (userRole === 'admin-subcont' || userRole === 'super-user') {
-        return <AdminTransactionReport />;
+        return <Transactions />;
+    } else if (userRole === 'admin-subcont') {
+        return <AdminTransactions />;
     } else {
         return <div>No dashboard available for your role.</div>;
     }
 };
 
-export default IndexTransactionsReport;
+export default IndexTransactions;

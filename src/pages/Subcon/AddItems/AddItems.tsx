@@ -1,17 +1,22 @@
 import { useEffect, useState, ChangeEvent, useRef } from 'react';
 import Select from 'react-select';
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
+import { toast, ToastContainer } from 'react-toastify';
+import { API_Create_Item_Subcont_Admin,  API_List_Item_ERP_Subcont_Admin,  API_List_Partner_Admin } from '../../../api/api';
+import Swal from 'sweetalert2';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { FaDownload, FaTimes, FaUpload } from 'react-icons/fa';
 
 interface SupplierOption {
     value: string;
     label: string;
 }
-import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Item_Subcont_Admin,  API_List_Partner_Admin } from '../../../api/api';
-import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
-import { FaDownload, FaTimes, FaUpload } from 'react-icons/fa';
+
+interface ItemOption {
+    value: string;
+    label: string;
+}
 
 export const AddItems = () => {
     const [suppliers, setSuppliers] = useState([]);
@@ -20,11 +25,13 @@ export const AddItems = () => {
     const [partNumber, setPartNumber] = useState('');
     const [excelData, setExcelData] = useState<any[]>([]);
     const [isExcelMode, setIsExcelMode] = useState(false);
+    const [itemOptions, setItemOptions] = useState<ItemOption[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement>(null); // Menambahkan useRef
 
     useEffect(() => {
         fetchSuppliers();
+        fetchItems();
     }, []);
 
     useEffect(() => {
@@ -71,6 +78,32 @@ export const AddItems = () => {
         } catch (error) {
             console.error('Error fetching suppliers:', error);
             toast.error('Failed to fetch suppliers list');
+        }
+    };
+
+    const fetchItems = async () => {
+        const token = localStorage.getItem('access_token');
+        try {
+            const response = await fetch(API_List_Item_ERP_Subcont_Admin(), {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch items');
+
+            const result = await response.json();
+            const itemsList = result.data.map((item: any) => ({
+                value: item.item_name,
+                label: `${item.item_name} || ${item.alias}`,
+            }));
+
+            setItemOptions(itemsList);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            toast.error('Failed to fetch items list');
         }
     };
 
@@ -186,14 +219,25 @@ export const AddItems = () => {
         setExcelData([...excelData, { bp_code: '', item_code: '', item_name: '' }]);
     };
 
+    const handlePartNumberChange = (selectedOption: ItemOption | null) => {
+        if (selectedOption) {
+            const [itemName, alias] = selectedOption.label.split(' || ');
+            setPartNumber(itemName);
+            setPartName(alias);
+        } else {
+            setPartNumber('');
+            setPartName('');
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+    
         if (!selectedSupplier) {
             toast.error('Please select a supplier');
             return;
         }
-
+    
         const confirm = await Swal.fire({
             title: 'Confirm Submission',
             html: `
@@ -209,24 +253,24 @@ export const AddItems = () => {
             cancelButtonColor: '#dc2626',
             confirmButtonText: 'Yes, Submit It!'
         });
-
+    
         if (!confirm.isConfirmed) {
             return;
         }
-
+    
         try {
             const token = localStorage.getItem('access_token');
             if (!token) {
                 toast.error('Authentication token not found');
                 return;
             }
-
+    
             const itemData = {
                 bp_code: selectedSupplier.value,
                 item_name: partName,
                 item_code: partNumber,
             };
-
+    
             const response = await fetch(API_Create_Item_Subcont_Admin(), {
                 method: 'POST',
                 headers: {
@@ -235,13 +279,13 @@ export const AddItems = () => {
                 },
                 body: JSON.stringify(itemData)
             });
-
+    
             if (!response.ok) throw new Error('Failed to submit');
-
+    
             toast.success('Item added successfully');
             
-            // Clear form
-            setSelectedSupplier(null);
+            // Clear form fields
+            
             setPartName('');
             setPartNumber('');
             
@@ -290,12 +334,13 @@ export const AddItems = () => {
                                     <label className="mb-2.5 block text-black dark:text-white">
                                         Part Number <span className="text-meta-1">*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={partNumber}
-                                        onChange={(e) => setPartNumber(e.target.value)}
-                                        placeholder="Enter Part Number"
-                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
+                                    <Select
+                                        options={itemOptions}
+                                        value={itemOptions.find(option => option.value === partNumber)}
+                                        onChange={handlePartNumberChange}
+                                        placeholder="Select Part Number"
+                                        className="w-full"
+                                        isClearable
                                         required
                                     />
                                 </div>

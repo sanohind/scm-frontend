@@ -13,7 +13,7 @@ const IndexStockItems: React.FC = () => {
   
     if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
       return <StockItems />;
-    } else if (userRole === 'admin-subcont') {
+    } else if (userRole === 'admin-subcont' || userRole === 'super-user') {
       return <AdminStockItems />;
     } else {
       return <div>No dashboard available for your role.</div>;

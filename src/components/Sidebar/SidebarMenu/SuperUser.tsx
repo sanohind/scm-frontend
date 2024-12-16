@@ -97,5 +97,5 @@ export const SuperUser = () => {
                 </ul>
             </div>
         </div>
-    )
-}
+    );
+};
