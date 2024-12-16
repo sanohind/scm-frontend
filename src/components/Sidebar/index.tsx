@@ -9,6 +9,7 @@ import { SupplierSubcontMarketing } from './SidebarMenu/SupplierSubcontMarketing
 import { SupplierMarketing } from './SidebarMenu/SupplierMarketing';
 import { SupplierSubcont } from './SidebarMenu/SupplierSubcont';
 import { SupplierWarehouse } from './SidebarMenu/SupplierWarehouse';
+import { SuperUser } from './SidebarMenu/SuperUser';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -109,6 +110,8 @@ const Sidebar : React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen, role })
 
           {role === 'super-admin' ? (
             <SuperAdmin />
+          ) : role === 'super-user' ? (
+            <SuperUser />
           ) : role === 'admin-purchasing' ? (
             <AdminPurchasing />
           ) : role === 'admin-warehouse' ? (

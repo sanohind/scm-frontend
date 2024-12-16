@@ -4,7 +4,7 @@ const Unauthorized = () => {
   const navigate = useNavigate();
 
   const handleRedirect = () => {
-    navigate('/'); // Mengarahkan ke halaman dashboard
+    navigate('/');
   };
   
   return (

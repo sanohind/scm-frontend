@@ -229,6 +229,7 @@ const EditUser = () => {
                 >
                   <option value="" disabled>Select a role</option>
                   <option value="1">Super Admin</option>
+                  <option value="9">Super User</option>
                   <option value="2">Admin Purchasing</option>
                   <option value="3">Admin Warehouse</option>
                   <option value="4">Admin Subcont</option>

@@ -10,7 +10,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
     const { isAuthenticated, userRole, isLoading } = useAuth();
 
-    // Tampilkan loading atau spinner saat status otentikasi sedang dimuat
     if (isLoading) {
         return <div>Loading...</div>;
     }

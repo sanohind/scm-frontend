@@ -58,6 +58,9 @@ const SignIn: React.FC = () => {
         case '8':
           localStorage.setItem("role", "supplier-subcont");          
           break;
+        case '9':
+          localStorage.setItem("role", "super-user");          
+          break;
         default:
           toast.error('Role not found!');
           break;
