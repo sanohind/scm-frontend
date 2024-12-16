@@ -171,22 +171,19 @@ const StockManagement = () => {
           now.getSeconds(),
         );
 
-        const formattedDate = `${String(transactionDateTime.getDate()).padStart(2, '0')}/${String(
-          transactionDateTime.getMonth() + 1,
-        ).padStart(2, '0')}/${transactionDateTime.getFullYear()} ${String(
-          transactionDateTime.getHours(),
-        ).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(
-          transactionDateTime.getSeconds(),
-        ).padStart(2, '0')}`;
+        const actualTransactionDate = `${transactionDateTime.getFullYear()}-${String(transactionDateTime.getMonth() + 1).padStart(2, '0')}-${String(transactionDateTime.getDate()).padStart(2, '0')}`;
+        const actualTransactionTime = `${String(transactionDateTime.getHours()).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(transactionDateTime.getSeconds()).padStart(2, '0')}`;
+
 
         return {
+          actual_transaction_date: actualTransactionDate,
+          actual_transaction_time: actualTransactionTime,
           transaction_type: value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing',
           status: status,
           delivery_note: deliveryNote || null,
           item_code: part.partNumber,
-          qty_ok: part.qtyOk || '0',
-          qty_ng: part.qtyNg || '0',
-          date: formattedDate,
+          qty_ok: parseInt(part.qtyOk || '0', 10),
+          qty_ng: parseInt(part.qtyNg || '0', 10),
         };
       });
 
@@ -196,7 +193,7 @@ const StockManagement = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ transactions }),
+        body: JSON.stringify({ data: transactions }),
       });
 
       if (!response.ok) throw new Error('Failed to submit');
