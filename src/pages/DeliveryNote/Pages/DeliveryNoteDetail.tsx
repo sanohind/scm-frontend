@@ -7,6 +7,7 @@ import { API_DN_Detail } from '../../../api/api';
 import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx';
+import { Dropdown } from 'flowbite-react';
 
 const DeliveryNoteDetail = () => {
   interface Detail {
@@ -172,12 +173,12 @@ const DeliveryNoteDetail = () => {
 
   const handlePageChange = (page: number) => setCurrentPage(page);
 
-  const handlePrintDN = () => {
-    window.open(`/#/print/delivery-note?noDN=${noDN}`, '_blank');
+  const handlePrintDN = (status: string) => {
+    window.open(`/#/print/delivery-note?noDN=${noDN}&status=${status}`, '_blank');
   };
 
-  const handlePrintLabel = () => {
-    window.open(`/#/print/label/delivery-note?noDN=${noDN}`, '_blank');
+  const handlePrintLabel = (status: string) => {
+    window.open(`/#/print/label/delivery-note?noDN=${noDN}&status=${status}`, '_blank');
   };
 
   const handleDownloadExcel = () => {
@@ -347,26 +348,49 @@ const DeliveryNoteDetail = () => {
               </div>
               {/* Print Buttons */}
               <div className="flex gap-2 items-center">
-                <button
-                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-6 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
-                  onClick={handlePrintLabel}
+                <Dropdown 
+                  label={
+                  <div className="flex items-center gap-2">
+                    <FaPrint className="w-4 h-4" />
+                    <span>Print DN</span>
+                  </div>
+                  } 
+                  dismissOnClick={false} 
+                  style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
                 >
-                  <FaPrint className="w-4 h-4" />
-                  <span>Print Label</span>
-                </button>
-                <button
-                  className="md:w-auto flex items-center justify-center gap-2 px-6 md:px-8 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
-                  onClick={handlePrintDN}
+                  <Dropdown.Item onClick={() => handlePrintDN('all')}>Print All</Dropdown.Item>
+                  <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
+                  {waveNumbers.map((waveNumber) => (
+                  <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
+                    {`Print Outstanding ${waveNumber}`}
+                  </Dropdown.Item>
+                  ))}
+                </Dropdown>
+                <Dropdown 
+                  label={
+                  <div className="flex items-center gap-2">
+                    <FaPrint className="w-4 h-4" />
+                    <span>Print Label</span>
+                  </div>
+                  }
+                  dismissOnClick={false} 
+                  style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
                 >
-                  <FaPrint className="w-4 h-4" />
-                  <span>Print DN</span>
-                </button>
+                  <Dropdown.Item onClick={() => handlePrintLabel('all')}>Print All</Dropdown.Item>
+                  <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
+                  {waveNumbers.map((waveNumber) => (
+                  <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
+                    {`Print Outstanding ${waveNumber}`}
+                  </Dropdown.Item>
+                  ))}
+                </Dropdown>
+
                 <button
-                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-4 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                  className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-[#1e3a8a] rounded-lg focus:ring-4 hover:ring-4 focus:outline-none focus:ring-blue-300"
                   onClick={handleDownloadExcel}
                 >
                   <FaFileExcel className="w-4 h-4" />
-                  <span>Download Excel</span>
+                  Download Excel
                 </button>
               </div>
             </div>
