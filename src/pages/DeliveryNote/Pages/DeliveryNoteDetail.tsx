@@ -8,6 +8,7 @@ import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import { Dropdown } from 'flowbite-react';
+import Button from '../../../components/Forms/Button';
 
 const DeliveryNoteDetail = () => {
   interface Detail {
@@ -385,13 +386,11 @@ const DeliveryNoteDetail = () => {
                   ))}
                 </Dropdown>
 
-                <button
-                  className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-[#1e3a8a] rounded-lg focus:ring-4 hover:ring-4 focus:outline-none focus:ring-blue-300"
+                <Button
+                  title="Download Excel"
+                  icon={FaFileExcel}
                   onClick={handleDownloadExcel}
-                >
-                  <FaFileExcel className="w-4 h-4" />
-                  Download Excel
-                </button>
+                />
               </div>
             </div>
 

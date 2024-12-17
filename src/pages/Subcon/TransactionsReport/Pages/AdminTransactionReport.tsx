@@ -9,6 +9,7 @@ import * as XLSX from 'xlsx';
 import SearchBar from '../../../../components/Table/SearchBar';
 import { API_List_Item_Subcont_Admin, API_List_Partner_Admin, API_Transaction_Report_Subcont_Admin } from '../../../../api/api';
 import DatePicker from '../../../../components/Forms/DatePicker';
+import Button from '../../../../components/Forms/Button';
 
 const AdminTransactionReport = () => {
     interface TransactionLog {
@@ -379,13 +380,11 @@ const AdminTransactionReport = () => {
                                 </div>
                                 {/* Download Buttons */}
                                 <div className="flex gap-2 self-center">
-                                    <button
-                                        className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
+                                    <Button
+                                        title="Download Excel"
                                         onClick={handleDownloadExcel}
-                                    >
-                                        <FaFileExcel className="w-4 h-4" />
-                                        <span>Download Excel</span>
-                                    </button>
+                                        icon={FaFileExcel}
+                                    />
                                 </div>
                             </div>
                         </div>

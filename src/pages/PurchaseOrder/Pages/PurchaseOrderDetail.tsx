@@ -7,6 +7,7 @@ import { API_PO_Detail } from '../../../api/api';
 import Swal from 'sweetalert2';
 import { FaSortDown, FaSortUp, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
+import Button from '../../../components/Forms/Button';
 
 const PurchaseOrderDetail = () => {
   interface DetailData {
@@ -193,13 +194,12 @@ const PurchaseOrderDetail = () => {
 
               {/* Print Button */}
               <div className="flex items-center">
-                <button
-                  className="md:w-auto flex items-center justify-center gap-2 px-4 md:px-6 py-2 text-sm md:text-base font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors duration-200 shadow-md hover:shadow-lg"
+                <Button
+                  title="Print PO"
+                  icon={FaPrint}
                   onClick={handlePrintPO}
-                >
-                  <FaPrint className="w-4 h-4" />
-                  <span>Print PO</span>
-                </button>
+                  className='px-4 md:px-6'
+                />
               </div>
             </div>
 

@@ -13,6 +13,7 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../../components/Table/Pagination';
 import SearchBar from '../../../components/Table/SearchBar';
 import { toast, ToastContainer } from 'react-toastify';
+import Button from '../../../components/Forms/Button';
 
 const CreateForecast = () => {
     interface ForecastReport {
@@ -466,12 +467,16 @@ const CreateForecast = () => {
                                             className="text-sm cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-2 file:px-4 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter"
                                             onChange={handleFileChange}
                                         />
-                                        <button
+                                        {/* <button
                                             type="submit"
                                             className="w-full sm:w-auto px-5 py-2 bg-blue-900 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
                                         >
                                             Upload
-                                        </button>
+                                        </button> */}
+                                        <Button
+                                            title="Upload"
+                                            type="submit"
+                                        />
                                     </div>
                                 </div>
                             </div>

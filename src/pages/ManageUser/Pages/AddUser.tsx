@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_User_Admin, API_List_Partner_Admin } from '../../../api/api';
+import Button from '../../../components/Forms/Button';
 
 const AddUser = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -259,13 +260,12 @@ const AddUser = () => {
                   <span className="text-meta-1 text-sm mt-1">Password must be at least 8 characters</span>
                   )}
                 </div>
-                <button
-                  type="button"
+                
+                <Button
+                  title="Generate Password"
                   onClick={generateRandomPassword}
-                  className="w-full h-11 md:w-auto rounded bg-primary py-2 px-4 text-white hover:bg-opacity-90 text-sm"
-                >
-                  Generate Password
-                </button>
+                  className="md:self-center"
+                />
               </div>
             </div>
 

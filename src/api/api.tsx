@@ -62,6 +62,9 @@ export const API_List_Item_Subcont_Admin = () => API + getRolePath() + `/item/li
 export const API_Stock_Item_Subcont_Admin = () => API + getRolePath() + `/item/index/`;
 export const API_Transaction_Report_Subcont_Admin = () => API + getRolePath() + `/transaction/index/`;
 export const API_List_Item_ERP_Subcont_Admin = () => API + getRolePath() + `/item/list/item`;
+export const API_Manage_Item_Subcont_Admin = () => API + getRolePath() + `/item/all-list/`;
+export const API_Update_Item_Subcont_Admin = () => API + getRolePath() + `/item/update`;
+export const API_Delete_Item_Subcont_Admin = () => API + getRolePath() + `/item/delete`;
 
 // Purchase Order Supplier
 export const API_PO = () => API + getRolePath() + `/po/index`;

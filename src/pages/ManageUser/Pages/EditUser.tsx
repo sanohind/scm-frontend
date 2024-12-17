@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Edit_User_Admin, API_List_Partner_Admin, API_Update_User_Admin } from "../../../api/api";
+import Button from "../../../components/Forms/Button";
 
 
 const EditUser = () => {
@@ -305,13 +306,11 @@ const EditUser = () => {
                     </span>
                   )}
                 </div>
-                <button
-                  type="button"
+                <Button
+                  title="Generate Password"
                   onClick={generateRandomPassword}
-                  className="w-full h-11 md:w-auto rounded bg-primary py-2 px-4 text-white hover:bg-opacity-90 text-sm"
-                >
-                  Generate Password
-                </button>
+                  className="md:self-center"
+                />
               </div>
             </div>
 

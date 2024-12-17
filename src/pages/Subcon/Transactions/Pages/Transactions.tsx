@@ -10,6 +10,7 @@ import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
+import Button from '../../../../components/Forms/Button';
 
 const Transactions = () => {
   const [value, setValue] = useState(0);
@@ -286,13 +287,18 @@ const Transactions = () => {
                     />
                   </div>
                   {/* Add Button */}
-                  <button
+                  {/* <button
                     onClick={handleAddPart}
                     className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90 mb-4"
                   >
                     <FaPlus className="mr-2" />
                     Add Part
-                  </button>
+                  </button> */}
+                  <Button
+                    title="Add Part"
+                    onClick={handleAddPart}
+                    icon={FaPlus}
+                  />
 
                   {/* Preview List */}
                   {partList.length > 0 && (

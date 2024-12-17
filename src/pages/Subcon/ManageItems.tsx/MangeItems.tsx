@@ -12,6 +12,10 @@ import { FaEdit, FaTrash, FaPlus, FaToggleOn, FaToggleOff } from 'react-icons/fa
 //     API_Delete_Item_Subcont_Admin,
 // } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
+import { API_Delete_Item_Subcont_Admin, API_List_Partner_Admin, API_Manage_Item_Subcont_Admin, API_Update_Item_Subcont_Admin } from '../../../api/api';
+import Swal from 'sweetalert2';
+import { sub } from 'date-fns';
+import Button from '../../../components/Forms/Button';
 
 interface SupplierOption {
     value: string;
@@ -36,33 +40,6 @@ const ManageItems: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const dummySuppliers: SupplierOption[] = [
-        { value: 'SUP001', label: 'SUP001 | Supplier One' },
-        { value: 'SUP002', label: 'SUP002 | Supplier Two' },
-        { value: 'SUP003', label: 'SUP003 | Supplier Three' },
-      ];
-
-    const dummyItems: Item[] = [
-        {
-            item_id: 'ITEM001',
-            item_code: 'P001',
-            item_name: 'Part One',
-            status: 'Active',
-        },
-        {
-            item_id: 'ITEM002',
-            item_code: 'P002',
-            item_name: 'Part Two',
-            status: 'Deactive',
-        },
-        {
-            item_id: 'ITEM003',
-            item_code: 'P003',
-            item_name: 'Part Three',
-            status: 'Active',
-        },
-    ];
-
     useEffect(() => {
         fetchSuppliers();
     }, []);
@@ -81,62 +58,61 @@ const ManageItems: React.FC = () => {
     }, [suppliers]);
 
     const fetchSuppliers = async () => {
-        // const token = localStorage.getItem('access_token');
-        // try {
-        // const response = await fetch(API_List_Partner_Admin(), {
-        //     method: 'GET',
-        //     headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     'Content-Type': 'application/json',
-        //     },
-        // });
+        const token = localStorage.getItem('access_token');
+        try {
+        const response = await fetch(API_List_Partner_Admin(), {
+            method: 'GET',
+            headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            },
+        });
 
-        // if (!response.ok) throw new Error('Failed to fetch suppliers');
+        if (!response.ok) throw new Error('Failed to fetch suppliers');
 
-        // const result = await response.json();
-        // const suppliersList = result.data.map((supplier: any) => ({
-        //     value: supplier.bp_code,
-        //     label: `${supplier.bp_code} | ${supplier.bp_name}`,
-        // }));
+        const result = await response.json();
+        const suppliersList = result.data.map((supplier: any) => ({
+            value: supplier.bp_code,
+            label: `${supplier.bp_code} | ${supplier.bp_name}`,
+        }));
 
-        // setSuppliers(suppliersList);
-        // } catch (error) {
-        // console.error('Error fetching suppliers:', error);
-        // toast.error('Failed to fetch suppliers list');
-        // }
-        setSuppliers(dummySuppliers);
+        setSuppliers(suppliersList);
+        } catch (error) {
+        console.error('Error fetching suppliers:', error);
+        toast.error('Failed to fetch suppliers list');
+        }
     };
 
     const fetchItems = async (supplierCode: string) => {
-        // const token = localStorage.getItem('access_token');
-        // setLoading(true);
-        // try {
-        // const response = await fetch(`${API_List_Item_Subcont_Admin()}${supplierCode}`, {
-        //     method: 'GET',
-        //     headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     'Content-Type': 'application/json',
-        //     },
-        // });
+        const token = localStorage.getItem('access_token');
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_Manage_Item_Subcont_Admin()}${supplierCode}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        // if (!response.ok) throw new Error('Failed to fetch items');
+            if (!response.ok) throw new Error('Failed to fetch items');
 
-        // const result = await response.json();
-        // const itemsList = result.data.map((item: any) => ({
-        //     item_id: item.item_id,
-        //     item_code: item.part_number,
-        //     item_name: item.part_name,
-        //     status: item.status === 1 ? 'Active' : 'Deactive',
-        // }));
+            const result = await response.json();
+            const itemsList = result.data.map((item: any) => ({
+                item_id: item.item_id,
+                item_code: item.part_number,
+                item_name: item.part_name,
+                status: item.status === "1" ? 'Active' : 'Deactive',
+            }));
 
-        // setItems(itemsList);
-        // setLoading(false);
-        // } catch (error) {
-        // console.error('Error fetching items:', error);
-        // toast.error('Failed to fetch items');
-        // setLoading(false);
-        // }
-        setItems(dummyItems);
+            setItems(itemsList);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+            toast.error('Failed to fetch items');
+            setLoading(false);
+        }
+
         setLoading(false);
     };
 
@@ -184,117 +160,134 @@ const ManageItems: React.FC = () => {
     };
 
     const handleSubmit = async (itemId: string) => {
-        // const token = localStorage.getItem('access_token');
-        // const item = items.find((item) => item.item_id === itemId);
-        // if (!item) return;
+        const token = localStorage.getItem('access_token');
+        const item = items.find((item) => item.item_id === itemId);
+        if (!item) return;
 
-        // try {
-        // const response = await fetch(`${API_Update_Item_Admin()}${itemId}`, {
-        //     method: 'PUT',
-        //     headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //     item_code: item.item_code,
-        //     item_name: item.item_name,
-        //     }),
-        // });
+        const payload: any = { sub_item_id: itemId };
 
-        // if (!response.ok) throw new Error('Failed to update item');
+        if (item.item_code !== item.editedItemCode) {
+            payload.item_code = item.item_code;
+        }
 
-        // toast.success('Item updated successfully');
-        // setItems((prevItems) =>
-        //     prevItems.map((itm) =>
-        //     itm.item_id === itemId ? { ...itm, isEditing: false } : itm
-        //     )
-        // );
-        // } catch (error) {
-        // console.error('Error updating item:', error);
-        // toast.error('Failed to update item');
-        // }
+        if (item.item_name !== item.editedItemName) {
+            payload.item_name = item.item_name;
+        }
 
-        setItems((prevItems) =>
-            prevItems.map((item) =>
-                item.item_id === itemId ? { ...item, isEditing: false } : item
-            )
-        );
-        toast.success('Item updated successfully');
+        try {
+            const response = await fetch(API_Update_Item_Subcont_Admin(), {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const responseData = await response.json();
+
+            if (responseData.status === true) {
+                setItems((prevItems) =>
+                    prevItems.map((itm) =>
+                        itm.item_id === itemId ? { ...itm, isEditing: false } : itm
+                    )
+                );
+
+                toast.success(responseData.message);
+            }
+
+            if (!response.ok) throw new Error('Failed to update item');
+
+        } catch (error) {
+            console.error('Error updating item:', error);
+            toast.error('Failed to update item');
+        }
     };
 
     const handleStatusChange = async (itemId: string, status: string) => {
-        // const token = localStorage.getItem('access_token');
-        // const newStatus = status === 'Active' ? '0' : '1';
-        // try {
-        // const response = await fetch(`${API_Update_Item_Status_Admin()}${itemId}`, {
-        //     method: 'PUT',
-        //     headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //     status: newStatus,
-        //     }),
-        // });
+        const token = localStorage.getItem('access_token');
+        const newStatus = status === 'Active' ? '0' : '1';
+        try {
+            const response = await fetch(API_Update_Item_Subcont_Admin(), {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sub_item_id: itemId,
+                    status: newStatus,
+                }),
+            });
 
-        // if (!response.ok) throw new Error('Failed to update status');
+            if (!response.ok) throw new Error('Failed to update status');
+            
+            const responseData = await response.json();
 
-        // toast.success('Status updated successfully');
-        // setItems((prevItems) =>
-        //     prevItems.map((item) =>
-        //     item.item_id === itemId
-        //         ? { ...item, status: newStatus === '1' ? 'Active' : 'Deactive' }
-        //         : item
-        //     )
-        // );
-        // } catch (error) {
-        // console.error('Error updating status:', error);
-        // toast.error('Failed to update status');
-        // }
-        setItems((prevItems) =>
-            prevItems.map((item) =>
-                item.item_id === itemId
-                    ? { ...item, status: status === 'Active' ? 'Deactive' : 'Active' }
-                    : item
-            )
-        );
-
-        setLoading(false);
+            if (responseData.status === true) {
+                setItems((prevItems) =>
+                    prevItems.map((item) =>
+                        item.item_id === itemId
+                            ? { ...item, status: newStatus === '1' ? 'Active' : 'Deactive', isLoading: false }
+                            : item
+                    )
+                );
+                toast.success(responseData.message);
+            } else {
+                throw new Error(responseData.message || 'Failed to update status');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            toast.error('Failed to update status');
+            setItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.item_id === itemId
+                        ? { ...item, isLoading: false }
+                        : item
+                )
+            );
+        }
     };
 
     const handleDelete = async (itemId: string) => {
-        // const confirm = await Swal.fire({
-        // title: 'Are you sure?',
-        // text: 'This item will be deleted permanently!',
-        // icon: 'warning',
-        // showCancelButton: true,
-        // confirmButtonColor: '#1e3a8a',
-        // cancelButtonColor: '#d33',
-        // confirmButtonText: 'Yes, delete it!',
-        // });
+        const confirm = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'This item will be deleted permanently!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e3a8a',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        });
 
-        // if (!confirm.isConfirmed) return;
+        if (!confirm.isConfirmed) return;
 
-        // const token = localStorage.getItem('access_token');
-        // try {
-        // const response = await fetch(`${API_Delete_Item_Admin()}${itemId}`, {
-        //     method: 'DELETE',
-        //     headers: {
-        //     Authorization: `Bearer ${token}`,
-        //     'Content-Type': 'application/json',
-        //     },
-        // });
+        const token = localStorage.getItem('access_token');
+        try {
+        const response = await fetch(API_Delete_Item_Subcont_Admin(), {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sub_item_id: itemId
+            }),
+        });
 
-        // if (!response.ok) throw new Error('Failed to delete item');
+        const responseData = await response.json();
 
-        // toast.success('Item deleted successfully');
-        // setItems((prevItems) => prevItems.filter((item) => item.item_id !== itemId));
-        // } catch (error) {
-        // console.error('Error deleting item:', error);
-        // toast.error('Failed to delete item');
-        // }
+        if (responseData.status === true) {
+            setItems((prevItems) => prevItems.filter((item) => item.item_id !== itemId));
+            toast.success(responseData.message);
+        }
 
-        setItems((prevItems) => prevItems.filter((item) => item.item_id !== itemId));
+        if (!response.ok) throw new Error('Failed to delete item');
+
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            toast.error('Failed to delete item');
+        }
     };
 
     return (
@@ -306,13 +299,11 @@ const ManageItems: React.FC = () => {
             <div className="p-2 md:p-4 lg:p-6 space-y-6">
             {/* Header Section */}
             <div className="flex justify-between items-center">
-                <button
+                <Button
+                    title="Add Items"
                     onClick={() => navigate('/add-items')}
-                    className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                >
-                <FaPlus />
-                    Add Items
-                </button>
+                    icon={FaPlus}
+                />
             </div>
 
             {/* Supplier Selection */}

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { FaDownload, FaTimes, FaUpload } from 'react-icons/fa';
+import Button from '../../../components/Forms/Button';
 
 interface SupplierOption {
     value: string;
@@ -303,13 +304,18 @@ export const AddItems = () => {
                 {!isExcelMode ? (
                     <>
                         <div className="flex justify-end">
-                            <button
+                            {/* <button
                                 onClick={() => setIsExcelMode(true)}
                                 className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center gap-2"
                             >
                                 <FaUpload />
                                 Upload via Excel
-                            </button>
+                            </button> */}
+                            <Button
+                                title="Upload via Excel"
+                                onClick={() => setIsExcelMode(true)}
+                                icon={FaUpload}
+                            />
                         </div>
                         <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
                             <div className="grid grid-cols-1 gap-4">

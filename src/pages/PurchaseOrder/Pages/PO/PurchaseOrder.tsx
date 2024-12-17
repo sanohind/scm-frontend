@@ -8,6 +8,7 @@ import Pagination from '../../../../components/Table/Pagination';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_PO, API_Update_PO } from '../../../../api/api';
+import Button from '../../../../components/Forms/Button';
 
 const PurchaseOrder = () => {
   interface PurchaseOrder {
@@ -335,18 +336,18 @@ const PurchaseOrder = () => {
                             </div>
                           ) : (
                             <div className="flex gap-2 justify-center">
-                              <button
-                                className="px-4 py-2 bg-green-700 text-white rounded"
+                              <Button
+                                title="Accept"
+                                type="button"
                                 onClick={() => handleResponse(row.noPO, 'Accepted')}
-                              >
-                                Accept
-                              </button>
-                              <button
-                                className="px-4 py-2 bg-red-600 text-white rounded"
+                                color='bg-green-700'
+                              />
+                              <Button
+                                title="Decline"
+                                type="button"
                                 onClick={() => handleResponse(row.noPO, 'Declined')}
-                              >
-                                Decline
-                              </button>
+                                color='bg-red-600'
+                              />
                             </div>
                           )}
                         </td>

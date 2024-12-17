@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Dropdown } from 'flowbite-react';
 import * as XLSX from 'xlsx';
 import { API_DN_Detail, API_Update_DN } from '../../../api/api';
+import Button from '../../../components/Forms/Button';
 
 const DeliveryNoteDetailEdit = () => {
   interface Detail {
@@ -506,13 +507,11 @@ const DeliveryNoteDetailEdit = () => {
                   ))}
                 </Dropdown>
 
-                <button
-                  className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-center text-white bg-[#1e3a8a] rounded-lg focus:ring-4 hover:ring-4 focus:outline-none focus:ring-blue-300"
+                <Button
+                  title="Download Excel"
+                  icon={FaFileExcel}
                   onClick={handleDownloadExcel}
-                >
-                  <FaFileExcel className="w-4 h-4" />
-                  Download Excel
-                </button>
+                />
               </div>
             </div>
           </div>
@@ -620,23 +619,26 @@ const DeliveryNoteDetailEdit = () => {
             {!confirmMode && !outstandingMode && (
               <>
                 {dnDetails.confirmUpdateAt ? (
-                  <button
+                  // <button
+                  //   onClick={handleAddOutstanding}
+                  //   className={`px-4 py-2 rounded-lg ${
+                  //     allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'}`}
+                  //   disabled={allQtyConfirmMatch}
+                  //   title={allQtyConfirmMatch ? 'QTY Confirm Exactly Matched' : ''}
+                  // >
+                  //   Add Outstanding
+                  // </button>
+                  <Button
+                    title="Add Outstanding"
                     onClick={handleAddOutstanding}
-                    className={`px-4 py-2 rounded-lg ${
-                      allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'
-                    }`}
                     disabled={allQtyConfirmMatch}
-                    title={allQtyConfirmMatch ? 'QTY Confirm Exactly Matched' : ''}
-                  >
-                    Add Outstanding
-                  </button>
+                    className={allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'}
+                  />
                 ) : (
-                  <button
+                  <Button
+                    title="Confirm Order"
                     onClick={handleConfirmMode}
-                    className="bg-blue-900 text-white px-4 py-2 rounded-lg"
-                  >
-                    Confirm Order
-                  </button>
+                  />
                 )}
               </>
             )}
@@ -660,21 +662,18 @@ const DeliveryNoteDetailEdit = () => {
           <div className="flex items-center mb-20">
             {(confirmMode || outstandingMode) && (
               <>
-                <button
+                <Button
+                  title="Save"
                   onClick={handleSubmit}
-                  className={`bg-green-600 text-white px-6 py-2 rounded-lg mr-2 ${
-                    !isCheckboxChecked ? 'opacity-40 cursor-not-allowed' : ''
-                  }`}
                   disabled={!isCheckboxChecked}
-                >
-                  Save
-                </button>
-                <button
+                  className={`mr-2 px-6 ${!isCheckboxChecked ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  color='bg-green-600'
+                />
+                <Button
+                  title="Cancel"
                   onClick={handleCancel}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
+                  color='bg-red-600'
+                />
               </>
             )}
           </div>

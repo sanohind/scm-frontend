@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import { FaSyncAlt } from 'react-icons/fa';
+import { FaSyncAlt, FaSpinner } from 'react-icons/fa';
 import { API_Sync_Admin } from '../../../../api/api';
+import Button from '../../../../components/Forms/Button';
 
 const DashboardAdminPurchasingWarehouse: React.FC = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -71,7 +72,7 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="w-full sm:w-auto border border-gray-300 dark:border-strokedark rounded-md p-2 mb-4 sm:mb-0 sm:mr-4"
               />
-              <button
+              {/* <button
                 id="sync-button"
                 onClick={handleSync}
                 className={`w-full sm:w-auto flex items-center justify-center px-4 py-2 text-white rounded-md ${
@@ -88,7 +89,14 @@ const DashboardAdminPurchasingWarehouse: React.FC = () => {
                   <FaSyncAlt className="w-4 h-4 mr-2" />
                 )}
                 {isSyncing ? 'Syncing...' : 'Sync'}
-              </button>
+              </button> */}
+              <Button
+                title={isSyncing ? 'Syncing...' : 'Sync'}
+                onClick={handleSync}
+                icon={isSyncing ? FaSpinner : FaSyncAlt}
+                disabled={isSyncing}
+                iconClassName={isSyncing ? 'animate-spin' : ''}
+              />
             </div>
           </div>
         </div>

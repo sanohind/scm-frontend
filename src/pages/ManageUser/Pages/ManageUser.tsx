@@ -7,6 +7,7 @@ import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit, FaUserPlus }
 import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_List_User_Admin, API_Update_Status_Admin } from '../../../api/api';
+import Button from '../../../components/Forms/Button';
 
 interface User {
     UserID: string;
@@ -226,13 +227,19 @@ const ManageUser: React.FC = () => {
                     {/* Header Section */}
                     <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
                         <div className='flex flex-col sm:flex-row gap-4 w-full lg:w-1/2'>
-                            <button
+                            {/* <button
                                 onClick={() => navigate('/add-user')}
                                 className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors whitespace-nowrap flex items-center justify-center"
                             >
                                 <FaUserPlus className="mr-2" />
                                 Add User
-                            </button>
+                            </button> */}
+                            <Button
+                                title="Add User"
+                                onClick={() => navigate('/add-user')}
+                                icon={FaUserPlus}
+                                className='transition-colors whitespace-nowrap flex items-center justify-center'
+                            />
 
                             {/* Search Bar */}
                             <div className="w-full">
