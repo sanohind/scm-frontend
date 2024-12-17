@@ -19,6 +19,7 @@ const DeliveryNoteDetailEdit = () => {
     qtyRequested: string;
     qtyConfirm: string;
     qtyDelivered: string;
+    qtyReceived: string;
     qtyMinus: string;
     outstandings: { [wave: string]: string | number };
   }
@@ -107,6 +108,7 @@ const DeliveryNoteDetailEdit = () => {
             qtyRequested: detail.dn_qty || '-',
             qtyConfirm: detail.qty_confirm || '', 
             qtyDelivered: detail.receipt_qty || '-',
+            qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
             outstandings,
           };
@@ -306,7 +308,7 @@ const DeliveryNoteDetailEdit = () => {
       ['No. PO :  ' + dnDetails.noPO, '', '', '', '', '', '', '', '', ''],
       ['Plan Delivery Date :  ' + dnDetails.planDelivery, '', '', '', '', '', '', '', '', ''],
       ['', '', '', '', '', '', '', '', '', ''],
-      ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Minus']
+      ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Received' ,'QTY Minus']
     ];
 
     // Add wave headers if any
@@ -335,6 +337,7 @@ const DeliveryNoteDetailEdit = () => {
         Number(row.qtyRequested) || 0,
         Number(row.qtyConfirm) || 0,
         Number(row.qtyDelivered) || 0,
+        Number(row.qtyReceived) || 0,
         Number(row.qtyMinus) || 0
       ];
       const waveData = waveNumbers.map(num => Number(row.outstandings[`wave_${num}`]) || 0);
@@ -349,12 +352,13 @@ const DeliveryNoteDetailEdit = () => {
         qtyRequested: acc.qtyRequested + Number(row[6] || 0),
         qtyConfirm: acc.qtyConfirm + Number(row[7] || 0),
         qtyDelivered: acc.qtyDelivered + Number(row[8] || 0),
-        qtyMinus: acc.qtyMinus + Number(row[9] || 0)
+        qtyReceived: acc.qtyReceived + Number(row[9] || 0),
+        qtyMinus: acc.qtyMinus + Number(row[10] || 0)
       };
-    }, { qtyPO: 0, qtyLabel: 0, qtyRequested: 0, qtyConfirm: 0, qtyDelivered: 0, qtyMinus: 0 });
+    }, { qtyPO: 0, qtyLabel: 0, qtyRequested: 0, qtyConfirm: 0, qtyDelivered: 0, qtyReceived: 0, qtyMinus: 0 });
 
-    const totalsWaves = waveNumbers.map((num, idx) => {
-      return dataRows.reduce((sum, row) => sum + Number(row[10 + idx] || 0), 0);
+    const totalsWaves = waveNumbers.map((_, idx) => {
+      return dataRows.reduce((sum, row) => sum + Number(row[11 + idx] || 0), 0);
     });
 
     // Add totals row
@@ -368,6 +372,7 @@ const DeliveryNoteDetailEdit = () => {
       totalsBase.qtyRequested,
       totalsBase.qtyConfirm,
       totalsBase.qtyDelivered,
+      totalsBase.qtyReceived,
       totalsBase.qtyMinus,
       ...totalsWaves
     ];
@@ -385,14 +390,20 @@ const DeliveryNoteDetailEdit = () => {
       { wch: 25 }, // Part Number
       { wch: 40 }, // Part Name
       { wch: 8 },  // UoM
-      { wch: 10 }, // QTY PO
-      { wch: 10 }, // QTY Label
+      { wch: 12 }, // QTY PO
+      { wch: 12 }, // QTY Label
       { wch: 12 }, // QTY Requested
       { wch: 12 }, // QTY Confirm
       { wch: 12 }, // QTY Delivered
-      { wch: 10 }  // QTY Minus
+      { wch: 12 }, // QTY Received
+      { wch: 15 },  // QTY Outstanding 1
+      { wch: 15 },  // QTY Outstanding 2
+      { wch: 15 },  // QTY Outstanding 3
+      { wch: 15 },  // QTY Outstanding 4
+      { wch: 15 },  // QTY Outstanding 5
+      { wch: 15 },  // QTY Outstanding 6
     ];
-    const waveColWidths = waveNumbers.map(() => ({ wch: 12 }));
+    const waveColWidths = waveNumbers.map(() => ({ wch: 15 }));
     ws['!cols'] = [...baseColWidths, ...waveColWidths];
   
     // Add worksheet to workbook
@@ -503,6 +514,7 @@ const DeliveryNoteDetailEdit = () => {
                       </th>
                     ))}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Received</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
                     
                   </tr>
@@ -522,18 +534,12 @@ const DeliveryNoteDetailEdit = () => {
                     filteredData.map((detail, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.no}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                          {detail.partNumber}
-                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partNumber}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partName}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.UoM}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.QTY}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                          {detail.qtyLabel}
-                        </td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                          {detail.qtyRequested}
-                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyLabel}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyRequested}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           {confirmMode ? (
                             <input
@@ -566,9 +572,8 @@ const DeliveryNoteDetailEdit = () => {
                             </td>
                           );
                         })}
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
-                          {detail.qtyDelivered}
-                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyDelivered}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyReceived}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           {isNaN(Number(detail.qtyMinus)) ? '-' : detail.qtyMinus}
                         </td>

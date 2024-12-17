@@ -47,8 +47,8 @@ const TransactionReport = () => {
         const result = await response.json();
         if (result.status) {
           const options = result.data.map((item: { part_number: string; part_name: string }) => ({
-            value: item.part_name,
-            text: item.part_name,
+            value: item.part_number,
+            text: `${item.part_number} | ${item.part_name}`,
           }));
           setPartOptions(options);
         } else {
@@ -138,7 +138,7 @@ const TransactionReport = () => {
     
     // Filter by part name
     if (selectedParts.length > 0) {
-      filtered = filtered.filter((row: any) => selectedParts.includes(row.partName));
+      filtered = filtered.filter((row: any) => selectedParts.includes(row.partNumber));
     }
     
     // Filter by delivery note

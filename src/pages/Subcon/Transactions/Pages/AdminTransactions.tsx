@@ -51,7 +51,7 @@ const AdminTransactions = () => {
 
     const partOptions = apiData.map((item) => ({
         value: item.partNumber,
-        label: `${item.partName} | ${item.partNumber}`,
+        label: `${item.partNumber} | ${item.partName}`,
     }));
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {

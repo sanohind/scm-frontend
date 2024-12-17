@@ -47,20 +47,20 @@ const AdminTransactionReport = () => {
         try {
             const token = localStorage.getItem('access_token');
             const response = await fetch(`${API_List_Item_Subcont_Admin()}${supplierCode || selectedSupplier?.value}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             });
             const result = await response.json();
             if (result.status) {
-            const options = result.data.map((item: { part_number: string; part_name: string }) => ({
-                value: item.part_name,
-                text: item.part_name,
+                const options = result.data.map((item: { part_name: string; part_number: string }) => ({
+                    value: item.part_number,
+                    text: `${item.part_number} | ${item.part_name}`,
             }));
             setPartOptions(options);
             } else {
-            console.error('Failed to fetch part options:', result.message);
-            toast.error('Failed to fetch part options');
+                console.error('Failed to fetch part options:', result.message);
+                toast.error('Failed to fetch part options');
             }
         } catch (error) {
             console.error('Error fetching part options:', error);
@@ -75,8 +75,8 @@ const AdminTransactionReport = () => {
         const response = await fetch(API_List_Partner_Admin(), {
             method: 'GET',
             headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
             },
         });
 
@@ -215,7 +215,7 @@ const AdminTransactionReport = () => {
         
         // Filter by part name
         if (selectedParts.length > 0) {
-        filtered = filtered.filter((row: any) => selectedParts.includes(row.partName));
+        filtered = filtered.filter((row: any) => selectedParts.includes(row.partNumber));
         }
         
         // Filter by delivery note
@@ -353,14 +353,14 @@ const AdminTransactionReport = () => {
                             {/* Part Name */}
                             <div className="w-full">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Part Name
+                                Part Number
                                 </label>
                                 <MultiSelect
-                                id="partNameSelect"
-                                label="Filter by Part Name"
-                                options={partOptions}
-                                selectedOptions={selectedParts}
-                                onChange={setSelectedParts}
+                                    id="partNumberSelect"
+                                    label="Filter by Part Number"
+                                    options={partOptions}
+                                    selectedOptions={selectedParts}
+                                    onChange={setSelectedParts}
                                 />
                             </div>
                         </div>

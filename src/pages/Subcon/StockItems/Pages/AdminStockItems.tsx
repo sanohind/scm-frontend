@@ -174,7 +174,7 @@ const AdminStockItems = () => {
                     {/* Table header and body from StockItems component */}
                     <thead className="bg-gray-50">
                     <tr>
-                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[18%]" rowSpan={2}>Part No</th>
+                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[18%]" rowSpan={2}>Part Number</th>
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[22%]" rowSpan={2}>Part Name</th>
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Fresh</th>
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Replating</th>

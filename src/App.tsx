@@ -20,7 +20,6 @@ import IndexHistoryPurchaseOrder from "./pages/PurchaseOrder/IndexHistoryPurchas
 import IndexHistoryDeliveryNote from "./pages/DeliveryNote/IndexHistoryDeliveryNote";
 import IndexDeliveryNote from "./pages/DeliveryNote/IndexDeliveryNote";
 import PrintPO from "./pages/Print/PrintPO";
-import Transactions from "./pages/Subcon/Transactions/Pages/Transactions";
 import PrintDN from "./pages/Print/PrintDN";
 import PrintLabel from "./pages/Print/PrintLabel";
 import IndexTransactionsReport from "./pages/Subcon/TransactionsReport/IndexTransactionReport";

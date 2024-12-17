@@ -22,7 +22,7 @@ const DeliveryNoteDetail = () => {
     [key: string]: string | number;
   }
   
-  const [details, setDetails] = useState<Detail[]>([]);
+  const [details] = useState<Detail[]>([]);
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,12 +32,13 @@ const DeliveryNoteDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const noDN = new URLSearchParams(location.search).get('noDN');
-  const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '' });
+  const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '', statusDN: '', confirmUpdateAt: '' });
+  const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
 
   // Fetch Delivery Note Details from API
   const fetchDeliveryNoteDetails = async () => {
     const token = localStorage.getItem('access_token');
-
+    setLoading(true);
     try {
       const response = await fetch(`${API_DN_Detail()}${noDN}`, {
         method: 'GET',
@@ -46,45 +47,73 @@ const DeliveryNoteDetail = () => {
           'Content-Type': 'application/json',
         },
       });
-      if (!response.ok) throw new Error('Network response was not ok');
+
+      if (!response.ok) throw new Error('Failed to fetch delivery notes');
 
       const result = await response.json();
-      setLoading(false);
 
-      if (result.data && result.data) {
-
+      if (result && result.data) {
         const dn = result.data;
-
         setDNDetails({
-            noDN: dn.no_dn || '-',
-            noPO: dn.po_no || '-',
-            planDelivery: dn.plan_delivery_date || '-',
+          noDN: dn.no_dn,
+          noPO: dn.po_no,
+          planDelivery: dn.plan_delivery_date,
+          statusDN: dn.status_desc,
+          confirmUpdateAt: dn.confirm_update_at,
         });
         
-            const details = dn.detail.map((detail: any) => ({
-            no: detail.dn_line ?? '-',
+        const waveNumberSet = new Set<number>();
+
+        const details = dn.detail.map((detail: any, index: number) => {
+          const outstandings: Record<string, string | number | undefined> = {};
+
+          if (detail.outstanding && typeof detail.outstanding === 'object') {
+            for (const key in detail.outstanding) {
+              const qtyArray = detail.outstanding[key]; // e.g., [50]
+              if (qtyArray && qtyArray.length > 0) {
+                const qty = qtyArray[0]; // Assuming the first element
+                outstandings[key] = qty;
+
+                // Extract wave number
+                const waveMatch = key.match(/wave_(\d+)/);
+                if (waveMatch && waveMatch[1]) {
+                  const waveNumber = parseInt(waveMatch[1], 10);
+                  waveNumberSet.add(waveNumber);
+                }
+              }
+            }
+          }
+
+          return {
+            no: (index + 1).toString(),
+            dnDetailNo: detail.dn_detail_no || '',
             partNumber: detail.part_no || '-',
             partName: detail.item_desc_a || '-',
-            QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
+            UoM: detail.dn_unit || '-',
+            QTY: detail.dn_qty || '-',
+            qtyRequested: detail.dn_qty || '-',
             qtyLabel: detail.dn_snp || '-',
+            qtyConfirm: detail.qty_confirm || '-', 
             qtyDelivered: detail.receipt_qty || '-',
             qtyReceived: detail.receipt_qty || '-',
-            qtyConfirm: detail.qty_confirm !== null ? detail.qty_confirm : '-',
-            uom: detail.dn_unit || '-',
-            }));
+            qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
+            outstandings,
+          };
+        });
 
-          setDetails(details);
-          setFilteredData(details);
-        
+        const waveNumbersArray = Array.from(waveNumberSet).sort((a, b) => a - b);
+        setWaveNumbers(waveNumbersArray);
+        setFilteredData(details);
+        setLoading(false);
       } else {
-        toast.error('No delivery note details found');
+        toast.error('No Delivery Notes found.');
       }
     } catch (error) {
-      console.error('Error fetching delivery note details:', error);
+      console.error('Error fetching delivery notes:', error);
       if (error instanceof Error) {
-        toast.error(`Error fetching delivery note details: ${error.message}`);
+        toast.error(`Error fetching delivery notes: ${error.message}`);
       } else {
-        toast.error('Error fetching delivery note details');
+        toast.error('Error fetching delivery notes');
       }
     }
   };
@@ -162,8 +191,14 @@ const DeliveryNoteDetail = () => {
       ['No. PO :  ' + dnDetails.noPO, '', '', '', '', '', '', '', '', ''],
       ['Plan Delivery Date :  ' + dnDetails.planDelivery, '', '', '', '', '', '', '', '', ''],
       ['', '', '', '', '', '', '', '', '', ''],
-      ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Minus']
+      ['No', 'Part Number', 'Part Name', 'UoM', 'QTY PO', 'QTY Label', 'QTY Requested', 'QTY Confirm', 'QTY Delivered', 'QTY Received' ,'QTY Minus']
     ];
+
+    // Add wave headers if any
+    if (waveNumbers.length > 0) {
+      const waveHeaders = waveNumbers.map(num => `QTY Outstanding ${num}`);
+      headerRows[5] = [...headerRows[5], ...waveHeaders];
+    }
 
     // Add worksheet configuration to merge cells
     const merges = [
@@ -174,41 +209,55 @@ const DeliveryNoteDetail = () => {
     ];
 
     // Convert all data to array format (including the actual data rows)
-    const dataRows = filteredData.map(row => [
-      row.no,
-      row.partNumber,
-      row.partName,
-      row.uom,
-      Number(row.QTY) || 0,
-      Number(row.qtyLabel) || 0,
-      Number(row.qtyRequested) || 0,
-      Number(row.qtyConfirm) || 0,
-      Number(row.qtyDelivered) || 0,
-      Number(row.qtyMinus) || 0
-    ]);
+    const dataRows = filteredData.map(row => {
+      const baseData = [
+        row.no,
+        row.partNumber,
+        row.partName,
+        row.UoM,
+        Number(row.QTY) || 0,
+        Number(row.qtyLabel) || 0,
+        Number(row.qtyRequested) || 0,
+        Number(row.qtyConfirm) || 0,
+        Number(row.qtyDelivered) || 0,
+        Number(row.qtyReceived) || 0,
+        Number(row.qtyMinus) || 0
+      ];
+      const waveData = waveNumbers.map(num => Number((row.outstandings as unknown as Record<string, string | number>)[`wave_${num}`]) || 0);
+      return [...baseData, ...waveData];
+    });
   
     // Calculate totals
-    const totals = {
-      qtyPO: dataRows.reduce((sum, row) => sum + Number(row[4] || 0), 0),
-      qtyLabel: dataRows.reduce((sum, row) => sum + Number(row[5] || 0), 0),
-      qtyRequested: dataRows.reduce((sum, row) => sum + Number(row[6] || 0), 0),
-      qtyConfirm: dataRows.reduce((sum, row) => sum + Number(row[7] || 0), 0),
-      qtyDelivered: dataRows.reduce((sum, row) => sum + Number(row[8] || 0), 0),
-      qtyMinus: dataRows.reduce((sum, row) => sum + Number(row[9] || 0), 0)
-    };
-  
+    const totalsBase = dataRows.reduce((acc, row) => {
+      return {
+        qtyPO: acc.qtyPO + Number(row[4] || 0),
+        qtyLabel: acc.qtyLabel + Number(row[5] || 0),
+        qtyRequested: acc.qtyRequested + Number(row[6] || 0),
+        qtyConfirm: acc.qtyConfirm + Number(row[7] || 0),
+        qtyDelivered: acc.qtyDelivered + Number(row[8] || 0),
+        qtyReceived: acc.qtyReceived + Number(row[9] || 0),
+        qtyMinus: acc.qtyMinus + Number(row[10] || 0)
+      };
+    }, { qtyPO: 0, qtyLabel: 0, qtyRequested: 0, qtyConfirm: 0, qtyDelivered: 0, qtyReceived: 0, qtyMinus: 0 });
+
+    const totalsWaves = waveNumbers.map((_, idx) => {
+      return dataRows.reduce((sum, row) => sum + Number(row[11 + idx] || 0), 0);
+    });
+
     // Add totals row
     const totalsRow = [
       'Totals:',
       '',
       '',
       '',
-      totals.qtyPO,
-      totals.qtyLabel,
-      totals.qtyRequested,
-      totals.qtyConfirm,
-      totals.qtyDelivered,
-      totals.qtyMinus
+      totalsBase.qtyPO,
+      totalsBase.qtyLabel,
+      totalsBase.qtyRequested,
+      totalsBase.qtyConfirm,
+      totalsBase.qtyDelivered,
+      totalsBase.qtyReceived,
+      totalsBase.qtyMinus,
+      ...totalsWaves
     ];
   
     // Combine all rows
@@ -218,20 +267,27 @@ const DeliveryNoteDetail = () => {
     const ws = XLSX.utils.aoa_to_sheet(allRows);
     ws['!merges'] = merges;
   
-    // Set column widths
-    const colWidths = [
+    // Set column widths (need to adjust based on dynamic columns)
+    const baseColWidths = [
       { wch: 5 },  // No
       { wch: 25 }, // Part Number
       { wch: 40 }, // Part Name
       { wch: 8 },  // UoM
-      { wch: 10 }, // QTY PO
-      { wch: 10 }, // QTY Label
+      { wch: 12 }, // QTY PO
+      { wch: 12 }, // QTY Label
       { wch: 12 }, // QTY Requested
       { wch: 12 }, // QTY Confirm
       { wch: 12 }, // QTY Delivered
-      { wch: 10 }  // QTY Minus
+      { wch: 12 }, // QTY Received
+      { wch: 15 },  // QTY Outstanding
+      { wch: 15 },  // QTY Outstanding
+      { wch: 15 },  // QTY Outstanding
+      { wch: 15 },  // QTY Outstanding
+      { wch: 15 },  // QTY Outstanding
+      { wch: 15 },  // QTY Outstanding
     ];
-    ws['!cols'] = colWidths;
+    const waveColWidths = waveNumbers.map(() => ({ wch: 12 }));
+    ws['!cols'] = [...baseColWidths, ...waveColWidths];
   
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Delivery Note Detail');
@@ -336,11 +392,18 @@ const DeliveryNoteDetail = () => {
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Number</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[26%]">Part Name</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">UoM</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b  w-[9%]">QTY</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Confirm</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY PO</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Label</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b  w-[9%]">QTY Requested</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Confirm</th>
+                    {waveNumbers.map((waveNumber) => (
+                      <th key={`qtyOutstanding${waveNumber}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b">
+                        {'Outstanding ' + waveNumber}
+                      </th>
+                    ))}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Delivered</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Received</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Minus</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -371,6 +434,19 @@ const DeliveryNoteDetail = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           <div className="h-4 bg-gray-200 rounded"></div>
                         </td>
+                        {waveNumbers.map((waveNumber) => {
+                          return (
+                            <td key={`qtyOutstanding${waveNumber}`} className="px-3 py-3 text-center whitespace-nowrap">
+                              <div className="h-4 bg-gray-200 rounded"></div>
+                            </td>
+                          );
+                        })}
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           <div className="h-4 bg-gray-200 rounded"></div>
                         </td>
@@ -382,12 +458,23 @@ const DeliveryNoteDetail = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.no}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.uom}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.UoM}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTY}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyConfirm}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyLabel}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyRequested}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyConfirm}</td>
+                        {waveNumbers.map((waveNumber) => {
+                          const waveKey = `wave_${waveNumber}`;
+                          const qtyValue = ((row.outstandings as unknown) as Record<string, string | number>)[waveKey] ?? '-';
+                          return (
+                            <td key={`qtyOutstanding${waveNumber}`} className="px-3 py-3 text-center whitespace-nowrap">
+                              {qtyValue}
+                            </td>
+                          );
+                        })}
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyDelivered}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyReceived}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyMinus}</td>
                       </tr>
                     ))
                   ) : (

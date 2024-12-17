@@ -52,7 +52,7 @@ const Transactions = () => {
 
   const partOptions = apiData.map((item) => ({
     value: item.partNumber,
-    label: `${item.partName} | ${item.partNumber}`,
+    label: `${item.partNumber} | ${item.partName}`,
   }));
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -280,7 +280,7 @@ const Transactions = () => {
                       options={partOptions}
                       value={selectedPart}
                       onChange={handlePartChange}
-                      placeholder="Select Part Name"
+                      placeholder="Select Part Number"
                       className="w-full"
                       isClearable
                     />
