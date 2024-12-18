@@ -18,7 +18,11 @@ export const API_Event = () => API + getRolePath() + `/event`;
 
 export const API_Print_PO = () => API + getRolePath() + `/po/print/`;
 export const API_Print_DN = () => API + getRolePath() + `/dn/print/`;
+export const API_Print_DN_Confirm = () => API + getRolePath() + `/dn/print/qty-confirm/`;
+export const API_Print_DN_Outstanding = () => API + getRolePath() + `/dn/print/outstanding/`;
 export const API_Print_Label = () => API + getRolePath() + `/dn-label/print/`;
+export const API_Print_Label_Confirm = () => API + getRolePath() + `/dn-label/print/qty-confirm/`;
+export const API_Print_Label_Outstanding = () => API + getRolePath() + `/dn-label/print/outstanding/`;
 
 export const API_Download_Performance_Report = () => API + getRolePath() + `/performance-report/file/`;
 export const API_Download_Forecast_Report = () => API + getRolePath() + `/forecast/file/`;

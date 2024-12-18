@@ -268,7 +268,7 @@ const CreateForecast = () => {
                                 render: 'Upload complete!',
                                 type: 'success',
                                 isLoading: false,
-                                autoClose: 3000
+                                autoClose: 2000
                             });
                             Swal.fire({
                                 title: 'Success',

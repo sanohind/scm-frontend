@@ -11,7 +11,7 @@ import {
   Font,
 } from '@react-pdf/renderer';
 import Swal from 'sweetalert2';
-import { API_Print_DN } from '../../api/api';
+import { API_Print_DN, API_Print_DN_Confirm, API_Print_DN_Outstanding } from '../../api/api';
 import logoSanoh from '../../images/logo-sanoh.png';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -485,51 +485,61 @@ const PrintDN = () => {
     const fetchDeliveryNoteData = async (noDN: string) => {
         const token = localStorage.getItem('access_token');
         if (!token) {
-        Swal.fire('Error', 'Access token is missing. Please log in again.', 'error');
-        return null;
+            Swal.fire('Error', 'Access token is missing. Please log in again.', 'error');
+            return null;
         }
 
         try {
-        const response = await fetch(`${API_Print_DN()}${noDN}`, {
-            method: 'GET',
-            headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            },
-        });
+            const status = queryParams.get('status');
+            let apiUrl = API_Print_DN();
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (status === 'confirm') {
+                apiUrl = API_Print_DN_Confirm();
+            } else if (status && status.startsWith('outstanding')) {
+                const outstandingNumber = status.split('_')[1];
+                apiUrl = `${API_Print_DN_Outstanding()}${outstandingNumber}/`;
+            }
 
-        const dnData = await response.json();
-        if (dnData.success && dnData.data && dnData.data.length > 0) {
-            const header = {
-            dn_number: dnData.data[0].dn_number,
-            po_number: dnData.data[0].po_number,
-            supplier_name: dnData.data[0].supplier_name,
-            supplier_code: dnData.data[0].supplier_code,
-            planned_receipt_date: dnData.data[0].planned_receipt_date,
-            total_box: dnData.data[0].total_box,
-            };
+            const response = await fetch(`${apiUrl}${noDN}`, {
+                method: 'GET',
+                headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                },
+            });
 
-            const details = dnData.data[0].detail.map((item: any) => ({
-            supplier_part_number: item.supplier_part_number,
-            internal_part_number: item.internal_part_number,
-            part_name: item.part_name,
-            pcs_per_kamban: item.pcs_per_kamban,
-            qty_confirm: item.qty_confirm,
-            no_of_kamban: item.no_of_kamban,
-            total_quantity: item.total_quantity,
-            box_quantity: item.box_quantity,
-            }));
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            return { header, details };
-        } else {
-            console.error('No data available:', dnData.message);
-            return null;
-        }
+            const dnData = await response.json();
+            if (dnData.success && dnData.data && dnData.data.length > 0) {
+                const header = {
+                    dn_number: dnData.data[0].dn_number,
+                    po_number: dnData.data[0].po_number,
+                    supplier_name: dnData.data[0].supplier_name,
+                    supplier_code: dnData.data[0].supplier_code,
+                    planned_receipt_date: dnData.data[0].planned_receipt_date,
+                    total_box: dnData.data[0].total_box,
+                };
+
+                const details = dnData.data[0].detail.map((item: any) => ({
+                    supplier_part_number: item.supplier_part_number,
+                    internal_part_number: item.internal_part_number,
+                    part_name: item.part_name,
+                    pcs_per_kamban: item.pcs_per_kamban,
+                    qty_confirm: item.qty_confirm,
+                    no_of_kamban: item.no_of_kamban,
+                    total_quantity: item.total_quantity,
+                    box_quantity: item.box_quantity,
+                }));
+
+                return { header, details };
+            } else {
+                console.error('No data available:', dnData.message);
+                return null;
+            }
         } catch (error) {
-        console.error('Error fetching DN data:', error);
-        return null;
+            console.error('Error fetching DN data:', error);
+            return null;
         }
     };
 

@@ -10,7 +10,7 @@ import {
   Font, Image,
 } from '@react-pdf/renderer';
 import Swal from 'sweetalert2';
-import { API_Print_Label } from '../../api/api';
+import { API_Print_Label, API_Print_Label_Confirm, API_Print_Label_Outstanding } from '../../api/api';
 import QRCode from 'qrcode';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -105,8 +105,6 @@ interface LabelDataItem {
     delivery_date: string;
     printed_date: string;
 }
-
-
 
 const generateQRCode = async (text: string) => {
     try {
@@ -262,44 +260,54 @@ const PrintLabel = () => {
     const fetchLabelData = async (noDN: string) => {
         const token = localStorage.getItem('access_token');
         if (!token) {
-        Swal.fire('Error', 'Access token is missing. Please log in again.', 'error');
-        return [];
-        }
-
-        try {
-        const response = await fetch(`${API_Print_Label()}${noDN}`, {
-            method: 'GET',
-            headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            },
-        });
-
-        const labelData = await response.json();
-
-        if (labelData.success && labelData.data && labelData.data.length > 0) {
-            return labelData.data.map((item: any) => ({
-            dn_label_no: item.dn_label_no || 'N/A',
-            lot_number: item.lot_number || 'N/A',
-            qr_number: item.qr_number || 'N/A',
-            po_number: item.po_number || 'N/A',
-            dn_number: item.dn_number || 'N/A',
-            model: item.model || 'N/A',
-            customer_name: item.customer_name || 'N/A',
-            supplier_name: item.supplier_name || 'N/A',
-            part_number: item.part_number || 'N/A',
-            part_name: item.part_name || 'N/A',
-            quantity: item.quantity || 'N/A',
-            delivery_date: item.delivery_date || 'N/A',
-            printed_date: item.printed_date ? item.printed_date.replace(/(\d{2})(\d{2})(\d{2}) (\d{2}:\d{2})/, '$1/$2/$3 $4') : 'N/A',
-            }));
-        } else {
-            console.error('Failed to fetch label data:', labelData.message);
+            Swal.fire('Error', 'Access token is missing. Please log in again.', 'error');
             return [];
         }
+
+        try {        
+            const status = queryParams.get('status');
+            let apiUrl = API_Print_Label();
+
+            if (status === 'confirm') {
+                apiUrl = API_Print_Label_Confirm();
+            } else if (status && status.startsWith('outstanding')) {
+                const outstandingNumber = status.split('_')[1];
+                apiUrl = `${API_Print_Label_Outstanding()}${outstandingNumber}/`;
+            }
+
+            const response = await fetch(`${apiUrl}${noDN}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const labelData = await response.json();
+
+            if (labelData.success && labelData.data && labelData.data.length > 0) {
+                return labelData.data.map((item: any) => ({
+                dn_label_no: item.dn_label_no || 'N/A',
+                lot_number: item.lot_number || 'N/A',
+                qr_number: item.qr_number || 'N/A',
+                po_number: item.po_number || 'N/A',
+                dn_number: item.dn_number || 'N/A',
+                model: item.model || 'N/A',
+                customer_name: item.customer_name || 'N/A',
+                supplier_name: item.supplier_name || 'N/A',
+                part_number: item.part_number || 'N/A',
+                part_name: item.part_name || 'N/A',
+                quantity: item.quantity || 'N/A',
+                delivery_date: item.delivery_date || 'N/A',
+                printed_date: item.printed_date ? item.printed_date.replace(/(\d{2})(\d{2})(\d{2}) (\d{2}:\d{2})/, '$1/$2/$3 $4') : 'N/A',
+                }));
+            } else {
+                console.error('Failed to fetch label data:', labelData.message);
+                return [];
+            }
         } catch (error) {
-        console.error('Error fetching label data:', error);
-        return [];
+            console.error('Error fetching label data:', error);
+            return [];
         }
     };
 
