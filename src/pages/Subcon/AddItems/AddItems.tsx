@@ -6,7 +6,7 @@ import { API_Create_Item_Subcont_Admin,  API_List_Item_ERP_Subcont_Admin,  API_L
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { FaDownload, FaTimes, FaUpload } from 'react-icons/fa';
+import { FaDownload, FaPlus, FaTimes, FaUpload } from 'react-icons/fa';
 import Button from '../../../components/Forms/Button';
 
 interface SupplierOption {
@@ -177,13 +177,21 @@ export const AddItems = () => {
                 return;
             }
 
+            const submissionData = {
+                data: excelData.map(item => ({
+                    bp_code: item.bp_code,
+                    item_code: item.item_code,
+                    item_name: item.item_name
+                }))
+            };
+
             const response = await fetch(API_Create_Item_Subcont_Admin(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ items: excelData })
+                body: JSON.stringify(submissionData)
             });
 
             if (!response.ok) throw new Error('Failed to submit');
@@ -266,10 +274,12 @@ export const AddItems = () => {
                 return;
             }
     
-            const itemData = {
-                bp_code: selectedSupplier.value,
-                item_name: partName,
-                item_code: partNumber,
+            const submissionData = {
+                data: [{
+                    bp_code: selectedSupplier.value,
+                    item_name: partName,
+                    item_code: partNumber,
+                }]
             };
     
             const response = await fetch(API_Create_Item_Subcont_Admin(), {
@@ -278,7 +288,7 @@ export const AddItems = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(itemData)
+                body: JSON.stringify(submissionData)
             });
     
             if (!response.ok) throw new Error('Failed to submit');
@@ -378,23 +388,20 @@ export const AddItems = () => {
                 ) : (
                     <>
                         <div className="flex justify-end">
-                            <button
+                            <Button
+                                title="Cancel"
                                 onClick={() => setIsExcelMode(false)}
-                                className="bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                            >
-                                <FaTimes />
-                                Cancel
-                            </button>
+                                icon={FaTimes}
+                                color='bg-red-600'
+                            />
                         </div>
                         <div className="max-w-[1024px] mx-auto space-y-4">
                             <div className="flex items-center gap-4">
-                                <button
+                                <Button
+                                    title="Excel Template"
                                     onClick={downloadTemplate}
-                                    className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition flex items-center gap-2"
-                                >
-                                    <FaDownload />
-                                    Excel Template
-                                </button>
+                                    icon={FaDownload}
+                                />
                                 <input
                                     type="file"
                                     accept=".xlsx, .xls"
@@ -407,12 +414,11 @@ export const AddItems = () => {
                             {excelData.length > 0 && (
                                 <>
                                     <h2 className="text-lg font-bold">Preview Items</h2>
-                                    <button
+                                    <Button
+                                        title="Add Rows"
                                         onClick={handleAddExcelItem}
-                                        className="mb-4 bg-blue-900 text-white px-4 py-2 rounded-md"
-                                    >
-                                        Add Item
-                                    </button>
+                                        icon={FaPlus}
+                                    />
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-gray-50">
                                             <tr>
@@ -458,12 +464,14 @@ export const AddItems = () => {
                                                         />
                                                     </td>
                                                     <td className="px-3 py-3 text-center border">
-                                                        <button
-                                                            onClick={() => handleExcelItemDelete(index)}
-                                                            className="bg-red-600 text-white px-2 py-1 rounded"
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                        <div className="flex justify-center">
+                                                            <Button
+                                                                title="Delete"
+                                                                onClick={() => handleExcelItemDelete(index)}
+                                                                className='text-xs py-[6px] px-[10px]'
+                                                                color='bg-red-600'
+                                                            />
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
