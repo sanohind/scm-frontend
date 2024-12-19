@@ -146,7 +146,7 @@ const ChartOne: React.FC<ChartProps> = ({ titleOne, titleTwo, dataOne, dataTwo, 
             <div
               className={`rounded py-1 px-3 text-xs font-medium text-black hover:shadow-card dark:text-white dark:hover:bg-boxdark bg-gray-100 hover:bg-primary-100 cursor-pointer transition-colors duration-200 ease-in-out`}
             >
-              Yearly
+              Monthly
             </div>
           
         </div>

@@ -109,7 +109,7 @@ const DeliveryNoteDetailEdit = () => {
             QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
             qtyLabel: detail.dn_snp || '-',
             qtyRequested: detail.dn_qty || '-',
-            qtyConfirm: detail.qty_confirm || '', 
+            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm, // Handle null case
             qtyDelivered: detail.receipt_qty || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
@@ -159,7 +159,7 @@ const DeliveryNoteDetailEdit = () => {
         ...detail,
         outstandings: {
           ...detail.outstandings,
-          [`wave_${newWaveNumber}`]: ''
+          [`wave_${newWaveNumber}`]: '0'
         }
       };
     });
@@ -236,11 +236,16 @@ const DeliveryNoteDetailEdit = () => {
       } catch (error) {
         console.error('Failed to update DN details:', error);
         if (error instanceof Error) {
-          toast.error(`Failed to update DN details: ${error.message}`);
+          toast.error(`${error.message}`);
         } else {
           toast.error('Failed to update DN details');
         }
-        Swal.fire('Error', 'Failed to update DN details.', 'error');
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to update DN details.',
+          icon: 'error',
+          confirmButtonColor: '#1e3a8a'
+        });
       }
     } else if (outstandingMode) {
       const latestWaveNumber = Math.max(...waveNumbers);
@@ -251,6 +256,12 @@ const DeliveryNoteDetailEdit = () => {
           qty_confirm: parseInt(detail.outstandings[waveKey] as string || '0', 10)
         };
       });
+
+      const allZero = updates.every(update => update.qty_confirm === 0);
+      if (allZero) {
+        toast.warning('At least one outstanding quantity must be greater than 0');
+        return;
+      }
 
       const payload = {
         no_dn: dnDetails.noDN,
@@ -573,7 +584,7 @@ const DeliveryNoteDetailEdit = () => {
                               max={detail.qtyRequested}
                             />
                           ) : (
-                            detail.qtyConfirm || '-'
+                            detail.qtyConfirm === null ? '-' : detail.qtyConfirm
                           )}
                         </td>
                         {waveNumbers.map((waveNumber) => {
@@ -605,7 +616,7 @@ const DeliveryNoteDetailEdit = () => {
                   ) : (
                     <tr>
                       <td colSpan={10 + waveNumbers.length} className="px-3 py-4 text-center text-gray-500">
-                        No details available for this delivery note
+                        No data available for this delivery note
                       </td>
                     </tr>
                   )}
@@ -619,15 +630,6 @@ const DeliveryNoteDetailEdit = () => {
             {!confirmMode && !outstandingMode && (
               <>
                 {dnDetails.confirmUpdateAt ? (
-                  // <button
-                  //   onClick={handleAddOutstanding}
-                  //   className={`px-4 py-2 rounded-lg ${
-                  //     allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'}`}
-                  //   disabled={allQtyConfirmMatch}
-                  //   title={allQtyConfirmMatch ? 'QTY Confirm Exactly Matched' : ''}
-                  // >
-                  //   Add Outstanding
-                  // </button>
                   <Button
                     title="Add Outstanding"
                     onClick={handleAddOutstanding}

@@ -93,7 +93,7 @@ const Transactions = () => {
         partName: selectedPart.label.split(' | ')[0],
         partNumber: selectedPart.value,
         qtyOk: '',
-        qtyNg: '',
+        qtyNg: '0',
       },
     ]);
     setSelectedPart(null);
@@ -286,14 +286,6 @@ const Transactions = () => {
                       isClearable
                     />
                   </div>
-                  {/* Add Button */}
-                  {/* <button
-                    onClick={handleAddPart}
-                    className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90 mb-4"
-                  >
-                    <FaPlus className="mr-2" />
-                    Add Part
-                  </button> */}
                   <Button
                     title="Add Part"
                     onClick={handleAddPart}
