@@ -44,14 +44,6 @@ export const SuperUser = () => {
                     <StockItems />
                     {/* <!-- Menu Item Stock Items --> */}
 
-                    {/* <!-- Menu Item Add Items --> */}
-                    <AddItems />
-                    {/* <!-- Menu Item Add Items --> */}
-
-                    {/* <!-- Menu Item Manage Items --> */}
-                    <ManageItems />
-                    {/* <!-- Menu Item Manage Items --> */}
-
                     {/* <!-- Menu Item Transaction --> */}
                     <TransactionSubcont />
                     {/* <!-- Menu Item Transaction --> */}
@@ -59,6 +51,14 @@ export const SuperUser = () => {
                     {/* <!-- Menu Item Report Transactions --> */}
                     <TransactionsReport />
                     {/* <!-- Menu Item Report Transaction --> */}
+                    
+                    {/* <!-- Menu Item Add Items --> */}
+                    <AddItems />
+                    {/* <!-- Menu Item Add Items --> */}
+
+                    {/* <!-- Menu Item Manage Items --> */}
+                    <ManageItems />
+                    {/* <!-- Menu Item Manage Items --> */}
                 </ul>
             </div>
 

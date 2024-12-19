@@ -12,7 +12,7 @@ const IndexTransactions: React.FC = () => {
 
     if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
         return <Transactions />;
-    } else if (userRole === 'admin-subcont') {
+    } else if (userRole === 'super-user') {
         return <AdminTransactions />;
     } else {
         return <div>No dashboard available for your role.</div>;

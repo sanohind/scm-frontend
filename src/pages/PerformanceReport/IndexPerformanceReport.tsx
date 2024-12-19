@@ -12,7 +12,7 @@ const IndexPerformanceReport: React.FC = () => {
   
     if (userRole === 'supplier-marketing' || userRole === 'supplier-subcont-marketing') {
       return <PerformanceReport />;
-    } else if (userRole === 'admin-purchasing') {
+    } else if (userRole === 'admin-purchasing' || userRole === 'super-user') {
       return <CreatePerformanceReport />;
     } else {
       return <div>No dashboard available for your role.</div>;

@@ -6,10 +6,11 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_List_Item_Subcont, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
+import Button from '../../../../components/Forms/Button';
 
 const AdminTransactions = () => {
     const [value, setValue] = useState(0);
@@ -19,6 +20,9 @@ const AdminTransactions = () => {
     const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
     const [transactionDate, setTransactionDate] = useState<Date>(new Date());
     const [partList, setPartList] = useState<any[]>([]);
+    const [suppliers, setSuppliers] = useState([]);
+    const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
+
 
     interface ApiItem {
         part_number: string;
@@ -26,33 +30,84 @@ const AdminTransactions = () => {
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem('access_token');
-                const response = await fetch(API_List_Item_Subcont(), {
-                headers: {
+        fetchSuppliers();
+    }, []);
+
+    useEffect(() => {
+        const savedSupplierCode = localStorage.getItem('selected_supplier');
+        if (savedSupplierCode && suppliers.length > 0) {
+            const savedSupplier = suppliers.find(
+                (sup: { value: string; label: string }) => sup.value === savedSupplierCode
+            );
+            if (savedSupplier) {
+                setSelectedSupplier(savedSupplier);
+                fetchData(savedSupplierCode);
+            }
+        }
+    }, [suppliers]);
+
+    const fetchData = async () => {
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`${API_List_Item_Subcont_Admin()}${selectedSupplier?.value}`, {
+            headers: {
                     Authorization: `Bearer ${token}`,
                 },
-                });
-                const result = await response.json();
-                if (result.status) {
+            });
+            const result = await response.json();
+            if (result.status) {
                 const transformedData = result.data.map((item: ApiItem) => ({
                     partNumber: item.part_number,
                     partName: item.part_name,
                 }));
                 setApiData(transformedData);
-                }
-            } catch (error) {
-                console.error('Error fetching parts:', error);
             }
-        };
-        fetchData();
-    }, []);
+        } catch (error) {
+            console.error('Error fetching parts:', error);
+        }
+    };
+
+    const fetchSuppliers = async () => {
+        const token = localStorage.getItem('access_token');
+        try {
+            const response = await fetch(API_List_Partner_Admin(), {
+                method: 'GET',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                },
+            });
+        
+            if (!response.ok) throw new Error('Failed to fetch suppliers');
+        
+            const result = await response.json();
+            const suppliersList = result.data.map((supplier: { bp_code: string; bp_name: string }) => ({
+                value: supplier.bp_code,
+                label: `${supplier.bp_code} | ${supplier.bp_name}`,
+            }));
+        
+            setSuppliers(suppliersList);
+        } catch (error) {
+            console.error('Error fetching suppliers:', error);
+            toast.error(`Error fetching suppliers: ${error}`);
+        }
+    };
 
     const partOptions = apiData.map((item) => ({
         value: item.partNumber,
         label: `${item.partNumber} | ${item.partName}`,
     }));
+
+    const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
+        setSelectedSupplier(selectedOption);
+        if (selectedOption) {
+            localStorage.setItem('selected_supplier', selectedOption.value);
+            fetchData(selectedOption.value);
+        } else {
+            localStorage.removeItem('selected_supplier');
+            setApiData([]);
+        }
+    };
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -91,7 +146,7 @@ const AdminTransactions = () => {
             partName: selectedPart.label.split(' | ')[0],
             partNumber: selectedPart.value,
             qtyOk: '',
-            qtyNg: '',
+            qtyNg: '0',
         },
         ]);
         setSelectedPart(null);
@@ -110,103 +165,111 @@ const AdminTransactions = () => {
 
     const handleSubmit = async () => {
         if (partList.length === 0) {
-        toast.error('Please add at least one part');
-        return;
+            toast.error('Please add at least one part');
+            return;
+        }
+
+        if (!selectedSupplier) {
+            toast.error('Please select a supplier');
+            return;
         }
 
         for (const part of partList) {
-        if (parseInt(part.qtyOk) <= 0) {
-            toast.error(`Qty OK for part ${part.partNumber} must be greater than 0`);
-            return;
-        }
-        if (parseInt(part.qtyNg) < 0) {
-            toast.error(`Qty NG for part ${part.partNumber} cannot be negative`);
-            return;
-        }
+            if (parseInt(part.qtyOk) <= 0) {
+                toast.error(`Qty OK for part ${part.partNumber} must be greater than 0`);
+                return;
+            }
+            if (parseInt(part.qtyNg) < 0) {
+                toast.error(`Qty NG for part ${part.partNumber} cannot be negative`);
+                return;
+            }
         }
 
         const confirm = await Swal.fire({
-        title: 'Confirm Submission',
-        html: `
-            <p>Are you sure the data entered is correct?</p>
-            <br>
-            <p><strong>Date:</strong> ${transactionDate.toLocaleDateString()}</p>
-            <p><strong>Status:</strong> ${status}</p>
-            <p><strong>Type:</strong> ${
-            value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing'
-            }</p>
-            <p><strong>Delivery Note:</strong> ${deliveryNote}</p>
-            <p><strong>Parts:</strong></p>
-            ${partList
-            .map(
-                (part) => `
-                <p>${part.partNumber} | Qty OK: ${part.qtyOk} | Qty NG: ${
-                part.qtyNg || 0
+            title: 'Confirm Submission',
+            html: `
+                <p>Are you sure the data entered is correct?</p>
+                <br>
+                <p><strong>Date:</strong> ${transactionDate.toLocaleDateString()}</p>
+                <p><strong>Status:</strong> ${status}</p>
+                <p><strong>Type:</strong> ${
+                value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing'
                 }</p>
-            `
-            )
-            .join('')}
-        `,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#1e3a8a',
-        cancelButtonColor: '#dc2626',
-        confirmButtonText: 'Yes, Submit!',
+                <p><strong>Delivery Note:</strong> ${deliveryNote}</p>
+                <p><strong>Supplier:</strong> ${selectedSupplier.label}</p>
+                <p><strong>Parts:</strong></p>
+                ${partList
+                .map(
+                    (part) => `
+                    <p>${part.partNumber} | Qty OK: ${part.qtyOk} | Qty NG: ${
+                    part.qtyNg || 0
+                    }</p>
+                `
+                )
+                .join('')}
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e3a8a',
+            cancelButtonColor: '#dc2626',
+            confirmButtonText: 'Yes, Submit!',
         });
 
         if (!confirm.isConfirmed) {
-        return;
+            return;
         }
 
         try {
-        const token = localStorage.getItem('access_token');
+            const token = localStorage.getItem('access_token');
 
-        const transactions = partList.map((part) => {
-            const transactionDateTime = new Date(transactionDate);
-            const now = new Date();
-            transactionDateTime.setHours(
-            now.getHours(),
-            now.getMinutes(),
-            now.getSeconds(),
-            );
+            const transactions = partList.map((part) => {
+                const transactionDateTime = new Date(transactionDate);
+                const now = new Date();
+                transactionDateTime.setHours(
+                    now.getHours(),
+                    now.getMinutes(),
+                    now.getSeconds(),
+                );
 
-            const actualTransactionDate = `${transactionDateTime.getFullYear()}-${String(transactionDateTime.getMonth() + 1).padStart(2, '0')}-${String(transactionDateTime.getDate()).padStart(2, '0')}`;
-            const actualTransactionTime = `${String(transactionDateTime.getHours()).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(transactionDateTime.getSeconds()).padStart(2, '0')}`;
+                const actualTransactionDate = `${transactionDateTime.getFullYear()}-${String(transactionDateTime.getMonth() + 1).padStart(2, '0')}-${String(transactionDateTime.getDate()).padStart(2, '0')}`;
+                const actualTransactionTime = `${String(transactionDateTime.getHours()).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(transactionDateTime.getSeconds()).padStart(2, '0')}`;
 
 
-            return {
-            actual_transaction_date: actualTransactionDate,
-            actual_transaction_time: actualTransactionTime,
-            transaction_type: value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing',
-            status: status,
-            delivery_note: deliveryNote || null,
-            item_code: part.partNumber,
-            qty_ok: parseInt(part.qtyOk || '0', 10),
-            qty_ng: parseInt(part.qtyNg || '0', 10),
-            };
-        });
+                return {
+                    actual_transaction_date: actualTransactionDate,
+                    actual_transaction_time: actualTransactionTime,
+                    transaction_type: value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing',
+                    status: status,
+                    delivery_note: deliveryNote || null,
+                    item_code: part.partNumber,
+                    qty_ok: parseInt(part.qtyOk || '0', 10),
+                    qty_ng: parseInt(part.qtyNg || '0', 10),
+                    bp_code: selectedSupplier.value,
+                };
+            });
 
-        const response = await fetch(API_Create_Transaction_Subcont(), {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ data: transactions }),
-        });
+            const response = await fetch(API_Create_Transaction_Subcont(), {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ data: transactions }),
+            });
 
-        if (!response.ok) throw new Error('Failed to submit');
+            if (!response.ok) throw new Error('Failed to submit');
 
-        toast.success('Data submitted successfully!');
+            toast.success('Data submitted successfully!');
 
-        // Reset form
-        setPartList([]);
-        setStatus('');
-        setDeliveryNote('');
-        setTransactionDate(new Date());
+            // Reset form
+            setPartList([]);
+            setStatus('');
+            setDeliveryNote('');
+            setTransactionDate(new Date());
+            setSelectedSupplier(null);
         } catch (error) {
-        toast.error('Error submitting data');
-        console.error(error);
+            toast.error('Error submitting data');
+            console.error(error);
         }
     };
 
@@ -225,6 +288,25 @@ const AdminTransactions = () => {
                 <div className="max-w-[1024px] mx-auto">
                 {(value === 0 || value === 1 || value === 2) && (
                     <div className="p-4 md:p-6.5 gap-4">
+
+                    {/* Supplier Selection */}
+                    <div className="mb-4.5 w-full">
+                        <label className="mb-2.5 block text-black">
+                            Select Supplier <span className="text-meta-1">*</span>
+                        </label>
+                        <div className="w-full">
+                            <Select
+                            id="supplier_id"
+                            options={suppliers}
+                            value={selectedSupplier}
+                            onChange={handleSupplierChange}
+                            placeholder="Search Supplier"
+                            className="w-full"
+                            isClearable
+                            />
+                        </div>
+                    </div>
+
                     {/* Date Picker */}
                     <div className="mb-4">
                         <DatePicker
@@ -236,6 +318,8 @@ const AdminTransactions = () => {
                         label='Date'
                         />
                     </div>
+                    
+
                     {/* Status Selection */}
                     {(value === 0 || value === 1 || value === 2) && (
                         <div className="mb-4">
@@ -279,19 +363,16 @@ const AdminTransactions = () => {
                         options={partOptions}
                         value={selectedPart}
                         onChange={handlePartChange}
-                        placeholder="Select Part Name"
+                        placeholder="Select Part Number"
                         className="w-full"
                         isClearable
                         />
                     </div>
-                    {/* Add Button */}
-                    <button
+                    <Button
+                        title="Add Part"
                         onClick={handleAddPart}
-                        className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center hover:bg-opacity-90 mb-4"
-                    >
-                        <FaPlus className="mr-2" />
-                        Add Part
-                    </button>
+                        icon={FaPlus}
+                    />
 
                     {/* Preview List */}
                     {partList.length > 0 && (

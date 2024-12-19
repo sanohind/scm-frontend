@@ -32,16 +32,21 @@ export const AdminSubcont = () => {
                 </h3>
 
                 <ul className="mb-6 flex flex-col gap-1.5">
-                    {/* <!-- Menu Item Manage Items --> */}
-                    <ManageItems />
-                    {/* <!-- Menu Item Add Items --> */}
-                    <AddItems />
                     {/* <!-- Menu Item Stock Items --> */}
                     <StockItems />
                     {/* <!-- Menu Item Stock Items --> */}
+                    
                     {/* <!-- Menu Item Report Transactions --> */}
                     <TransactionsReport />
-                    {/* <!-- Menu Item Report Transaction --> */}
+                    {/* <!-- Menu Item Report Transactions --> */}
+                    
+                    {/* <!-- Menu Item Manage Items --> */}
+                    <ManageItems />
+                    {/* <!-- Menu Item Manage Items --> */}
+
+                    {/* <!-- Menu Item Add Items --> */}
+                    <AddItems />
+                    {/* <!-- Menu Item Add Items --> */}
 
                 </ul>
             </div>
