@@ -12,6 +12,7 @@ interface Event {
   start: Date;
   end: Date;
   type: string;
+  bp_code?: string;
 }
 
 interface CalendarProps {
@@ -25,7 +26,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
   const onSelectEventHandler = (event: Event) => {
     Swal.fire({
       icon: 'info',
-      title: event.title,
+      title: event.bp_code ? `${event.title} | ${event.bp_code}` : event.title,
       html: `
       <div>
         <p>
@@ -34,7 +35,7 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
         <p>
           End Date: <strong>${moment(event.end).format('MMMM D, YYYY')}</strong>
         </p>
-        <p>Type: ${event.type}</p>
+        <p>Type: <strong>${event.type}</strong></p>
       </div>
       `,
       confirmButtonColor: '#1e3a8a',
@@ -191,6 +192,49 @@ const Calendar: React.FC<CalendarProps> = ({ events, defaultView = Views.MONTH }
             background: #e5e7eb;
             color: #111827;
           }
+
+          .custom-calendar .rbc-overlay {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: white;
+      width: 300px;
+    }
+
+    .custom-calendar .rbc-overlay-header {
+      font-weight: 600;
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+    }
+
+    .custom-calendar .rbc-overlay > .rbc-event {
+      margin: 8px 0;
+    }
+
+    /* Scrollbar styling */
+    .custom-calendar .rbc-overlay::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-calendar .rbc-overlay::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .custom-calendar .rbc-overlay::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+
+    .custom-calendar .rbc-overlay::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
         `}
       </style>
     </div>
