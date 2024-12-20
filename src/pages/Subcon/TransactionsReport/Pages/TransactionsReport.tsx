@@ -29,12 +29,12 @@ const TransactionReport = () => {
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
-  const today = new Date();
-  const [startDate, setStartDate] = useState<Date>(today);
-  const [endDate, setEndDate] = useState<Date>(today);
+  const NowDate = new Date();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>(NowDate);
   const [partOptions, setPartOptions] = useState<{ value: string; text: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPartOptions = async () => {
@@ -294,13 +294,6 @@ const TransactionReport = () => {
                 </div>
                 {/* Download Buttons */}
                 <div className="flex gap-2 self-center">
-                  {/* <button
-                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-800 transition-colors"
-                    onClick={handleDownloadExcel}
-                  >
-                    <FaFileExcel className="w-4 h-4" />
-                    <span>Download Excel</span>
-                  </button> */}
                   <Button
                     title="Download Excel"
                     icon={FaFileExcel}

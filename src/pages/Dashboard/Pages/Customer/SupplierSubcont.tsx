@@ -189,7 +189,7 @@ const DashboardSupplierSubcont: React.FC = () => {
                         <>
                             <ChartOne
                                 titleOne="DN Confirmed"
-                                titleTwo="DN Over Time"
+                                titleTwo="DN Delayed"
                                 dataOne={dnData.dn_done}
                                 dataTwo={dnData.dn_overtime}
                                 categories={months}
