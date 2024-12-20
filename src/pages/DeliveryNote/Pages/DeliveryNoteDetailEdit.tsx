@@ -40,6 +40,7 @@ const DeliveryNoteDetailEdit = () => {
     planDelivery: '',
     statusDN: '',
     confirmUpdateAt: '',
+    
   });
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
@@ -70,15 +71,22 @@ const DeliveryNoteDetailEdit = () => {
 
       if (result && result.data) {
         const dn = result.data;
-        setDNDetails({
-          noDN: dn.no_dn,
-          noPO: dn.po_no,
-          planDelivery: dn.plan_delivery_date,
-          statusDN: dn.status_desc,
-          confirmUpdateAt: dn.confirm_update_at,
-        });
-        
         const waveNumberSet = new Set<number>();
+
+        const dnDetailsWithWaves: DNDetails & { [key: string]: string } = {
+          noDN: dn.no_dn || '-',
+          noPO: dn.po_no || '-',
+          planDelivery: dn.plan_delivery_date || '-',
+          statusDN: dn.status_desc || '-',
+          confirmUpdateAt: dn.confirm_update_at || '-',
+        };
+
+        // Loop through the waves and add confirmAt properties dynamically
+        for (let i = 1; i <= waveNumberSet.size; i++) {
+          dnDetailsWithWaves[`confirmAt${i}`] = dn[`confirm_at_${i}`] || '-';
+        }
+
+        setDNDetails(dnDetailsWithWaves);
 
         const details = dn.detail.map((detail: any, index: number) => {
           const outstandings: { [wave: string]: string | number } = {};
@@ -109,7 +117,7 @@ const DeliveryNoteDetailEdit = () => {
             QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
             qtyLabel: detail.dn_snp || '-',
             qtyRequested: detail.dn_qty || '-',
-            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm, // Handle null case
+            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm,
             qtyDelivered: detail.receipt_qty || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
@@ -143,7 +151,7 @@ const DeliveryNoteDetailEdit = () => {
   const handleConfirmMode = () => {
     const updatedData = filteredData.map((detail) => ({
       ...detail,
-      qtyConfirm: detail.qtyConfirm || detail.qtyRequested,
+      qtyConfirm: detail.qtyConfirm === '-' ? detail.qtyRequested : detail.qtyConfirm,
     }));
     setFilteredData(updatedData);
     setConfirmMode(true);
@@ -155,11 +163,17 @@ const DeliveryNoteDetailEdit = () => {
     setWaveNumbers([...waveNumbers, newWaveNumber]);
 
     const updatedData = filteredData.map(detail => {
+      const previousOutstandingQty = waveNumbers.reduce((acc, waveNumber) => {
+        const waveKey = `wave_${waveNumber}`;
+        return acc + (Number(detail.outstandings[waveKey]) || 0);
+      }, 0);
+      const outstandingQty = Number(detail.qtyRequested) - Number(detail.qtyConfirm) - previousOutstandingQty;
+  
       return {
         ...detail,
         outstandings: {
           ...detail.outstandings,
-          [`wave_${newWaveNumber}`]: '0'
+          [`wave_${newWaveNumber}`]: outstandingQty.toString()
         }
       };
     });
@@ -539,12 +553,14 @@ const DeliveryNoteDetailEdit = () => {
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[24%]">Part Name</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">UoM</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY PO</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Label</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">SNP</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Requested</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Confirm</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                      {waveNumbers.length > 0 ? 'QTY Confirm 1' : 'QTY Confirm'}
+                    </th>
                     {waveNumbers.map((waveNumber) => (
-                      <th key={`qtyOutstanding${waveNumber}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b">
-                        {'Outstanding ' + waveNumber}
+                      <th key={`qtyConfirm${waveNumber + 1}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                      {'QTY Confirm ' + (waveNumber + 1)}
                       </th>
                     ))}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
@@ -596,7 +612,7 @@ const DeliveryNoteDetailEdit = () => {
                               {outstandingMode && waveNumber === Math.max(...waveNumbers) ? (
                                 <input
                                   type="number"
-                                  className="border border-gray-300 rounded text-center"
+                                  className="border border-gray-300 rounded text-center w-full"
                                   value={qtyValue}
                                   onChange={(e) => handleOutstandingQtyChange(index, waveKey, e.target.value)}
                                 />
