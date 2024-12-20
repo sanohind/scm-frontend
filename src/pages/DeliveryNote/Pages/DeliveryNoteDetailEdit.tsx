@@ -30,17 +30,22 @@ const DeliveryNoteDetailEdit = () => {
     noDN: string;
     noPO: string;
     planDelivery: string;
-    statusDN: string;
     confirmUpdateAt: string;
+    confirmAt2: string;
+    confirmAt3: string;
+    confirmAt4: string;
+    confirmAt5: string;
   }
   
   const [dnDetails, setDNDetails] = useState<DNDetails>({
     noDN: '',
     noPO: '',
     planDelivery: '',
-    statusDN: '',
     confirmUpdateAt: '',
-    
+    confirmAt2: '',
+    confirmAt3: '',
+    confirmAt4: '',
+    confirmAt5: '',
   });
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
@@ -71,22 +76,18 @@ const DeliveryNoteDetailEdit = () => {
 
       if (result && result.data) {
         const dn = result.data;
+        setDNDetails({
+          noDN: dn.no_dn || '',
+          noPO: dn.po_no || '',
+          planDelivery: dn.plan_delivery_date || '',
+          confirmUpdateAt: dn.confirm_update_at,
+          confirmAt2: dn.confirm_at_2,
+          confirmAt3: dn.confirm_at_3,
+          confirmAt4: dn.confirm_at_4,
+          confirmAt5: dn.confirm_at_5,
+        });
+        
         const waveNumberSet = new Set<number>();
-
-        const dnDetailsWithWaves: DNDetails & { [key: string]: string } = {
-          noDN: dn.no_dn || '-',
-          noPO: dn.po_no || '-',
-          planDelivery: dn.plan_delivery_date || '-',
-          statusDN: dn.status_desc || '-',
-          confirmUpdateAt: dn.confirm_update_at || '-',
-        };
-
-        // Loop through the waves and add confirmAt properties dynamically
-        for (let i = 1; i <= waveNumberSet.size; i++) {
-          dnDetailsWithWaves[`confirmAt${i}`] = dn[`confirm_at_${i}`] || '-';
-        }
-
-        setDNDetails(dnDetailsWithWaves);
 
         const details = dn.detail.map((detail: any, index: number) => {
           const outstandings: { [wave: string]: string | number } = {};
@@ -117,7 +118,7 @@ const DeliveryNoteDetailEdit = () => {
             QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
             qtyLabel: detail.dn_snp || '-',
             qtyRequested: detail.dn_qty || '-',
-            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm,
+            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm, // Handle null case
             qtyDelivered: detail.receipt_qty || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
@@ -556,17 +557,56 @@ const DeliveryNoteDetailEdit = () => {
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">SNP</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Requested</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      {waveNumbers.length > 0 ? 'QTY Confirm 1' : 'QTY Confirm'}
+                      <div>
+                        {waveNumbers.length > 0 ? 'QTY Confirm 1' : 'QTY Confirm'}
+                        {dnDetails.confirmUpdateAt && (
+                          <>
+                          <div className="border-t border-gray-300 my-1"></div>
+                          <div className="text-xs font-normal normal-case">
+                            {dnDetails.confirmUpdateAt}
+                          </div>
+                          </>
+                        )}
+                      </div>
                     </th>
-                    {waveNumbers.map((waveNumber) => (
+                    {waveNumbers.map((waveNumber) => {
+                      let confirmDate;
+                      switch(waveNumber) {
+                        case 1:
+                          confirmDate = dnDetails.confirmAt2;
+                          break;
+                        case 2:
+                          confirmDate = dnDetails.confirmAt3;
+                          break;
+                        case 3:
+                          confirmDate = dnDetails.confirmAt4;
+                          break;
+                        case 4:
+                          confirmDate = dnDetails.confirmAt5;
+                          break;
+                        default:
+                          confirmDate = null;
+                      }
+                      
+                      return (
                       <th key={`qtyConfirm${waveNumber + 1}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
-                      {'QTY Confirm ' + (waveNumber + 1)}
+                        <div>
+                          {'QTY Confirm ' + (waveNumber + 1)}
+                          {confirmDate && (
+                            <>
+                              <div className="border-t border-gray-300 my-1"></div>
+                              <div className="text-xs font-normal normal-case">
+                                {new Date(confirmDate).toLocaleString()}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </th>
-                    ))}
+                      );
+                    })}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Received</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
-                    
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">

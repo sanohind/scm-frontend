@@ -34,7 +34,7 @@ const DeliveryNoteDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const noDN = new URLSearchParams(location.search).get('noDN');
-  const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '', statusDN: '', confirmUpdateAt: '' });
+  const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '', confirmUpdateAt: '', confirmAt2: '', confirmAt3: '', confirmAt4: '', confirmAt5: '' });
   const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
 
   // Fetch Delivery Note Details from API
@@ -60,8 +60,11 @@ const DeliveryNoteDetail = () => {
           noDN: dn.no_dn,
           noPO: dn.po_no,
           planDelivery: dn.plan_delivery_date,
-          statusDN: dn.status_desc,
           confirmUpdateAt: dn.confirm_update_at,
+          confirmAt2: dn.confirm_at_2,
+          confirmAt3: dn.confirm_at_3,
+          confirmAt4: dn.confirm_at_4,
+          confirmAt5: dn.confirm_at_5,
         });
         
         const waveNumberSet = new Set<number>();
@@ -415,19 +418,61 @@ const DeliveryNoteDetail = () => {
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">No</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Number</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[26%]">Part Name</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">UoM</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY PO</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Label</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b  w-[9%]">QTY Requested</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Confirm</th>
-                    {waveNumbers.map((waveNumber) => (
-                      <th key={`qtyOutstanding${waveNumber}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b">
-                        {'Outstanding ' + waveNumber}
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">UoM</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY PO</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">SNP</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b  w-[8%]">QTY Requested</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                      <div>
+                        {waveNumbers.length > 0 ? 'QTY Confirm 1' : 'QTY Confirm'}
+                        {dnDetails.confirmUpdateAt && (
+                          <>
+                          <div className="border-t border-gray-300 my-1"></div>
+                          <div className="text-xs font-normal normal-case">
+                            {dnDetails.confirmUpdateAt}
+                          </div>
+                          </>
+                        )}
+                      </div>
+                    </th>
+                    {waveNumbers.map((waveNumber) => {
+                      let confirmDate;
+                      switch(waveNumber) {
+                        case 1:
+                          confirmDate = dnDetails.confirmAt2;
+                          break;
+                        case 2:
+                          confirmDate = dnDetails.confirmAt3;
+                          break;
+                        case 3:
+                          confirmDate = dnDetails.confirmAt4;
+                          break;
+                        case 4:
+                          confirmDate = dnDetails.confirmAt5;
+                          break;
+                        default:
+                          confirmDate = null;
+                      }
+                      
+                      return (
+                      <th key={`qtyConfirm${waveNumber + 1}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                        <div>
+                          {'QTY Confirm ' + (waveNumber + 1)}
+                          {confirmDate && (
+                            <>
+                              <div className="border-t border-gray-300 my-1"></div>
+                              <div className="text-xs font-normal normal-case">
+                                {new Date(confirmDate).toLocaleString()}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </th>
-                    ))}
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Delivered</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Received</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">QTY Minus</th>
+                      );
+                    })}
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Received</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
