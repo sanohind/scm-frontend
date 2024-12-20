@@ -480,44 +480,45 @@ const DeliveryNoteDetailEdit = () => {
                 </div>
               </div>
               {/* Print Buttons */}
-              <div className="flex gap-2 items-center">
-                <Dropdown 
-                  label={
-                  <div className="flex items-center gap-2">
-                    <FaPrint className="w-4 h-4" />
-                    <span>Print DN</span>
-                  </div>
-                  } 
-                  dismissOnClick={false} 
-                  style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
-                >
-                  <Dropdown.Item onClick={() => handlePrintDN('all')}>Print All</Dropdown.Item>
-                  <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
-                  {waveNumbers.map((waveNumber) => (
-                  <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
-                    {`Print Outstanding ${waveNumber}`}
-                  </Dropdown.Item>
-                  ))}
-                </Dropdown>
-                <Dropdown 
-                  label={
-                  <div className="flex items-center gap-2">
-                    <FaPrint className="w-4 h-4" />
-                    <span>Print Label</span>
-                  </div>
-                  }
-                  dismissOnClick={false} 
-                  style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
-                >
-                  <Dropdown.Item onClick={() => handlePrintLabel('all')}>Print All</Dropdown.Item>
-                  <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
-                  {waveNumbers.map((waveNumber) => (
-                  <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
-                    {`Print Outstanding ${waveNumber}`}
-                  </Dropdown.Item>
-                  ))}
-                </Dropdown>
-
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center items-start">
+                <div className='flex gap-2 items-center'>
+                  <Dropdown 
+                    label={
+                    <div className="flex items-center gap-2">
+                      <FaPrint className="w-4 h-4" />
+                      <span>Print DN</span>
+                    </div>
+                    } 
+                    dismissOnClick={false} 
+                    style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
+                  >
+                    <Dropdown.Item onClick={() => handlePrintDN('all')}>Print All</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
+                    {waveNumbers.map((waveNumber) => (
+                    <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
+                      {`Print Outstanding ${waveNumber}`}
+                    </Dropdown.Item>
+                    ))}
+                  </Dropdown>
+                  <Dropdown 
+                    label={
+                    <div className="flex items-center gap-2">
+                      <FaPrint className="w-4 h-4" />
+                      <span>Print Label</span>
+                    </div>
+                    }
+                    dismissOnClick={false} 
+                    style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
+                  >
+                    <Dropdown.Item onClick={() => handlePrintLabel('all')}>Print All</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
+                    {waveNumbers.map((waveNumber) => (
+                    <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
+                      {`Print Outstanding ${waveNumber}`}
+                    </Dropdown.Item>
+                    ))}
+                  </Dropdown>
+                </div>
                 <Button
                   title="Download Excel"
                   icon={FaFileExcel}

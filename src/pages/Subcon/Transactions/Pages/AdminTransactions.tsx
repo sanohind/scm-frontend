@@ -6,7 +6,7 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_List_Item_Subcont, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_Create_Transaction_Subcont_Admin, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
@@ -46,10 +46,10 @@ const AdminTransactions = () => {
         }
     }, [suppliers]);
 
-    const fetchData = async () => {
+    const fetchData = async (supplierCode: string) => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_List_Item_Subcont_Admin()}${selectedSupplier?.value}`, {
+            const response = await fetch(`${API_List_Item_Subcont_Admin()}${supplierCode}`, {
             headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -244,7 +244,6 @@ const AdminTransactions = () => {
                     item_code: part.partNumber,
                     qty_ok: parseInt(part.qtyOk || '0', 10),
                     qty_ng: parseInt(part.qtyNg || '0', 10),
-                    bp_code: selectedSupplier.value,
                 };
             });
 

@@ -60,7 +60,7 @@ Font.register({
 const styles = StyleSheet.create({
     page: {
         padding: 30,
-        fontSize: 8,
+        fontSize: 9,
         fontFamily: 'Poppins',
     },
     pageInfo: {
@@ -91,16 +91,16 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         textAlign: 'center',
         flexGrow: 1,
-        fontSize: 7,
+        fontSize: 8,
     },
     deliveryNote: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 'semibold',
         
     },
     details: {
         flexDirection: 'row',
-        fontSize: 8,
+        fontSize: 9,
         lineHeight: 1.1,
         marginTop: 12,
     },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         height: 30,
         fontWeight: 'semibold',
-        fontSize: 7,
+        fontSize: 8,
     },
     tableColNo: {
         width: '5%',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'stretch',
         minHeight: 24,
-        fontSize: 7,
+        fontSize: 8,
     },
     tableRowNo: {
         width: '5%',
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     },
     terms: {
         marginTop: 20,
-        fontSize: 8,
+        fontSize: 9,
         fontStyle: 'italic',   
         color: '#1F2937',
     },
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     
     downloadAt: {
         position: 'absolute',
-        fontSize: 8,
+        fontSize: 9,
         fontWeight: 'medium',
     },
 });

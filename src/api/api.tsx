@@ -69,6 +69,7 @@ export const API_List_Item_ERP_Subcont_Admin = () => API + getRolePath() + `/ite
 export const API_Manage_Item_Subcont_Admin = () => API + getRolePath() + `/item/all-list/`;
 export const API_Update_Item_Subcont_Admin = () => API + getRolePath() + `/item/update`;
 export const API_Delete_Item_Subcont_Admin = () => API + getRolePath() + `/item/delete`;
+export const API_Create_Transaction_Subcont_Admin = () => API + getRolePath() + `/transaction/store/`;
 
 // Purchase Order Supplier
 export const API_PO = () => API + getRolePath() + `/po/index`;
