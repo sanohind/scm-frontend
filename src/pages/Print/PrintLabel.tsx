@@ -127,78 +127,77 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
                     <View key={index} style={styles.label}>
                         <View style={styles.table}>
                             {/* Row 1 */}
-                            <View style={{flexDirection: 'row', border: '1px', height: '70%' }}>
+                            <View style={{flexDirection: 'row', border: '1px', height: '60%' }}>
                                 <View style={{ borderRight: '1px', width: '13%', justifyContent: 'center', marginLeft: 3 }}>
-                                    <Text style={{ fontSize: 6 }}>
+                                    <Text style={{ fontSize: 7 }}>
                                     MODEL
                                     </Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '57%', justifyContent: 'center'}}>
-                                    <Text style={{ marginLeft: 3, fontSize: 6}}>PART NO</Text>
-                                    <Text style={{ marginTop: 1, alignSelf: 'center', fontSize: 10, fontWeight: 'semibold'}}>{item.part_number || 'N/A'}</Text>
+                                    <Text style={{ marginLeft: 3, fontSize: 7}}>PART NO</Text>
+                                    <Text style={{ alignSelf: 'center', fontSize: 12, fontWeight: 'semibold'}}>{item.part_number || 'N/A'}</Text>
                                 </View>
                                 <View style={{width: '30%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}>LOT NO</Text>
-                                    <Text style={{ marginTop: 1, alignSelf: 'center', fontSize: 9, fontWeight: 'semibold'}}>{item.lot_number || 'N/A'}</Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}>LOT NO</Text>
+                                    <Text style={{alignSelf: 'center', fontSize: 9, fontWeight: 'semibold'}}>{item.lot_number || 'N/A'}</Text>
                                 </View>
                             </View>
 
                             {/* Row 2 */}
-                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '70%' }}>
+                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '60%' }}>
                                 <View style={{borderRight: '1px', width: '13%', justifyContent: 'center', marginLeft: 3 }}>
-                                    <Text style={{ fontSize: 6}}>CUSTOMER</Text>
+                                    <Text style={{ fontSize: 7}}>CUSTOMER</Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '57%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}>PART NAME</Text>
-                                    <Text style={{marginTop: 1, alignSelf: 'center', fontSize: 10, fontWeight: 'semibold'}}>{item.part_name || 'N/A'}</Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}>PART NAME</Text>
+                                    <Text style={{alignSelf: 'center', fontSize: 12, fontWeight: 'semibold'}}>{item.part_name || 'N/A'}</Text>
                                 </View>
                                 <View style={{width: '30%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}>QUANTITY</Text>
-                                    <Text style={{marginTop: 1, alignSelf: 'center', fontSize: 9, fontWeight: 'semibold'}}>{item.quantity || 'N/A'}</Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}>QUANTITY</Text>
+                                    <Text style={{alignSelf: 'center', fontSize: 12, fontWeight: 'semibold'}}>{item.quantity || 'N/A'}</Text>
                                 </View>
                             </View>
 
                             {/* Row 3 */}
-                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '70%' }}>
+                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '60%' }}>
                                 <View style={{borderRight: '1px', width: '45%', justifyContent: 'center', marginLeft: 3 }}>
-                                    <Text style={{ marginTop: 1, alignSelf: 'center', fontSize: 10, fontWeight: 'semibold' }}>{item.customer_name || 'N/A'}</Text>
+                                    <Text style={{ alignSelf: 'center', fontSize: 12, fontWeight: 'semibold' }}>{item.customer_name || 'N/A'}</Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '25%', justifyContent: 'center'}}>
-                                    <Text style={{marginTop: 1, alignSelf: 'center', fontSize: 10, fontWeight: 'semibold'}}>{item.po_number || 'N/A'}</Text>
+                                    <Text style={{alignSelf: 'center', fontSize: 12, fontWeight: 'semibold'}}>{item.po_number || 'N/A'}</Text>
                                 </View>
                                 <View style={{width: '30%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}>DATE DELIVERY</Text>
-                                    <Text style={{marginTop: 1, alignSelf: 'center', fontSize: 9, fontWeight: 'semibold'}}>{item.delivery_date || 'N/A'}</Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}>DATE DELIVERY</Text>
+                                    <Text style={{alignSelf: 'center', fontSize: 11, fontWeight: 'semibold'}}>{item.delivery_date || 'N/A'}</Text>
                                 </View>
                             </View>
 
                             {/* Row 4 */}
-                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '70%'}}>
+                            <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '60%'}}>
                                 <View style={{borderRight: '1px', width: '13%', paddingTop: 3, marginLeft: 3 }}>
-                                    <Text style={{fontSize: 6}}>QUALITY</Text>
+                                    <Text style={{fontSize: 7}}>QUALITY</Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '32%', paddingTop: 3, paddingLeft: 3 }}>
-                                    <Text style={{fontSize: 6}}>INSPECTION</Text>
+                                    <Text style={{fontSize: 7}}>INSPECTION</Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '25%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}>PRINTED DATE</Text>
-                                    <Text style={{ marginLeft: 3, fontSize: 6}}>{item.printed_date || 'N/A'}</Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}>PRINTED DATE</Text>
+                                    <Text style={{ alignSelf: 'center',marginLeft: 3, fontSize: 7}}>{item.printed_date || 'N/A'}</Text>
                                 </View>
                                 <View style={{width: '30%', justifyContent: 'center'}}>
-                                    <Text style={{marginLeft: 3, fontSize: 6}}> </Text>
+                                    <Text style={{marginLeft: 3, fontSize: 7}}> </Text>
                                 </View>
-
                             </View>
 
                             {/* Row 5 */}
                             <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, justifyContent: 'space-between', height: '100%'}}>
                                 {item.qr_number && (
-                                    <View style={{flexDirection: 'row' , alignItems: 'center'}}>
-                                    <Image
-                                        src={generateQRCode(item.qr_number)}
-                                        style={{}}
-                                    />
-                                    <Text style={{fontSize: 6, marginTop: 5}}>{item.qr_number}</Text>
+                                    <View style={{flexDirection: 'row' , alignItems: 'center', justifyContent: 'center'}}>
+                                        <Image
+                                            src={generateQRCode(item.qr_number)}
+                                            style={{}}
+                                        />
+                                        <Text style={{fontSize: 7}}>{item.qr_number}</Text>
                                     </View>
                                 )}
                                 {item.po_number && (
@@ -207,7 +206,7 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
                                             src={generateQRCode(item.po_number)}
                                             style={{}}
                                         />
-                                        <Text style={{fontSize: 6, margin: 2}}>{item.po_number}</Text>
+                                        <Text style={{fontSize: 7}}>{item.po_number}</Text>
                                     </View>
                                 )}
                             </View>
