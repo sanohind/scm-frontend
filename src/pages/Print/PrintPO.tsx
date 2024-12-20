@@ -52,7 +52,7 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     padding: 30,
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: 'Poppins',
   },
   pageInfo: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   details: {
     flexDirection: 'row',
-    fontSize: 8,
+    fontSize: 9,
     lineHeight: 1.1,
     marginTop: 7,
   },
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     minHeight: 24,
     fontWeight: 'bold',
-    fontSize: 8,
+    fontSize: 9,
   },
   tableColNo: {
     width: '5%',
@@ -155,6 +155,12 @@ const styles = StyleSheet.create({
   },
   tableCol: {
     width: '20%',
+    borderRightWidth: 1,
+    borderColor: '#000',
+    paddingTop: 8,
+  },
+  tableColDate: {
+    width: '15%',
     borderRightWidth: 1,
     borderColor: '#000',
     paddingTop: 8,
@@ -199,7 +205,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems: 'stretch',
     minHeight: 24,
-    fontSize: 7,
+    fontSize: 8,
   },
   tableRowDescription: {
     width: '35%',
@@ -321,7 +327,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
           <View style={styles.details}>
             <View style={styles.detailsLeft}>
               <Text>
-                <Text style={{ fontWeight: 'semibold' }}>To</Text> :  {' '}
+                <Text style={{ fontWeight: 'semibold' }}>To</Text> : {' '}
                 <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_name}</Text>
               </Text>
               <View style={{ paddingLeft: 20 }}>
@@ -336,7 +342,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 <Text>Attn</Text> :    {data.header.attn}
               </Text>
               <Text> </Text>
-              <Text style={{ fontSize: 6 }}>Please supply the following</Text>
+              <Text style={{ fontSize: 7 }}>Please supply the following</Text>
             </View>
             <View style={styles.detailsRight}>
               <View style={styles.row}>
@@ -375,7 +381,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 <Text>Description</Text>
                 <Text>Part No.</Text>
               </View>
-              <Text style={styles.tableCol}>Delivery Date</Text>
+              <Text style={styles.tableColDate}>Delivery Date</Text>
               <Text style={styles.tableColQty}>Qty</Text>
               <Text style={styles.tableColQty}>Unit</Text>
               <Text style={styles.tableColPrice}>Unit Price</Text>
@@ -389,7 +395,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                   <Text>{item.part_name}</Text>
                   <Text>{item.part_number}</Text>
                 </View>
-                <Text style={styles.tableCol}>{item.delivery_date}</Text>
+                <Text style={styles.tableColDate}>{item.delivery_date}</Text>
                 <Text style={styles.tableRowQTY}>{item.quantity}</Text>
                 <Text style={[styles.tableRowUnit, {textAlign: 'center'}]}>{item.unit}</Text>
                 <Text style={styles.tableRowPrice}>{item.unit_price}</Text>
@@ -406,11 +412,11 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 ]}
               >
               </Text>
-              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Subtotal</Text>
-              <Text style={[styles.tableRowQTY, {fontSize: 7, textAlign: 'right', fontWeight: 'bold' }]}>{calculateTotalQuantity(data.details)}</Text>
+              <Text style={[styles.tableColDate, { fontSize: 9, textAlign: 'center', fontWeight: 'bold'}]}>Subtotal</Text>
+              <Text style={[styles.tableRowQTY, {fontSize: 8, textAlign: 'right', fontWeight: 'bold' }]}>{calculateTotalQuantity(data.details)}</Text>
               <Text style={[styles.tableRowQTY]}></Text>
               <Text style={[styles.tableRowPrice]}></Text>
-              <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.total_amount}</Text>
+              <Text style={[styles.tableRowAmount, { fontSize: 8, fontWeight: 'bold' }]}>{data.header.total_amount}</Text>
             </View>
             <View style={styles.tableRow}>
               <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
@@ -421,11 +427,11 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 ]}
               >
               </Text>
-              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>PPN 11%</Text>
+              <Text style={[styles.tableColDate, { fontSize: 9, textAlign: 'center', fontWeight: 'bold'}]}>PPN 11%</Text>
               <Text style={[styles.tableRowQTY]}></Text>
               <Text style={[styles.tableRowQTY]}></Text>
               <Text style={[styles.tableRowPrice]}></Text>
-              <Text style={[styles.tableRowAmount, { fontSize: 7, fontWeight: 'bold' }]}>{data.header.ppn}</Text>
+              <Text style={[styles.tableRowAmount, { fontSize: 8, fontWeight: 'bold' }]}>{data.header.ppn}</Text>
             </View>
             <View style={[styles.tableRow, { borderBottomWidth: 0} ]}>
               <Text style={[styles.tableColNo, { borderRightWidth: 0 }]}></Text>
@@ -436,11 +442,11 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 ]}
               >
               </Text>
-              <Text style={[styles.tableCol, { fontSize: 7, textAlign: 'center', fontWeight: 'bold'}]}>Total</Text>
+              <Text style={[styles.tableColDate, { fontSize: 9, textAlign: 'center', fontWeight: 'bold'}]}>Total</Text>
               <Text style={[styles.tableRowQTY]}></Text>
               <Text style={[styles.tableRowQTY]}></Text>
               <Text style={[styles.tableRowPrice]}></Text>
-              <Text style={[styles.tableRowAmount, { borderBottomWidth: 0, fontSize: 7, fontWeight: 'bold' }]}>{data.header.total}</Text>
+              <Text style={[styles.tableRowAmount, { borderBottomWidth: 0, fontSize: 8, fontWeight: 'bold' }]}>{data.header.total}</Text>
             </View>
           </View>
 
@@ -472,7 +478,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
         <View wrap={false}>
           {/* Signature Section */}
           <View style={styles.signatureSection}>
-            <View style={{ width: '40%', textAlign: 'center', fontSize: 8 }}>
+            <View style={{ width: '40%', textAlign: 'center', fontSize: 9 }}>
               <Text>Accepted & Confirmed</Text>
               <Text>{data.header.supplier_name || ''}</Text>
               <Text style={{ marginTop: 90 }}>_____________________</Text>
