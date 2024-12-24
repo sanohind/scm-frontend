@@ -23,7 +23,22 @@ const DeliveryNoteDetail = () => {
     uom: string;
     [key: string]: string | number;
   }
+
+  interface DNDetails {
+    noDN: string;
+    noPO: string;
+    planDelivery: string;
+    confirmUpdateAt: string;
+    [key: string]: string | undefined;
+  }
   
+  const [dnDetails, setDNDetails] = useState<DNDetails>({
+    noDN: '',
+    noPO: '',
+    planDelivery: '',
+    confirmUpdateAt: '',
+  });
+
   const [details] = useState<Detail[]>([]);
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +49,6 @@ const DeliveryNoteDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const noDN = new URLSearchParams(location.search).get('noDN');
-  const [dnDetails, setDNDetails] = useState({ noDN: '', noPO: '', planDelivery: '', confirmUpdateAt: '', confirmAt2: '', confirmAt3: '', confirmAt4: '', confirmAt5: '' });
   const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
 
   // Fetch Delivery Note Details from API
@@ -56,16 +70,21 @@ const DeliveryNoteDetail = () => {
 
       if (result && result.data) {
         const dn = result.data;
-        setDNDetails({
-          noDN: dn.no_dn,
-          noPO: dn.po_no,
-          planDelivery: dn.plan_delivery_date,
+        const confirmAt = dn.confirm_at || {};
+        const confirmAtKeys = Object.keys(confirmAt).sort();
+
+        const dnDetails = {
+          noDN: dn.no_dn || '',
+          noPO: dn.po_no || '',
+          planDelivery: dn.plan_delivery_date || '',
           confirmUpdateAt: dn.confirm_update_at,
-          confirmAt2: dn.confirm_at_2,
-          confirmAt3: dn.confirm_at_3,
-          confirmAt4: dn.confirm_at_4,
-          confirmAt5: dn.confirm_at_5,
+        };
+  
+        confirmAtKeys.forEach((key, index) => {
+          (dnDetails as any)[`confirmAt${index + 2}`] = confirmAt[key];
         });
+  
+        setDNDetails(dnDetails);
         
         const waveNumberSet = new Set<number>();
 
@@ -95,11 +114,11 @@ const DeliveryNoteDetail = () => {
             partNumber: detail.part_no || '-',
             partName: detail.item_desc_a || '-',
             UoM: detail.dn_unit || '-',
-            QTY: detail.dn_qty || '-',
+            qtyPO: detail.po_qty || '-',
             qtyRequested: detail.dn_qty || '-',
             qtyLabel: detail.dn_snp || '-',
             qtyConfirm: detail.qty_confirm || '-', 
-            qtyDelivered: detail.receipt_qty || '-',
+            qtyDelivered: detail.qty_delivery || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
             outstandings,
@@ -367,7 +386,7 @@ const DeliveryNoteDetail = () => {
                     <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
-                      {`Print Outstanding ${waveNumber}`}
+                      {`Print Confirm ${waveNumber + 1}`}
                     </Dropdown.Item>
                     ))}
                   </Dropdown>
@@ -385,7 +404,7 @@ const DeliveryNoteDetail = () => {
                     <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
-                      {`Print Outstanding ${waveNumber}`}
+                      {`Print Confirm ${waveNumber + 1}`}
                     </Dropdown.Item>
                     ))}
                   </Dropdown>
@@ -435,41 +454,21 @@ const DeliveryNoteDetail = () => {
                         )}
                       </div>
                     </th>
-                    {waveNumbers.map((waveNumber) => {
-                      let confirmDate;
-                      switch(waveNumber) {
-                        case 1:
-                          confirmDate = dnDetails.confirmAt2;
-                          break;
-                        case 2:
-                          confirmDate = dnDetails.confirmAt3;
-                          break;
-                        case 3:
-                          confirmDate = dnDetails.confirmAt4;
-                          break;
-                        case 4:
-                          confirmDate = dnDetails.confirmAt5;
-                          break;
-                        default:
-                          confirmDate = null;
-                      }
-                      
-                      return (
-                      <th key={`qtyConfirm${waveNumber + 1}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                    {Object.keys(dnDetails).filter(key => key.startsWith('confirmAt')).map((key, index) => (
+                      <th key={key} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
                         <div>
-                          {'QTY Confirm ' + (waveNumber + 1)}
-                          {confirmDate && (
+                          {`QTY Confirm ${index + 2}`}
+                          {dnDetails[key] && (
                             <>
                               <div className="border-t border-gray-300 my-1"></div>
                               <div className="text-xs font-normal normal-case">
-                                {new Date(confirmDate).toLocaleString()}
+                                {new Date(dnDetails[key]).toLocaleString()}
                               </div>
                             </>
                           )}
                         </div>
                       </th>
-                      );
-                    })}
+                    ))}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Received</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
@@ -528,7 +527,7 @@ const DeliveryNoteDetail = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.UoM}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.QTY}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyPO}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyLabel}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyRequested}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyConfirm}</td>

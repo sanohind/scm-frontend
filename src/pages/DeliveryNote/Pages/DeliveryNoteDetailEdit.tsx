@@ -17,6 +17,7 @@ const DeliveryNoteDetailEdit = () => {
     partName: string;
     UoM: string;
     QTY: string;
+    qtyPO: string;
     qtyLabel: string;
     qtyRequested: string;
     qtyConfirm: string;
@@ -31,10 +32,7 @@ const DeliveryNoteDetailEdit = () => {
     noPO: string;
     planDelivery: string;
     confirmUpdateAt: string;
-    confirmAt2: string;
-    confirmAt3: string;
-    confirmAt4: string;
-    confirmAt5: string;
+    [key: string]: string | undefined;
   }
   
   const [dnDetails, setDNDetails] = useState<DNDetails>({
@@ -42,10 +40,6 @@ const DeliveryNoteDetailEdit = () => {
     noPO: '',
     planDelivery: '',
     confirmUpdateAt: '',
-    confirmAt2: '',
-    confirmAt3: '',
-    confirmAt4: '',
-    confirmAt5: '',
   });
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
@@ -55,7 +49,8 @@ const DeliveryNoteDetailEdit = () => {
   const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
-  const allQtyConfirmMatch = filteredData.every(detail => detail.qtyConfirm === detail.qtyRequested);
+  const allQtyDeliveredMatch = filteredData.every(detail => detail.qtyDelivered === detail.qtyRequested);
+
 
   // Fetch Delivery Note Details
   const fetchDeliveryNotes = async () => {
@@ -69,36 +64,41 @@ const DeliveryNoteDetailEdit = () => {
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (!response.ok) throw new Error('Failed to fetch delivery notes');
-
+  
       const result = await response.json();
-
+  
       if (result && result.data) {
         const dn = result.data;
-        setDNDetails({
+        const confirmAt = dn.confirm_at || {};
+        const confirmAtKeys = Object.keys(confirmAt).sort();
+  
+        const dnDetails = {
           noDN: dn.no_dn || '',
           noPO: dn.po_no || '',
           planDelivery: dn.plan_delivery_date || '',
           confirmUpdateAt: dn.confirm_update_at,
-          confirmAt2: dn.confirm_at_2,
-          confirmAt3: dn.confirm_at_3,
-          confirmAt4: dn.confirm_at_4,
-          confirmAt5: dn.confirm_at_5,
+        };
+  
+        confirmAtKeys.forEach((key, index) => {
+          (dnDetails as any)[`confirmAt${index + 2}`] = confirmAt[key];
         });
-        
+  
+        setDNDetails(dnDetails);
+  
         const waveNumberSet = new Set<number>();
-
+  
         const details = dn.detail.map((detail: any, index: number) => {
           const outstandings: { [wave: string]: string | number } = {};
-
+  
           if (detail.outstanding && typeof detail.outstanding === 'object') {
             for (const key in detail.outstanding) {
               const qtyArray = detail.outstanding[key]; // e.g., [50]
               if (qtyArray && qtyArray.length > 0) {
                 const qty = qtyArray[0]; // Assuming the first element
                 outstandings[key] = qty;
-
+  
                 // Extract wave number
                 const waveMatch = key.match(/wave_(\d+)/);
                 if (waveMatch && waveMatch[1]) {
@@ -108,7 +108,7 @@ const DeliveryNoteDetailEdit = () => {
               }
             }
           }
-
+  
           return {
             no: (index + 1).toString(),
             dnDetailNo: detail.dn_detail_no || '',
@@ -117,15 +117,16 @@ const DeliveryNoteDetailEdit = () => {
             UoM: detail.dn_unit || '-',
             QTY: detail.dn_qty !== null ? detail.dn_qty : '-',
             qtyLabel: detail.dn_snp || '-',
+            qtyPO: detail.po_qty || '-',
             qtyRequested: detail.dn_qty || '-',
             qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm, // Handle null case
-            qtyDelivered: detail.receipt_qty || '-',
+            qtyDelivered: detail.qty_delivery || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
             outstandings,
           };
         });
-
+  
         const waveNumbersArray = Array.from(waveNumberSet).sort((a, b) => a - b);
         setWaveNumbers(waveNumbersArray);
         setFilteredData(details);
@@ -162,6 +163,11 @@ const DeliveryNoteDetailEdit = () => {
   const handleAddOutstanding = () => {
     const newWaveNumber = waveNumbers.length > 0 ? Math.max(...waveNumbers) + 1 : 1;
     setWaveNumbers([...waveNumbers, newWaveNumber]);
+
+    setDNDetails(prev => ({
+      ...prev,
+      [`confirmAt${newWaveNumber + 1}`]: '',
+    }));
 
     const updatedData = filteredData.map(detail => {
       const previousOutstandingQty = waveNumbers.reduce((acc, waveNumber) => {
@@ -511,7 +517,7 @@ const DeliveryNoteDetailEdit = () => {
                     <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
-                      {`Print Outstanding ${waveNumber}`}
+                      {`Print Confirm ${waveNumber + 1}`}
                     </Dropdown.Item>
                     ))}
                   </Dropdown>
@@ -529,7 +535,7 @@ const DeliveryNoteDetailEdit = () => {
                     <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
-                      {`Print Outstanding ${waveNumber}`}
+                      {`Print Confirm ${waveNumber + 1}`}
                     </Dropdown.Item>
                     ))}
                   </Dropdown>
@@ -569,41 +575,21 @@ const DeliveryNoteDetailEdit = () => {
                         )}
                       </div>
                     </th>
-                    {waveNumbers.map((waveNumber) => {
-                      let confirmDate;
-                      switch(waveNumber) {
-                        case 1:
-                          confirmDate = dnDetails.confirmAt2;
-                          break;
-                        case 2:
-                          confirmDate = dnDetails.confirmAt3;
-                          break;
-                        case 3:
-                          confirmDate = dnDetails.confirmAt4;
-                          break;
-                        case 4:
-                          confirmDate = dnDetails.confirmAt5;
-                          break;
-                        default:
-                          confirmDate = null;
-                      }
-                      
-                      return (
-                      <th key={`qtyConfirm${waveNumber + 1}`} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
+                    {Object.keys(dnDetails).filter(key => key.startsWith('confirmAt')).map((key, index) => (
+                      <th key={key} className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">
                         <div>
-                          {'QTY Confirm ' + (waveNumber + 1)}
-                          {confirmDate && (
+                          {`QTY Confirm ${index + 2}`}
+                          {dnDetails[key] && (
                             <>
                               <div className="border-t border-gray-300 my-1"></div>
                               <div className="text-xs font-normal normal-case">
-                                {new Date(confirmDate).toLocaleString()}
+                                {new Date(dnDetails[key]).toLocaleString()}
                               </div>
                             </>
                           )}
                         </div>
                       </th>
-                      );
-                    })}
+                    ))}
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Delivered</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Received</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY Minus</th>
@@ -627,7 +613,7 @@ const DeliveryNoteDetailEdit = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partNumber}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partName}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.UoM}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.QTY}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyPO}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyLabel}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyRequested}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
@@ -690,8 +676,8 @@ const DeliveryNoteDetailEdit = () => {
                   <Button
                     title="Add Outstanding"
                     onClick={handleAddOutstanding}
-                    disabled={allQtyConfirmMatch}
-                    className={allQtyConfirmMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'}
+                    disabled={allQtyDeliveredMatch}
+                    className={allQtyDeliveredMatch ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-blue-900 text-white'}
                   />
                 ) : (
                   <Button
