@@ -38,6 +38,7 @@ export const API_User_Login_Performance__Admin = () => API + getRolePath() + `/u
 
 export const API_Create_User_Admin = () => API + getRolePath() + '/user/store';
 export const API_Edit_User_Admin = () => API + getRolePath() + '/user/edit/';
+export const API_Get_Email_Admin = () => API + getRolePath() + '/user/email/';
 export const API_Update_User_Admin = () => API + getRolePath() + '/user/update/';
 export const API_List_User_Admin = () => API + getRolePath() + '/user/index';
 export const API_Update_Status_Admin = () => API + getRolePath() + `/user/update/status/`;

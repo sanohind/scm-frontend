@@ -209,7 +209,7 @@ const EditUser = () => {
 
     return (
       <div className="w-full">
-        <div className="flex flex-wrap gap-2 p-2 border rounded-md mb-2">
+        <div className="flex flex-wrap gap-2 p-2 mb-2 rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
           {emails.map((email, index) => (
             <span key={index} className="bg-blue-100 px-2 py-1 rounded-md flex items-center gap-2">
               {email}
@@ -229,7 +229,7 @@ const EditUser = () => {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            placeholder="Type email"
+            placeholder="Type email ..."
             className="outline-none border-none flex-1 min-w-[200px]"
           />
         </div>
@@ -282,7 +282,7 @@ const EditUser = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Enter name"
                   required
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-d</a>efault disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
               </div>
 
@@ -329,7 +329,7 @@ const EditUser = () => {
               {/* Email Fields */}
               <div className="w-full md:w-[600px]">
                 <label className="mb-2.5 block text-black dark:text-white">
-                  Email <span className="text-meta-1">*</span>
+                  Email 
                 </label>
                   <EmailInput />
               </div>

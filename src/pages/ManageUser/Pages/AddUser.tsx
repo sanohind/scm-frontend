@@ -4,7 +4,7 @@ import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import Swal from 'sweetalert2';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_User_Admin, API_List_Partner_Admin } from '../../../api/api';
+import { API_Create_User_Admin, API_Get_Email_Admin, API_List_Partner_Admin } from '../../../api/api';
 import Button from '../../../components/Forms/Button';
 
 const AddUser = () => {
@@ -49,6 +49,39 @@ const AddUser = () => {
 
   const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
     setSelectedSupplier(selectedOption);
+    if (selectedOption) {
+      fetchEmails(selectedOption.value);
+    } else {
+      setEmails([]); // Clear emails when supplier is cleared
+    }
+  };
+
+  const fetchEmails = async (supplierCode: string) => {
+    const token = localStorage.getItem('access_token');
+    try {
+      const response = await fetch(`${API_Get_Email_Admin()}${supplierCode}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch emails');
+      
+      const result = await response.json();
+      if (result.success && result.data) {
+        if (result.data.length === 0) {
+          toast.warning('No emails found for this supplier');
+          setEmails(result.data);
+        } else {
+          setEmails(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching emails:', error);
+      toast.error(`Error fetching emails: ${error}`);
+    }
   };
 
 
@@ -116,10 +149,10 @@ const AddUser = () => {
   };
 
   const resetForm = () => {
-    setSelectedSupplier(null);
+    // setSelectedSupplier(null);
     setFirstName("");
     setUsername("");
-    setEmails([]);
+    // setEmails([]);
     setPassword("");
     setRole("");
   };
@@ -170,7 +203,7 @@ const AddUser = () => {
 
     return (
       <div className="w-full">
-        <div className="flex flex-wrap gap-2 p-2 border rounded-md mb-2">
+        <div className="flex flex-wrap gap-2 p-2 mb-2 rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
           {emails.map((email, index) => (
             <span key={index} className="bg-blue-100 px-2 py-1 rounded-md flex items-center gap-2">
               {email}
@@ -190,7 +223,7 @@ const AddUser = () => {
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            placeholder="Type email"
+            placeholder="Type email ..."
             className="outline-none border-none flex-1 min-w-[200px]"
           />
         </div>
@@ -227,7 +260,7 @@ const AddUser = () => {
             <div className="mb-4.5 flex flex-col md:flex-row gap-4 md:gap-6">
               <div className="w-full md:w-[300px]">
                 <label className="mb-2.5 block text-black dark:text-white">
-                  Name
+                  Name <span className="text-meta-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -241,7 +274,7 @@ const AddUser = () => {
 
                     <div className="w-full md:w-[300px]">
                 <label className="mb-2.5 block text-black dark:text-white">
-                  Role
+                  Role <span className="text-meta-1">*</span>
                 </label>
                 <select
                   value={role}
@@ -266,17 +299,17 @@ const AddUser = () => {
                   {/* Username and Email in one row */}
                   <div className="mb-4.5 flex flex-col md:flex-row gap-4 md:gap-6">
                     <div className="w-full md:w-[300px]">
-                <label className="mb-2.5 block text-black dark:text-white">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
-                  required
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Username <span className="text-meta-1">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter username"
+                        required
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
                     </div>
 
               <div className="w-full md:w-[600px]">
