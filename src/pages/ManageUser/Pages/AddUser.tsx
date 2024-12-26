@@ -12,11 +12,10 @@ const AddUser = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const [emailError, setEmailError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emails, setEmails] = useState<string[]>([]);
 
   useEffect(() => {
     fetchSuppliers();
@@ -52,12 +51,6 @@ const AddUser = () => {
     setSelectedSupplier(selectedOption);
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    setEmailError(!value.includes('@'));
-  };
-
 
   const generateRandomPassword = () => {
     if (selectedSupplier) {
@@ -81,7 +74,7 @@ const AddUser = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedSupplier || emailError) {
+    if (!selectedSupplier || !firstName || !role || !username || !password) {
       Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
       return;
     }
@@ -93,7 +86,7 @@ const AddUser = () => {
       status: "1",  // Default status for new users, can be adjusted as needed
       username,
       password,
-      email,
+      email: emails.filter(email => email.trim() !== ""),
     };
 
     try {
@@ -109,7 +102,7 @@ const AddUser = () => {
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok && result.status) {
         toast.success('User successfully created!');
         resetForm();
       } else {
@@ -126,9 +119,83 @@ const AddUser = () => {
     setSelectedSupplier(null);
     setFirstName("");
     setUsername("");
-    setEmail("");
+    setEmails([]);
     setPassword("");
     setRole("");
+  };
+
+  
+  const EmailInput = () => {
+    const [inputValue, setInputValue] = useState('');
+    
+    const handleEmailRemove = (index: number) => {
+      setEmails(emails.filter((_, i) => i !== index));
+    };
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setInputValue(value);
+
+      if (value.includes('@') && (value.endsWith('.com') || value.endsWith('.co.id') || value.endsWith('.net') || value.endsWith('.org'))) {
+        setEmails(prev => [...prev, value.trim()]);
+        setInputValue('');
+        setTimeout(() => {
+          document.getElementById('email-input')?.focus();
+        }, 0);
+      }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
+          setEmails(prev => [...prev, inputValue.trim()]);
+          setInputValue('');
+          setTimeout(() => {
+            document.getElementById('email-input')?.focus();
+          }, 0);
+        }
+      }
+    };
+
+    const handleBlur = () => {
+      if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
+      setEmails(prev => [...prev, inputValue.trim()]);
+      setInputValue('');
+      setTimeout(() => {
+        document.getElementById('email-input')?.focus();
+      }, 0);
+      }
+    };
+
+    return (
+      <div className="w-full">
+        <div className="flex flex-wrap gap-2 p-2 border rounded-md mb-2">
+          {emails.map((email, index) => (
+            <span key={index} className="bg-blue-100 px-2 py-1 rounded-md flex items-center gap-2">
+              {email}
+              <button 
+                type="button"
+                onClick={() => handleEmailRemove(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            id="email-input"
+            value={inputValue}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            placeholder="Type email"
+            className="outline-none border-none flex-1 min-w-[200px]"
+          />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -212,19 +279,11 @@ const AddUser = () => {
                 />
                     </div>
 
-                    <div className="w-full md:w-[300px]">
+              <div className="w-full md:w-[600px]">
                 <label className="mb-2.5 block text-black dark:text-white">
                   Email <span className="text-meta-1">*</span>
                 </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  placeholder="Enter email address"
-                  required
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-                {emailError && <span className="text-meta-1 text-sm mt-1">Email must contain "@" symbol.</span>}
+                  <EmailInput />
               </div>
             </div>
 

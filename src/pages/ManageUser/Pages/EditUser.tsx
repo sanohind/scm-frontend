@@ -14,15 +14,16 @@ const EditUser = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
   const [firstName, setFirstName] = useState("");
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-  const [emailError, setEmailError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get('userId');
+  const [emails, setEmails] = useState<string[]>([""]);
+  const [originalUsername, setOriginalUsername] = useState('');
+
 
   useEffect(() => {
     fetchSuppliers();
@@ -82,7 +83,7 @@ const EditUser = () => {
     }
   };
 
-  const populateForm = (data: { bp_code: string; name: string; role: string; username: string; email: string }) => {
+  const populateForm = (data: { bp_code: string; name: string; role: string; username: string; email: string[] }) => {
     if (!data) {
       console.error("Cannot populate form: data is undefined");
       return;
@@ -91,16 +92,10 @@ const EditUser = () => {
     setSelectedSupplier(matchedSupplier || null);
     setFirstName(data.name || "");
     setRole(data.role || "");
+    setOriginalUsername(data.username || "");
     setUsername(data.username || "");
-    setEmail(data.email || "");
+    setEmails(Array.isArray(data.email) ? data.email : [data.email || ""]);
   };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    setEmailError(!value.includes('@'));
-  };
-
 
   const generateRandomPassword = () => {
     if (selectedSupplier) {
@@ -124,18 +119,18 @@ const EditUser = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedSupplier || emailError) {
+    if (!selectedSupplier) {
       Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
       return;
     }
 
     const payload = {
       bp_code: selectedSupplier.value,
-      username: username,
+      username: username === originalUsername ? "" : username, // Compare with original username
       name: firstName,
       role,
-      password: password || null,
-      email,
+      password: password || "",
+      email: emails.filter(email => email.trim() !== ""),
     };
 
     try {
@@ -151,7 +146,7 @@ const EditUser = () => {
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok && result.status) {
         toast.success('User successfully updated!');
         setTimeout(() => {
           navigate('/list-user');
@@ -167,6 +162,79 @@ const EditUser = () => {
       console.error('Error during user update:', error);
       toast.error('An error occurred while updating the user.');
     }
+  };
+
+  const EmailInput = () => {
+    const [inputValue, setInputValue] = useState('');
+    
+    const handleEmailRemove = (index: number) => {
+      setEmails(emails.filter((_, i) => i !== index));
+    };
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setInputValue(value);
+
+      if (value.includes('@') && (value.endsWith('.com') || value.endsWith('.co.id') || value.endsWith('.net') || value.endsWith('.org'))) {
+        setEmails(prev => [...prev, value.trim()]);
+        setInputValue('');
+        setTimeout(() => {
+          document.getElementById('email-input')?.focus();
+        }, 0);
+      }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
+          setEmails(prev => [...prev, inputValue.trim()]);
+          setInputValue('');
+          setTimeout(() => {
+            document.getElementById('email-input')?.focus();
+          }, 0);
+        }
+      }
+    };
+
+    const handleBlur = () => {
+      if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
+      setEmails(prev => [...prev, inputValue.trim()]);
+      setInputValue('');
+      setTimeout(() => {
+        document.getElementById('email-input')?.focus();
+      }, 0);
+      }
+    };
+
+    return (
+      <div className="w-full">
+        <div className="flex flex-wrap gap-2 p-2 border rounded-md mb-2">
+          {emails.map((email, index) => (
+            <span key={index} className="bg-blue-100 px-2 py-1 rounded-md flex items-center gap-2">
+              {email}
+              <button 
+                type="button"
+                onClick={() => handleEmailRemove(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            id="email-input"
+            value={inputValue}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            placeholder="Type email"
+            className="outline-none border-none flex-1 min-w-[200px]"
+          />
+        </div>
+      </div>
+    );
   };
 
 
@@ -258,19 +326,12 @@ const EditUser = () => {
                 />
               </div>
 
-              <div className="w-full md:w-[300px]">
+              {/* Email Fields */}
+              <div className="w-full md:w-[600px]">
                 <label className="mb-2.5 block text-black dark:text-white">
                   Email <span className="text-meta-1">*</span>
                 </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={handleEmailChange}
-                  placeholder="Enter email address"
-                  required
-                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                />
-                {emailError && <span className="text-meta-1 text-sm mt-1">Email must contain "@" symbol.</span>}
+                  <EmailInput />
               </div>
             </div>
 
