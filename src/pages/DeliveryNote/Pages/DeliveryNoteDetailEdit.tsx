@@ -119,7 +119,7 @@ const DeliveryNoteDetailEdit = () => {
             qtyLabel: detail.dn_snp || '-',
             qtyPO: detail.po_qty || '-',
             qtyRequested: detail.dn_qty || '-',
-            qtyConfirm: detail.qty_confirm === null ? '-' : detail.qty_confirm, // Handle null case
+            qtyConfirm: dn.confirm_update_at === null ? '-' : detail.qty_confirm, // Handle null case
             qtyDelivered: detail.qty_delivery || '-',
             qtyReceived: detail.receipt_qty || '-',
             qtyMinus: Number(detail.dn_qty || 0) - Number(detail.receipt_qty || 0),
@@ -338,7 +338,7 @@ const DeliveryNoteDetailEdit = () => {
 
     // Add wave headers if any
     if (waveNumbers.length > 0) {
-      const waveHeaders = waveNumbers.map(num => `QTY Outstanding ${num}`);
+      const waveHeaders = waveNumbers.map(num => `QTY Confirm ${num + 1}`);
       headerRows[5] = [...headerRows[5], ...waveHeaders];
     }
 
@@ -627,7 +627,7 @@ const DeliveryNoteDetailEdit = () => {
                               max={detail.qtyRequested}
                             />
                           ) : (
-                            detail.qtyConfirm === null ? '-' : detail.qtyConfirm
+                            detail.qtyConfirm
                           )}
                         </td>
                         {waveNumbers.map((waveNumber) => {

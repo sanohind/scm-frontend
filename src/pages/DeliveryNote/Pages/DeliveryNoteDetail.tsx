@@ -220,7 +220,7 @@ const DeliveryNoteDetail = () => {
 
     // Add wave headers if any
     if (waveNumbers.length > 0) {
-      const waveHeaders = waveNumbers.map(num => `QTY Outstanding ${num}`);
+      const waveHeaders = waveNumbers.map(num => `QTY Confirm ${num + 1}`);
       headerRows[5] = [...headerRows[5], ...waveHeaders];
     }
 
