@@ -230,8 +230,8 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                         return (
                         <>
                             <ChartOne
-                                titleOne="PO Closed"
-                                titleTwo="PO Cancelled"
+                                titleOne="PO Accepted"
+                                titleTwo="PO Declined"
                                 dataOne={poData.po_done}
                                 dataTwo={poData.po_canceled}
                                 categories={months}
