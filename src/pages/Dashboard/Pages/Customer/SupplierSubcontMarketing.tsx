@@ -103,8 +103,8 @@ const DashboardSupplierSubcontMarketing: React.FC = () => {
                     const data = result.data;
                     
                     setPoData({
-                        po_done: data.po_closed.map((item: { count: number }) => item.count).slice(-12),
-                        po_canceled: data.po_cancelled.map((item: { count: number }) => item.count).slice(-12)
+                        po_done: data.po_accepted.map((item: { count: number }) => item.count).slice(-12),
+                        po_canceled: data.po_declined.map((item: { count: number }) => item.count).slice(-12)
                     });
 
                     setDnData({

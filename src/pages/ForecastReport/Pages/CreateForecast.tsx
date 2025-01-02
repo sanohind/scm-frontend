@@ -176,9 +176,9 @@ const CreateForecast = () => {
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
-        setLoading(true);
         if (selectedOption) {
             localStorage.setItem('selected_supplier', selectedOption.value);
+            setLoading(true);
             fetchForecastReport(selectedOption.value);
         } else {
             localStorage.removeItem('selected_supplier');
@@ -285,17 +285,17 @@ const CreateForecast = () => {
                         reject(new Error('Upload failed'));
                     }
                 };
-
+    
                 xhr.onerror = () => {
                     reject(new Error('Network error occurred'));
                 };
-
+    
                 xhr.open('POST', API_Create_Forecast_Report_Admin(), true);
                 xhr.setRequestHeader('Authorization', `Bearer ${token}`);
                 xhr.send(formData);
             });
         };
-
+    
         try {
             await uploadPromise();
         } catch (error) {
