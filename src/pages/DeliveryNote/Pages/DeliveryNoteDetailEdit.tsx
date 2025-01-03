@@ -226,7 +226,13 @@ const DeliveryNoteDetailEdit = () => {
         dn_detail_no: detail.dnDetailNo,
         qty_confirm: parseInt(detail.qtyConfirm || '0', 10),
       }));
-  
+
+      const allZeroOrNegative = updates.every(update => update.qty_confirm <= 0);
+      if (allZeroOrNegative) {
+          toast.warning('At least one confirm quantity must be greater than 0');
+          return;
+      }
+
       const payload = {
         no_dn: dnDetails.noDN,
         updates: updates,
@@ -278,10 +284,10 @@ const DeliveryNoteDetailEdit = () => {
         };
       });
 
-      const allZero = updates.every(update => update.qty_confirm === 0);
-      if (allZero) {
-        toast.warning('At least one outstanding quantity must be greater than 0');
-        return;
+      const allZeroOrNegative = updates.every(update => update.qty_confirm <= 0);
+      if (allZeroOrNegative) {
+          toast.warning('At least one outstanding quantity must be greater than 0');
+          return;
       }
 
       const payload = {

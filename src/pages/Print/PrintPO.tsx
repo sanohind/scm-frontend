@@ -330,7 +330,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
                 <Text style={{ fontWeight: 'semibold' }}>To</Text> : {' '}
                 <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_name}</Text>
               </Text>
-              <View style={{ paddingLeft: 20 }}>
+              <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                 <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_code}</Text>
                 <Text style={{ fontWeight: 'semibold' }}>{data.header.supplier_address}</Text>
                 <Text> </Text>

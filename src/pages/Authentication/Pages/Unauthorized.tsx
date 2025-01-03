@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Button from "../../../components/Forms/Button";
 
 const Unauthorized = () => {
   const navigate = useNavigate();
@@ -18,14 +19,14 @@ const Unauthorized = () => {
             The user is not authorized.
           </p>
           <p className="mb-4 text-lg text-gray-500 dark:text-gray-400">
-            Sorry, you don't have permission to access this page.
+            Sorry, you don't have permission to access this menu.
           </p>
-          <button
-            onClick={handleRedirect}
-            className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-900"
-          >
-            Go to Dashboard
-          </button>
+          <div className="flex justify-center">
+            <Button
+              title="Go to Dashboard"
+              onClick={handleRedirect}
+            />
+          </div>
         </div>
       </section>
     </>
