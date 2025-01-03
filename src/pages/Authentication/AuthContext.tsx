@@ -3,7 +3,6 @@ import { API_Logout } from '../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Login } from '../../api/api';
 import axios from 'axios';
-import { tr } from 'date-fns/locale';
 
 type Role = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | null;
 
@@ -24,7 +23,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    const role = localStorage.getItem('userRole') as Role;
+    const role = localStorage.getItem('role');
     const loginError = localStorage.getItem('login_error');
 
     if (loginError) {
@@ -35,7 +34,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (token && role) {
-      setUserRole(role);
+      const roleValue = role === 'super-admin' ? '1' :
+        role === 'admin-purchasing' ? '2' :
+        role === 'admin-warehouse' ? '3' :
+        role === 'admin-subcont' ? '4' :
+        role === 'supplier-marketing' ? '5' :
+        role === 'supplier-subcont-marketing' ? '6' :
+        role === 'supplier-warehouse' ? '7' :
+        role === 'supplier-subcont' ? '8' :
+        role === 'super-user' ? '9' : 
+        null;
+      setUserRole(roleValue);
       setIsAuthenticated(true);
     } else {
       setUserRole(null);
