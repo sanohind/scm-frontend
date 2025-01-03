@@ -1,81 +1,22 @@
 import FotoSanoh from '../../../images/cover/foto-sanoh-2.png';
 import Logo from '../../../images/logo-sanoh.png'
 import PasswordInput from '../../../components/PasswordInput';
-import { API_Login } from '../../../api/api';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from '../AuthContext';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    
-    try {
-      // Melakukan request ke endpoint login API
-      const response = await axios.post(API_Login(), {
-        username,
-        password,
-      });
-      const { access_token, role, bp_code, name, supplier_name } = response.data;
-      // toast.success('Login berhasil!');
-      
-      // Simpan token ke localStorage
-      localStorage.setItem('name', name);
-      localStorage.setItem('bp_code', bp_code);
-      localStorage.setItem('supplier_name', supplier_name);
-
-      switch (role) {
-        case '1':
-          localStorage.setItem("role", "super-admin");          
-          break;
-        case '2':
-          localStorage.setItem("role", "admin-purchasing");
-          break;
-        case '3':
-          localStorage.setItem("role", "admin-warehouse");          
-          break;
-        case '4':
-          localStorage.setItem("role", "admin-subcont");          
-          break;
-        case '5':
-          localStorage.setItem("role", "supplier-marketing");          
-          break;
-        case '6':
-          localStorage.setItem("role", "supplier-subcont-marketing");          
-          break;
-        case '7':
-          localStorage.setItem("role", "supplier-warehouse");          
-          break;
-        case '8':
-          localStorage.setItem("role", "supplier-subcont");          
-          break;
-        case '9':
-          localStorage.setItem("role", "super-user");          
-          break;
-        default:
-          toast.error('Role not found!');
-          break;
-      }
-      login(role, access_token);
+    const success = await login(username, password);
+    if (success) {
       navigate('/dashboard');
-    } catch (error) {
-      // Error handling jika terjadi kesalahan saat login
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('An unexpected error occurred');
-      }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -114,20 +55,21 @@ const SignIn: React.FC = () => {
                       className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] shadow-[0px_4px_8px_rgba(70,95,241,0.1)] text-sm text-zinc-400"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
+                      required
                     />
                   </div>
 
                   <div className="flex flex-col mb-5 mt-3">
-                    <PasswordInput password={password} setPassword={setPassword} />
+                    <PasswordInput password={password} setPassword={setPassword} isRequired />
                   </div>
 
                   <button
                     id="login-button"
                     type="submit"
                     className="gap-2 self-stretch px-5 py-3 mt-7 text-base text-white whitespace-nowrap rounded-lg bg-blue-900 min-h-[48px] hover:bg-blue-950 focus:ring-4 focus:ring-blue-300"
-                    disabled={loading}
+                    disabled={isLoading}
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <>
                         <svg
                           aria-hidden="true"
@@ -149,12 +91,12 @@ const SignIn: React.FC = () => {
                         Loading...
                       </>
                     ) : (
-                      'Login'
+                      'Sign In'
                     )}
                   </button>
                 </form>
                 <p className="self-center mt-9 text-xs font-medium text-center text-slate-800 w-[259px] max-md:mt-10 max-sm:self-center">
-                  <span className="text-zinc-400">By logging in, I accept the company&apos;s</span>
+                  <span className="text-zinc-400">By Sing in, I accept the company&apos;s</span>
                   <br />
                     <button
                     onClick={() => {

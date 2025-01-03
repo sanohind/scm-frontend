@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import { FC, useState } from 'react';
 
-const PasswordInput = ({ password, setPassword }) => {
+interface PasswordInputProps {
+  password: string;
+  setPassword: (password: string) => void;
+  isRequired?: boolean;
+}
+
+const PasswordInput: FC<PasswordInputProps> = ({ password, setPassword, isRequired }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePassword = () => setShowPassword(!showPassword);
@@ -19,6 +25,7 @@ const PasswordInput = ({ password, setPassword }) => {
             className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] text-sm text-zinc-400 shadow-[0px_4px_8px_rgba(70,95,241,0.1)]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required={isRequired}
           />
           <button
             type="button"

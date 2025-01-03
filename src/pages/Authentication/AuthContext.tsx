@@ -1,13 +1,16 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { API_Logout } from '../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
+import { API_Login } from '../../api/api';
+import axios from 'axios';
+import { tr } from 'date-fns/locale';
 
 type Role = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | null;
 
 interface AuthContextProps {
     isAuthenticated: boolean;
     userRole: Role;
-    login: (role: Role, token: string) => void;
+    login: (username: string, password: string) => Promise<boolean>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -22,6 +25,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     const role = localStorage.getItem('userRole') as Role;
+    const loginError = localStorage.getItem('login_error');
+
+    if (loginError) {
+      setTimeout(() => {
+        toast.error(loginError);
+        localStorage.removeItem('login_error');
+      }, 100);
+    }
 
     if (token && role) {
       setUserRole(role);
@@ -54,17 +65,72 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const login = (role: Role, token: string) => {
-    const name = localStorage.getItem('name');
-    toast.success('Welcome back! ' + name);
-    setIsAuthenticated(true);
-    setUserRole(role);
-    localStorage.setItem('access_token', token);
-    if (role) {
-      localStorage.setItem('userRole', role);
+  const login = async (username: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(API_Login(), {
+        username,
+        password,
+      });
+      const { access_token, role, bp_code, name, supplier_name } = response.data;
+  
+      // Save data to localStorage
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('name', name);
+      localStorage.setItem('bp_code', bp_code);
+      localStorage.setItem('supplier_name', supplier_name);
+  
+      switch (role) {
+        case '1':
+          localStorage.setItem("role", "super-admin");          
+          break;
+        case '2':
+          localStorage.setItem("role", "admin-purchasing");
+          break;
+        case '3':
+          localStorage.setItem("role", "admin-warehouse");          
+          break;
+        case '4':
+          localStorage.setItem("role", "admin-subcont");          
+          break;
+        case '5':
+          localStorage.setItem("role", "supplier-marketing");          
+          break;
+        case '6':
+          localStorage.setItem("role", "supplier-subcont-marketing");          
+          break;
+        case '7':
+          localStorage.setItem("role", "supplier-warehouse");          
+          break;
+        case '8':
+          localStorage.setItem("role", "supplier-subcont");          
+          break;
+        case '9':
+          localStorage.setItem("role", "super-user");          
+          break;
+        default:
+          toast.error('Role not found!');
+          break;
+      }
+      setIsAuthenticated(true);
+      setUserRole(role);
+
+      const expirationTime = new Date().getTime() + 3599 * 1000;
+      localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit 59 Detik
+
+      toast.success('Welcome back! ' + name);
+      return true;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        localStorage.setItem('login_error', error.response.data.message);
+      } else {
+        localStorage.setItem('login_error', 'An unexpected error occurred');
+      }
+      window.location.reload();
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    const expirationTime = new Date().getTime() + 3599 * 1000;
-    localStorage.setItem('token_expiration', expirationTime.toString()); // 59 Menit 59 Detik
   };
 
   const logout = async () => {    
