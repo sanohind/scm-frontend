@@ -96,7 +96,7 @@ const SignIn: React.FC = () => {
                   </button>
                 </form>
                 <p className="self-center mt-9 text-xs font-medium text-center text-slate-800 w-[259px] max-md:mt-10 max-sm:self-center">
-                  <span className="text-zinc-400">By Sing in, I accept the company&apos;s</span>
+                  <span className="text-zinc-400">By Signing in, I accept the company&apos;s</span>
                   <br />
                     <button
                     onClick={() => {
