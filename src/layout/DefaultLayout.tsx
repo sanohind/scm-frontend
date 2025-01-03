@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import Header from './Header';
+import Footer from './Footer/Footer';
 
 const DefaultLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,6 +33,9 @@ const DefaultLayout: React.FC = () => {
           {/* Render halaman sesuai route */}
           <Outlet />
         </main>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
