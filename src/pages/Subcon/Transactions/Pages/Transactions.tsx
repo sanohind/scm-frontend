@@ -90,7 +90,7 @@ const Transactions = () => {
     setPartList([
       ...partList,
       {
-        partName: selectedPart.label.split(' | ')[0],
+        partName: selectedPart.label.split(' | ')[1],
         partNumber: selectedPart.value,
         qtyOk: '',
         qtyNg: '0',
