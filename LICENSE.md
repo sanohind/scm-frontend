@@ -1,6 +1,6 @@
 Proprietary License
 
-Copyright (c) 2024 PT Sanoh Indonesia
+Copyright (c) 2025 PT Sanoh Indonesia
 
 All rights reserved.
 

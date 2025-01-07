@@ -520,7 +520,9 @@ const DeliveryNoteDetailEdit = () => {
                     style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
                   >
                     <Dropdown.Item onClick={() => handlePrintDN('all')}>Print All</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
+                    {dnDetails.confirmUpdateAt && (
+                      <Dropdown.Item onClick={() => handlePrintDN('confirm')}>Print Confirm</Dropdown.Item>
+                    )}
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printOutstanding${waveNumber}`} onClick={() => handlePrintDN(`outstanding_${waveNumber}`)}>
                       {`Print Confirm ${waveNumber + 1}`}
@@ -538,7 +540,9 @@ const DeliveryNoteDetailEdit = () => {
                     style={{backgroundColor: 'rgb(30 58 138)', color: 'white'}}
                   >
                     <Dropdown.Item onClick={() => handlePrintLabel('all')}>Print All</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
+                    {dnDetails.confirmUpdateAt && (
+                      <Dropdown.Item onClick={() => handlePrintLabel('confirm')}>Print Confirm</Dropdown.Item>
+                    )}
                     {waveNumbers.map((waveNumber) => (
                     <Dropdown.Item key={`printLabelOutstanding${waveNumber}`} onClick={() => handlePrintLabel(`outstanding_${waveNumber}`)}>
                       {`Print Confirm ${waveNumber + 1}`}
