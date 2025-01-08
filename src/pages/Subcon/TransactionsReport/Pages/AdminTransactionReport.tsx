@@ -43,6 +43,7 @@ const AdminTransactionReport = () => {
     const [loading, setLoading] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
+    const [isSearchClicked, setIsSearchClicked] = useState(false);
 
     const fetchPartOptions = async (supplierCode?: string) => {
         try {
@@ -107,10 +108,10 @@ const AdminTransactionReport = () => {
                 (sup: Supplier) => sup.value === savedSupplierCode
             );
             if (savedSupplier) {      
-                setLoading(true);
+                // setLoading(true);
                 setSelectedSupplier(savedSupplier);
                 fetchPartOptions(savedSupplierCode);
-                fetchTransactionLogs(savedSupplierCode, startDate, endDate);
+                // fetchTransactionLogs(savedSupplierCode, startDate, endDate);
             }
         }
     }, [suppliers]);
@@ -170,12 +171,12 @@ const AdminTransactionReport = () => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
             localStorage.setItem('selected_supplier', selectedOption.value);
-            setLoading(true);
+            // setLoading(true);
             setAllData([]);
             setFilteredData([]);
             setSelectedParts([]);
             await fetchPartOptions(selectedOption.value);
-            await fetchTransactionLogs(selectedOption.value, startDate, endDate);
+            // await fetchTransactionLogs(selectedOption.value, startDate, endDate);
         } else {
             localStorage.removeItem('selected_supplier');
             setSelectedParts([]);
@@ -188,16 +189,25 @@ const AdminTransactionReport = () => {
     const handleStartDateChange = async (date: Date) => {
         setStartDate(date);
         
-        if (selectedSupplier) {
-            await fetchTransactionLogs(selectedSupplier.value, date, endDate);
-        }
+        // if (selectedSupplier) {
+        //     await fetchTransactionLogs(selectedSupplier.value, date, endDate);
+        // }
     };
 
     const handleEndDateChange = async (date: Date) => {
         setEndDate(date);
         
+        // if (selectedSupplier) {
+        //     await fetchTransactionLogs(selectedSupplier.value, startDate, date);
+        // }
+    };
+
+    const handleSearch = async () => {
         if (selectedSupplier) {
-            await fetchTransactionLogs(selectedSupplier.value, startDate, date);
+            setIsSearchClicked(true);
+            await fetchTransactionLogs(selectedSupplier.value, startDate, endDate);
+        } else {
+            toast.warning('Please select a supplier');
         }
     };
 
@@ -315,7 +325,17 @@ const AdminTransactionReport = () => {
                                     label="End Date"
                                 />
                             </div>
+                            {/* Search Button */}
+                            <div className="w-full flex items-center">
+                                <Button
+                                    title="Search"
+                                    onClick={handleSearch}
+                                />
+                            </div>
+                        </div>
 
+                        {/* Filters and Search Bar */}
+                        <div className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 ${!isSearchClicked ? 'opacity-50 pointer-events-none' : ''}`}>
                             {/* Transaction Type */}
                             <div className="w-full">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -367,24 +387,25 @@ const AdminTransactionReport = () => {
                         </div>
 
                         {/* Search Bar */}
-                        <div>
+                        <div className={`${!isSearchClicked ? 'opacity-50 pointer-events-none' : ''}`}>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Delivery Note
                             </label>
                             <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
-                                <div className='md:w-1/2 lg:w-1/3'>
-                                    <SearchBar
-                                        placeholder="Filter by Delivery Note"
-                                        onSearchChange={setSearchQuery}
-                                    />
+                                <div className="md:w-1/2 lg:w-1/3">
+                                <SearchBar
+                                    placeholder="Filter by Delivery Note"
+                                    onSearchChange={setSearchQuery}
+                                />
                                 </div>
                                 {/* Download Buttons */}
                                 <div className="flex gap-2 self-center">
-                                    <Button
-                                        title="Download Excel"
-                                        onClick={handleDownloadExcel}
-                                        icon={FaFileExcel}
-                                    />
+                                <Button
+                                    title="Download Excel"
+                                    icon={FaFileExcel}
+                                    onClick={handleDownloadExcel}
+                                    disabled={!isSearchClicked || filteredData.length === 0}
+                                />
                                 </div>
                             </div>
                         </div>

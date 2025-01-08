@@ -30,40 +30,41 @@ const TransactionReport = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedParts, setSelectedParts] = useState<string[]>([]);
   const NowDate = new Date();
-  const [startDate, setStartDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>(NowDate);
   const [endDate, setEndDate] = useState<Date>(NowDate);
   const [partOptions, setPartOptions] = useState<{ value: string; text: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSearchClicked, setIsSearchClicked] = useState(false);
 
   useEffect(() => {
-    const fetchPartOptions = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(API_List_Item_Subcont(), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = await response.json();
-        if (result.status) {
-          const options = result.data.map((item: { part_number: string; part_name: string }) => ({
-            value: item.part_number,
-            text: `${item.part_number} | ${item.part_name}`,
-          }));
-          setPartOptions(options);
-        } else {
-          console.error('Failed to fetch part options:', result.message);
-          toast.error('Failed to fetch part options');
-        }
-      } catch (error) {
-        console.error('Error fetching part options:', error);
-        toast.error('Error fetching part options');
-      }
-    };
-
     fetchPartOptions();
   }, []);
+
+  const fetchPartOptions = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(API_List_Item_Subcont(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (result.status) {
+        const options = result.data.map((item: { part_number: string; part_name: string }) => ({
+          value: item.part_number,
+          text: `${item.part_number} | ${item.part_name}`,
+        }));
+        setPartOptions(options);
+      } else {
+        console.error('Failed to fetch part options:', result.message);
+        toast.error('Failed to fetch part options');
+      }
+    } catch (error) {
+      console.error('Error fetching part options:', error);
+      toast.error('Error fetching part options');
+    }
+  };
 
   const fetchTransactionLogs = async () => {
     if (!startDate || !endDate) {
@@ -72,13 +73,14 @@ const TransactionReport = () => {
     }
 
     setLoading(true);
+    setIsSearchClicked(true);
 
     try {
       const token = localStorage.getItem('access_token');
 
       // Format dates in 'YYYY-MM-DD' format
       const formatDate = (date: Date) => {
-        return date.toLocaleDateString('en-CA'); // 'en-CA' gives 'YYYY-MM-DD' format
+        return date.toLocaleDateString('en-CA');
       };
 
       const startDateString = formatDate(startDate);
@@ -117,12 +119,6 @@ const TransactionReport = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (startDate && endDate) {
-      fetchTransactionLogs();
-    }
-  }, [startDate, endDate]);
 
   useEffect(() => {
     let filtered = [...allData];
@@ -230,6 +226,17 @@ const TransactionReport = () => {
                 />
               </div>
 
+              {/* Search Button */}
+              <div className="w-full flex items-center">
+                <Button
+                  title="Search"
+                  onClick={fetchTransactionLogs}
+                />
+                </div>
+            </div>
+
+            {/* Filters and Search Bar */}
+            <div className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 ${!isSearchClicked ? 'opacity-50 pointer-events-none' : ''}`}>
               {/* Transaction Type */}
               <div className="w-full">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -279,9 +286,10 @@ const TransactionReport = () => {
                 />
               </div>
             </div>
+            
 
             {/* Search Bar */}
-            <div>
+            <div className={`${!isSearchClicked ? 'opacity-50 pointer-events-none' : ''}`}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Delivery Note
               </label>
@@ -298,11 +306,13 @@ const TransactionReport = () => {
                     title="Download Excel"
                     icon={FaFileExcel}
                     onClick={handleDownloadExcel}
+                    disabled={!isSearchClicked || filteredData.length === 0}
                   />
                 </div>
               </div>
             </div>
           </div>
+          
           
 
           {/* Table Section */}
