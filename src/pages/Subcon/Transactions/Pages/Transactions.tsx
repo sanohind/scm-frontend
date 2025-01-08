@@ -220,7 +220,7 @@ const Transactions = () => {
         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
           <Tabs value={value} onChange={handleChange} centered>
             <Tab label="Record Incoming" />
-            <Tab label="Record Process" />
+            <Tab label="Finish Process" />
             <Tab label="Record Outgoing" />
           </Tabs>
           <div className="rounded-sm border-t-2 border-stroke bg-white">
