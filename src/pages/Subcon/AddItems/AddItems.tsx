@@ -24,6 +24,7 @@ export const AddItems = () => {
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
     const [partName, setPartName] = useState('');
     const [partNumber, setPartNumber] = useState('');
+    const [oldPartName, setOldPartName] = useState('');
     const [excelData, setExcelData] = useState<any[]>([]);
     const [isExcelMode, setIsExcelMode] = useState(false);
     const [itemOptions, setItemOptions] = useState<ItemOption[]>([]);
@@ -97,8 +98,8 @@ export const AddItems = () => {
 
             const result = await response.json();
             const itemsList = result.data.map((item: any) => ({
-                value: item.item_name,
-                label: `${item.item_name} || ${item.alias}`,
+                value: item.part_number,
+                label: `${item.part_number || '-'} | ${item.part_name || '-'} | ${item.old_part_name || '-'}`,
             }));
 
             setItemOptions(itemsList);
@@ -110,13 +111,14 @@ export const AddItems = () => {
 
     const downloadTemplate = () => {
         const ws = XLSX.utils.json_to_sheet([
-            { bp_code: ' ', item_code: ' ', item_name: ' ' }
+            { bp_code: ' ', part_number: ' ', part_name: ' ', old_part_name: ' ' }
         ]);
 
         // Set column widths
         ws['!cols'] = [
             { wch: 15 },  // bp_code width
             { wch: 20 },  // item_code width
+            { wch: 30 },   // item_name width
             { wch: 30 }   // item_name width
         ];
 
@@ -180,8 +182,9 @@ export const AddItems = () => {
             const submissionData = {
                 data: excelData.map(item => ({
                     bp_code: item.bp_code,
-                    item_code: item.item_code,
-                    item_name: item.item_name
+                    part_number: item.part_number,
+                    part_name: item.part_name,
+                    old_part_name: item.old_part_name
                 }))
             };
 
@@ -225,17 +228,19 @@ export const AddItems = () => {
     };
 
     const handleAddExcelItem = () => {
-        setExcelData([...excelData, { bp_code: '', item_code: '', item_name: '' }]);
+        setExcelData([...excelData, { bp_code: '', part_number: '', part_name: '', old_part_name: '' }]);
     };
 
     const handlePartNumberChange = (selectedOption: ItemOption | null) => {
         if (selectedOption) {
-            const [itemName, alias] = selectedOption.label.split(' || ');
-            setPartNumber(itemName);
-            setPartName(alias);
+            const [partNumber, partName, oldPartName] = selectedOption.label.split(' | ');
+            setPartNumber(partNumber);
+            setPartName(partName);
+            setOldPartName(oldPartName);
         } else {
             setPartNumber('');
             setPartName('');
+            setOldPartName('');
         }
     };
 
@@ -255,6 +260,7 @@ export const AddItems = () => {
             <p><strong>Supplier:</strong> ${selectedSupplier.label}</p>
             <p><strong>Part Number:</strong> ${partNumber}</p>
             <p><strong>Part Name:</strong> ${partName}</p>
+            <p><strong>Old Part Name:</strong> ${oldPartName}</p>
             `,
             icon: 'warning',
             showCancelButton: true,
@@ -277,8 +283,9 @@ export const AddItems = () => {
             const submissionData = {
                 data: [{
                     bp_code: selectedSupplier.value,
-                    item_name: partName,
-                    item_code: partNumber,
+                    part_number: partNumber,
+                    part_name: partName,
+                    old_part_name: oldPartName
                 }]
             };
     
@@ -314,13 +321,6 @@ export const AddItems = () => {
                 {!isExcelMode ? (
                     <>
                         <div className="flex justify-end">
-                            {/* <button
-                                onClick={() => setIsExcelMode(true)}
-                                className="bg-blue-900 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                            >
-                                <FaUpload />
-                                Upload via Excel
-                            </button> */}
                             <Button
                                 title="Upload via Excel"
                                 onClick={() => setIsExcelMode(true)}
@@ -373,6 +373,20 @@ export const AddItems = () => {
                                         placeholder="Enter Part Name"
                                         className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                                         required
+                                    />
+                                </div>
+
+                                {/* Old Part Name Input */}
+                                <div>
+                                    <label className="mb-2.5 block text-black dark:text-white">
+                                        Old Part Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={oldPartName}
+                                        onChange={(e) => setOldPartName(e.target.value)}
+                                        placeholder="Enter Old Part Name"
+                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                                     />
                                 </div>
 
@@ -432,6 +446,9 @@ export const AddItems = () => {
                                                     Part Name
                                                 </th>
                                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider border">
+                                                    Old Part Name
+                                                </th>
+                                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider border">
                                                     Actions
                                                 </th>
                                             </tr>
@@ -450,7 +467,7 @@ export const AddItems = () => {
                                                     <td className="px-3 py-3 text-center border">
                                                         <input
                                                             type="text"
-                                                            value={item.item_code}
+                                                            value={item.part_number}
                                                             onChange={(e) => handleExcelDataChange(index, 'item_code', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
@@ -458,8 +475,16 @@ export const AddItems = () => {
                                                     <td className="px-3 py-3 text-center border">
                                                         <input
                                                             type="text"
-                                                            value={item.item_name}
+                                                            value={item.part_name}
                                                             onChange={(e) => handleExcelDataChange(index, 'item_name', e.target.value)}
+                                                            className="border border-gray-300 rounded p-1 text-center w-full"
+                                                        />
+                                                    </td>
+                                                    <td className="px-3 py-3 text-center border">
+                                                        <input
+                                                            type="text"
+                                                            value={item.old_part_name}
+                                                            onChange={(e) => handleExcelDataChange(index, 'old_item_name', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
                                                     </td>
