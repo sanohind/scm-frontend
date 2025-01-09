@@ -6,7 +6,7 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_Create_Transaction_Subcont_Admin, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
@@ -17,7 +17,7 @@ const AdminTransactions = () => {
     const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
     const [status, setStatus] = useState('');
     const [deliveryNote, setDeliveryNote] = useState('');
-    const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
+    const [apiData, setApiData] = useState<{ partNumber: string; partName: string; oldPartName: string }[]>([]);
     const [transactionDate, setTransactionDate] = useState<Date>(new Date());
     const [partList, setPartList] = useState<any[]>([]);
     const [suppliers, setSuppliers] = useState([]);
@@ -27,6 +27,7 @@ const AdminTransactions = () => {
     interface ApiItem {
         part_number: string;
         part_name: string;
+        old_part_name: string;
     }
 
     useEffect(() => {
@@ -59,6 +60,7 @@ const AdminTransactions = () => {
                 const transformedData = result.data.map((item: ApiItem) => ({
                     partNumber: item.part_number,
                     partName: item.part_name,
+                    oldPartName : item.old_part_name || '-',
                 }));
                 setApiData(transformedData);
             }
@@ -95,7 +97,7 @@ const AdminTransactions = () => {
 
     const partOptions = apiData.map((item) => ({
         value: item.partNumber,
-        label: `${item.partNumber} | ${item.partName}`,
+        label: `${item.partNumber} | ${item.partName} | ${item.oldPartName}`,
     }));
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
@@ -125,29 +127,30 @@ const AdminTransactions = () => {
 
     const handleAddPart = () => {
         if (!selectedPart) {
-        toast.error('Please select a part');
-        return;
+            toast.error('Please select a part');
+            return;
         }
         // Cek apakah part sudah ada di partList
         const partExists = partList.some(
-        (part) => part.partNumber === selectedPart.value
+            (part) => part.partNumber === selectedPart.value
         );
 
         if (partExists) {
-        toast.error('Part already exists in the list');
-        setSelectedPart(null);
-        return;
+            toast.error('Part already exists in the list');
+            setSelectedPart(null);
+            return;
         }
 
         // Lanjutkan menambahkan part jika tidak duplikat
         setPartList([
-        ...partList,
-        {
-            partName: selectedPart.label.split(' | ')[0],
-            partNumber: selectedPart.value,
-            qtyOk: '',
-            qtyNg: '0',
-        },
+            ...partList,
+            {
+                partName: selectedPart.label.split(' | ')[0],
+                partNumber: selectedPart.value,
+                oldPartName: selectedPart.label.split(' | ')[2],
+                qtyOk: '',
+                qtyNg: '0',
+            },
         ]);
         setSelectedPart(null);
     };
@@ -253,7 +256,10 @@ const AdminTransactions = () => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ data: transactions }),
+                body: JSON.stringify({ 
+                    bp_code: selectedSupplier?.value,
+                    data: transactions 
+                }),
             });
 
             if (!response.ok) throw new Error('Failed to submit');
@@ -380,19 +386,22 @@ const AdminTransactions = () => {
                             <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
-                                PART NUMBER
-                                </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[30%]">
-                                PART NAME
+                                    PART NUMBER
                                 </th>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
-                                QTY OK
+                                    PART NAME
                                 </th>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
-                                QTY NG
+                                    OLD PART NAME
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
+                                    QTY OK
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
+                                    QTY NG
                                 </th>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
-                                ACTION
+                                    ACTION
                                 </th>
                             </tr>
                             </thead>
@@ -401,6 +410,7 @@ const AdminTransactions = () => {
                                 <tr key={index} className="hover:bg-gray-50">
                                 <td className="px-3 py-3 text-center border">{part.partNumber}</td>
                                 <td className="px-3 py-3 text-center border">{part.partName}</td>
+                                <td className="px-3 py-3 text-center border">{part.oldPartName}</td>
                                 <td className="px-3 py-3 text-center border">
                                     <input
                                     type="number"

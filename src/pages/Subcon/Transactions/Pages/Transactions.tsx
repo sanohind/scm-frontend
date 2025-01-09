@@ -17,13 +17,14 @@ const Transactions = () => {
   const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
   const [status, setStatus] = useState('');
   const [deliveryNote, setDeliveryNote] = useState('');
-  const [apiData, setApiData] = useState<{ partNumber: string; partName: string }[]>([]);
+  const [apiData, setApiData] = useState<{ partNumber: string; partName: string; oldPartName: string }[]>([]);
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [partList, setPartList] = useState<any[]>([]);
 
   interface ApiItem {
     part_number: string;
     part_name: string;
+    old_part_name: string;
   }
 
   useEffect(() => {
@@ -40,6 +41,7 @@ const Transactions = () => {
           const transformedData = result.data.map((item: ApiItem) => ({
             partNumber: item.part_number,
             partName: item.part_name,
+            oldPartName : item.old_part_name || '-',
           }));
           setApiData(transformedData);
         }
@@ -53,7 +55,7 @@ const Transactions = () => {
 
   const partOptions = apiData.map((item) => ({
     value: item.partNumber,
-    label: `${item.partNumber} | ${item.partName}`,
+    label: `${item.partNumber} | ${item.partName} | ${item.oldPartName}`,
   }));
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -86,12 +88,15 @@ const Transactions = () => {
       return;
     }
 
+    const selectedPartData = apiData.find(item => item.partNumber === selectedPart.value);
+
     // Lanjutkan menambahkan part jika tidak duplikat
     setPartList([
       ...partList,
       {
         partName: selectedPart.label.split(' | ')[1],
         partNumber: selectedPart.value,
+        oldPartName: selectedPartData?.oldPartName || '-',
         qtyOk: '',
         qtyNg: '0',
       },
@@ -301,13 +306,16 @@ const Transactions = () => {
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
                               PART NUMBER
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[30%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
                               PART NAME
                             </th>
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                              OLD PART NAME
+                            </th>
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
                               QTY OK
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
                               QTY NG
                             </th>
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
@@ -320,6 +328,7 @@ const Transactions = () => {
                             <tr key={index} className="hover:bg-gray-50">
                               <td className="px-3 py-3 text-center border">{part.partNumber}</td>
                               <td className="px-3 py-3 text-center border">{part.partName}</td>
+                              <td className="px-3 py-3 text-center border">{part.oldPartName}</td>
                               <td className="px-3 py-3 text-center border">
                                 <input
                                   type="number"
