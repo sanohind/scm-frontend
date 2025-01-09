@@ -2,19 +2,10 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-// import Swal from 'sweetalert2';
 import { FaEdit, FaTrash, FaPlus, FaToggleOn, FaToggleOff } from 'react-icons/fa';
-// import {
-//     API_List_Partner_Admin,
-//     API_List_Item_Subcont_Admin,
-//     API_Update_Item_Subcont_Admin,
-//     API_Update_Item_Status_Subcont_Admin,
-//     API_Delete_Item_Subcont_Admin,
-// } from '../../../api/api';
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { API_Delete_Item_Subcont_Admin, API_List_Partner_Admin, API_Manage_Item_Subcont_Admin, API_Update_Item_Subcont_Admin } from '../../../api/api';
 import Swal from 'sweetalert2';
-import { sub } from 'date-fns';
 import Button from '../../../components/Forms/Button';
 
 interface SupplierOption {
@@ -24,13 +15,15 @@ interface SupplierOption {
 
 interface Item {
     item_id: string;
-    item_code: string;
-    item_name: string;
+    part_number: string;
+    part_name: string;
+    old_part_name: string;
     status: string;
     isEditing?: boolean;
     isLoading?: boolean;
-    editedItemCode?: string;
-    editedItemName?: string;
+    editedPartNumber?: string;
+    editedPartName?: string;
+    editedOldPartName?: string;
 }
 
 const ManageItems: React.FC = () => {
@@ -100,8 +93,9 @@ const ManageItems: React.FC = () => {
             const result = await response.json();
             const itemsList = result.data.map((item: any) => ({
                 item_id: item.item_id,
-                item_code: item.part_number,
-                item_name: item.part_name,
+                part_number: item.part_number || '-',
+                part_name: item.part_name || '-',
+                old_part_name: item.old_part_name || '-',
                 status: item.status === "1" ? 'Active' : 'Deactive',
             }));
 
@@ -134,8 +128,9 @@ const ManageItems: React.FC = () => {
             ? {
                 ...item,
                 isEditing: true,
-                editedItemCode: item.item_code,
-                editedItemName: item.item_name,
+                editedPartNumber: item.part_number,
+                editedPartName: item.part_name,
+                editedOldPartName: item.old_part_name,
                 }
             : item
         )
@@ -151,7 +146,7 @@ const ManageItems: React.FC = () => {
     const handleInputChange = (
         e: ChangeEvent<HTMLInputElement>,
         itemId: string,
-        field: 'item_code' | 'item_name'
+        field: 'part_number' | 'part_name' | 'old_part_name'
     ) => {
         const value = e.target.value;
         setItems((prevItems) =>
@@ -166,12 +161,16 @@ const ManageItems: React.FC = () => {
 
         const payload: any = { sub_item_id: itemId };
 
-        if (item.item_code !== item.editedItemCode) {
-            payload.item_code = item.item_code;
+        if (item.part_number !== item.editedPartNumber) {
+            payload.part_number = item.part_number;
         }
 
-        if (item.item_name !== item.editedItemName) {
-            payload.item_name = item.item_name;
+        if (item.part_name !== item.editedPartName) {
+            payload.part_name = item.part_name;
+        }
+
+        if (item.old_part_name !== item.editedOldPartName) {
+            payload.old_part_name = item.old_part_name;
         }
 
         try {
@@ -331,11 +330,14 @@ const ManageItems: React.FC = () => {
                                 <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">
                                     NO
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[30%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
                                     PART NUMBER
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[30%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
                                     PART NAME
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                                    OLD PART NAME
                                 </th>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
                                     STATUS
@@ -355,24 +357,36 @@ const ManageItems: React.FC = () => {
                                         {item.isEditing ? (
                                             <input
                                                 type="text"
-                                                value={item.item_code}
-                                                onChange={(e) => handleInputChange(e, item.item_id, 'item_code')}
+                                                value={item.part_number}
+                                                onChange={(e) => handleInputChange(e, item.item_id, 'part_number')}
                                                 className="border border-gray-300 rounded p-1 w-full"
                                             />
                                         ) : (
-                                            item.item_code
+                                            item.part_number
                                         )}
                                     </td>
                                     <td className="px-3 py-3 text-center border">
                                         {item.isEditing ? (
                                             <input
                                                 type="text"
-                                                value={item.item_name}
-                                                onChange={(e) => handleInputChange(e, item.item_id, 'item_name')}
+                                                value={item.part_name}
+                                                onChange={(e) => handleInputChange(e, item.item_id, 'part_name')}
                                                 className="border border-gray-300 rounded p-1 w-full"
                                             />
                                         ) : (
-                                            item.item_name
+                                            item.part_name
+                                        )}
+                                    </td>
+                                    <td className="px-3 py-3 text-center border">
+                                        {item.isEditing ? (
+                                            <input
+                                                type="text"
+                                                value={item.old_part_name}
+                                                onChange={(e) => handleInputChange(e, item.item_id, 'old_part_name')}
+                                                className="border border-gray-300 rounded p-1 w-full"
+                                            />
+                                        ) : (
+                                            item.old_part_name
                                         )}
                                     </td>
                                     <td className="px-3 py-3 text-center whitespace-nowrap border">
