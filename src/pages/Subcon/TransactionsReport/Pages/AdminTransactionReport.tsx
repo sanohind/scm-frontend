@@ -21,6 +21,9 @@ const AdminTransactionReport = () => {
         qtyOk: number;
         qtyNg: number;
         deliveryNote: string;
+        actualQtyOk: number;
+        actualQtyNg: number;
+        response: string;
     }
     
     interface Supplier {
@@ -140,7 +143,7 @@ const AdminTransactionReport = () => {
             const result = await response.json();
             if (result.status) {
                 const logs = result.data.map((item: any) => ({
-                    timestamp: `${item.transaction_date}T${item.transaction_time}`,
+                    timestamp: `${item.transaction_date} ${item.transaction_time}`,
                     type: item.transaction_type,
                     status: item.status,
                     partName: item.part_name,
@@ -148,6 +151,9 @@ const AdminTransactionReport = () => {
                     qtyOk: item.qty_ok,
                     qtyNg: item.qty_ng,
                     deliveryNote: item.delivery_note,
+                    actualQtyOk: item.actual_qty_ok,
+                    actualQtyNg: item.actual_qty_ng,
+                    response: item.response,
                 }));
                 setAllData(logs);
                 setFilteredData(logs);
@@ -205,6 +211,7 @@ const AdminTransactionReport = () => {
     const handleSearch = async () => {
         if (selectedSupplier) {
             setIsSearchClicked(true);
+            setLoading(true);
             await fetchTransactionLogs(selectedSupplier.value, startDate, endDate);
         } else {
             toast.warning('Please select a supplier');
@@ -417,15 +424,23 @@ const AdminTransactionReport = () => {
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[10%]">Date Time</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[17%]">Delivery Note</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]">Transaction Type</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]">Status</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Name</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]">Part Number</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY OK</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]">QTY NG</th>
-                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]">Total</th>
+                                        <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[10%]" rowSpan={2}>Date Time</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[12%]" rowSpan={2}>Delivery Note</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[8%]" rowSpan={2}>Transaction Type</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[9%]" rowSpan={2}>Status</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[12%]" rowSpan={2}>Part Name</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[12%]" rowSpan={2}>Part Number</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]" colSpan={3}>Confirm Supplier</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]" colSpan={3}>Received Sanoh</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]" rowSpan={2}>Response</th>
+                                    </tr>
+                                    <tr>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">QTY OK</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">QTY NG</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">Total</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">QTY OK</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">QTY NG</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -433,31 +448,43 @@ const AdminTransactionReport = () => {
                                     Array.from({ length: rowsPerPage }).map((_, index) => (
                                     <tr key={index} className="animate-pulse">
                                         <td className="px-1 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                                        <div className="h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            <div className="h-4 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            <div className="h-4 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            <div className="h-4 bg-gray-200 rounded"></div>
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            <div className="h-4 bg-gray-200 rounded"></div>
                                         </td>
                                     </tr>
                                     ))
@@ -473,22 +500,38 @@ const AdminTransactionReport = () => {
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyNg}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk + row.qtyNg}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.actualQtyOk || '-'}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.actualQtyNg || '-'}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{(row.actualQtyOk + row.actualQtyNg) || '-'}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{(row.response) || '-'}</td>
                                     </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                    <td colSpan={9} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
+                                    <td colSpan={13} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
                                     </tr>
                                 )}
                                 </tbody>
                                 <tfoot className="bg-gray-50">
                                 <tr>
                                     <td colSpan={6} className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">Totals:</td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">{paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}</td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">{paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}</td>
                                     <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                    {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
+                                        {paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}</td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                        {paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}</td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                        {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
                                     </td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                        {paginatedData.reduce((sum, row) => sum + (row.actualQtyOk || 0), 0) || '-'}
+                                    </td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                        {paginatedData.reduce((sum, row) => sum + (row.actualQtyNg || 0), 0) || '-'}
+                                    </td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                        {paginatedData.reduce((sum, row) => sum + ((row.actualQtyOk || 0) + (row.actualQtyNg || 0)), 0) || '-'}
+                                    </td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td>
                                 </tr>
                                 </tfoot>
                             </table>

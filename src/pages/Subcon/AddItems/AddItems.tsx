@@ -182,7 +182,7 @@ export const AddItems = () => {
             const submissionData = {
                 data: excelData.map(item => ({
                     bp_code: item.bp_code,
-                    part_number: item.part_number,
+                    part_number: String(item.part_number),
                     part_name: item.part_name,
                     old_part_name: item.old_part_name
                 }))
