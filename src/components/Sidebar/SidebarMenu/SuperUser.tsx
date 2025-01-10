@@ -9,6 +9,7 @@ import PerformanceReport from "./component/PerformanceReport"
 import PurchaseOrder from "./component/PurchaseOrder"
 import StockItems from "./component/StockItems"
 import TransactionsReport from "./component/TransactionsReport"
+import TransactionsReviewSubcont from "./component/TransactionsReviewSubcont"
 import TransactionSubcont from "./component/TransactionSubcont"
 
 export const SuperUser = () => {
@@ -47,6 +48,10 @@ export const SuperUser = () => {
                     {/* <!-- Menu Item Transaction --> */}
                     <TransactionSubcont />
                     {/* <!-- Menu Item Transaction --> */}
+
+                    {/* <!-- Menu Item Transaction Review --> */}
+                    <TransactionsReviewSubcont />
+                    {/* <!-- Menu Item Transaction Review --> */}
                     
                     {/* <!-- Menu Item Report Transactions --> */}
                     <TransactionsReport />

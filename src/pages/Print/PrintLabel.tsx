@@ -161,7 +161,14 @@ const LabelDocument = ({ data }: { data: LabelDataItem[] }) => (
                             {/* Row 3 */}
                             <View style={{flexDirection: 'row', borderBottom: 1, borderLeft: 1, borderRight: 1, height: '60%' }}>
                                 <View style={{borderRight: '1px', width: '45%', justifyContent: 'center', marginLeft: 3 }}>
-                                    <Text style={{ alignSelf: 'center', fontSize: 12, fontWeight: 'semibold' }}>{item.customer_name || 'N/A'}</Text>
+                                    <Text style={{ 
+                                        alignSelf: 'center', 
+                                        fontSize: item.customer_name?.length > 28 ? 8 : 
+                                                item.customer_name?.length > 20 ? 10 : 12, 
+                                        fontWeight: 'semibold' 
+                                    }}>
+                                        {item.customer_name || 'N/A'}
+                                    </Text>
                                 </View>
                                 <View style={{borderRight: '1px', width: '25%', justifyContent: 'center'}}>
                                     <Text style={{alignSelf: 'center', fontSize: 12, fontWeight: 'semibold'}}>{item.po_number || 'N/A'}</Text>

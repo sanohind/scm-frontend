@@ -27,6 +27,8 @@ import IndexStockItems from "./pages/Subcon/StockItems/IndexStockItems";
 import { AddItems } from "./pages/Subcon/AddItems/AddItems";
 import ManageItems from "./pages/Subcon/ManageItems.tsx/MangeItems";
 import IndexTransactions from "./pages/Subcon/Transactions/IndexTransactions";
+import IndexTransactionsReview from "./pages/Subcon/TransactionsReview/IndexTransactionsReview";
+import TransactionsReviewDetail from "./pages/Subcon/TransactionsReview/Pages/Detail/TransactionsReviewDetail";
 
 const App: React.FC = () => {
   return (
@@ -201,7 +203,7 @@ const App: React.FC = () => {
               path="/add-items"
               element={
                 <ProtectedRoute allowedRoles={['4','9']}>
-                  <PageTitle title="Add Item | PT SANOH INDONESIA" />
+                  <PageTitle title="Add Item Subcont | PT SANOH INDONESIA" />
                   <AddItems />
                 </ProtectedRoute>
               }
@@ -210,7 +212,7 @@ const App: React.FC = () => {
               path="/manage-items"
               element={
                 <ProtectedRoute allowedRoles={['4','9']}>
-                  <PageTitle title="Manage Item | PT SANOH INDONESIA" />
+                  <PageTitle title="Manage Item Subcont | PT SANOH INDONESIA" />
                   <ManageItems />
                 </ProtectedRoute>
               }
@@ -218,8 +220,8 @@ const App: React.FC = () => {
             <Route
               path="/stock-items"
               element={
-                <ProtectedRoute allowedRoles={['4','5','6','8','9']}>
-                  <PageTitle title="Stock Item | PT SANOH INDONESIA" />
+                <ProtectedRoute allowedRoles={['4','6','8','9']}>
+                  <PageTitle title="Stock Item Subcont | PT SANOH INDONESIA" />
                   <IndexStockItems />
                 </ProtectedRoute>
               }
@@ -227,9 +229,27 @@ const App: React.FC = () => {
             <Route
               path="/transactions"
               element={
-                <ProtectedRoute allowedRoles={['5','6','8','9']}>
-                  <PageTitle title="Transaksi | PT SANOH INDONESIA" />
+                <ProtectedRoute allowedRoles={['6','8','9']}>
+                  <PageTitle title="Transactions Subcont | PT SANOH INDONESIA" />
                   <IndexTransactions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transactions-review"
+              element={
+                <ProtectedRoute allowedRoles={['4','9']}>
+                  <PageTitle title="Transactions Review Subcont | PT SANOH INDONESIA" />
+                  <IndexTransactionsReview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transactions-review-detail"
+              element={
+                <ProtectedRoute allowedRoles={['4','9']}>
+                  <PageTitle title="Transactions Review Detail Subcont | PT SANOH INDONESIA" />
+                  <TransactionsReviewDetail />
                 </ProtectedRoute>
               }
             />
@@ -237,7 +257,7 @@ const App: React.FC = () => {
               path="/transactions-report"
               element={
                 <ProtectedRoute allowedRoles={['4','5','6','8','9']}>
-                  <PageTitle title="Transactions Report | PT SANOH INDONESIA" />
+                  <PageTitle title="Transactions Report Subcont | PT SANOH INDONESIA" />
                   <IndexTransactionsReport />
                 </ProtectedRoute>
               }

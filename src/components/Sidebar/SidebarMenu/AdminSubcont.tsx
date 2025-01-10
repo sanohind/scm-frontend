@@ -5,6 +5,7 @@ import AddItems from "./component/AddItems";
 import StockItems from "./component/StockItems";
 import TransactionsReport from "./component/TransactionsReport";
 import HistoryDeliveryNote from "./component/HistoryDeliveryNote";
+import TransactionReviewSubcont from "./component/TransactionsReviewSubcont";
 
 export const AdminSubcont = () => {
 
@@ -35,6 +36,10 @@ export const AdminSubcont = () => {
                     {/* <!-- Menu Item Stock Items --> */}
                     <StockItems />
                     {/* <!-- Menu Item Stock Items --> */}
+
+                    {/* <!-- Menu Item Transaction Review --> */}
+                    <TransactionReviewSubcont />
+                    {/* <!-- Menu Item Transaction Review --> */}
                     
                     {/* <!-- Menu Item Report Transactions --> */}
                     <TransactionsReport />

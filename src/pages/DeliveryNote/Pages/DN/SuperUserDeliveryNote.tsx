@@ -195,6 +195,9 @@ const SuperUserDeliveryNote = () => {
     const handleDNNavigate = (noDN: string) => {
         navigate(`/delivery-note-detail-edit?noDN=${noDN}`);
     };
+    const handlePONavigate = (noPO: string) => {
+        navigate(`/purchase-order-detail?noPO=${noPO}`);
+    };
 
     return (
         <>
@@ -315,27 +318,32 @@ const SuperUserDeliveryNote = () => {
                         paginatedData.map((row, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            <button
-                                onClick={() => handleDNNavigate(row.noDN)}
-                                className="text-blue-600 underline"
-                            >
-                                {row.noDN}
-                            </button>
+                                <button
+                                    onClick={() => handleDNNavigate(row.noDN)}
+                                    className="text-blue-600 underline"
+                                >
+                                    {row.noDN}
+                                </button>
                             </td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.noPO}
+                                <button
+                                    onClick={() => handlePONavigate(row.noPO)}
+                                    className="text-blue-600 underline"
+                                >
+                                    {row.noPO}
+                                </button>
                             </td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.createdDate}
+                                {row.createdDate}
                             </td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.planDNDate}
+                                {row.planDNDate}
                             </td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.statusDN}
+                                {row.statusDN}
                             </td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">
-                            {row.progress}
+                                {row.progress}
                             </td>
                         </tr>
                         ))
