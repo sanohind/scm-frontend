@@ -1,4 +1,4 @@
-const API = 'https://apiv2.edutrashgo.com/api';
+const API = 'https://be-sss-dev.sanohindonesia.co.id:8443/api';
 
 
 const getRolePath = () => {
