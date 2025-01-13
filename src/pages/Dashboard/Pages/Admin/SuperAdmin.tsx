@@ -148,9 +148,9 @@ const DashboardSuperAdmin: React.FC = () => {
       case '8':
         return 'Supplier Warehouse';
       case '9':
-        return 'Super Admin';
+        return 'Super User';
       default:
-        return 'Unknown';
+        return 'Unknown Role';
     }
   };
 

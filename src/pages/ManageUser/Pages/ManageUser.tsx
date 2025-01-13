@@ -210,6 +210,8 @@ const ManageUser: React.FC = () => {
                 return 'Supplier Warehouse';
             case '8':
                 return 'Supplier Subcont';
+            case '9':
+                return 'Super User';
             default:
                 return 'Unknown Role';
         }

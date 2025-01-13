@@ -6,7 +6,7 @@ import Pagination from '../../../../components/Table/Pagination';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_DN_Admin, API_List_Partner_Admin } from '../../../../api/api';
+import { API_DN_Admin, API_List_Partner_Admin, API_Transaction_Review_Subcont_Admin } from '../../../../api/api';
 
 const AdminTransactionReview = () => {
     interface TransactionReview {
@@ -57,7 +57,7 @@ const AdminTransactionReview = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_DN_Admin()}${supplierCode}`, {
+            const response = await fetch(`${API_Transaction_Review_Subcont_Admin()}${supplierCode}`, {
                 method: 'GET',
                 headers: {
                 'Authorization': `Bearer ${token}`,
@@ -74,12 +74,12 @@ const AdminTransactionReview = () => {
             }
 
             const result = await response.json();
-            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+            if (result.data && Array.isArray(result.data) && result.data.length > 0) {
                 const TransactionReview = result.data.map((transaction: any) => ({
-                noDN: transaction.no_dn || 'N/A',                
-                transactionDate: transaction.transaction_date || '-',
-                status: transaction.status || '-',
-                response: transaction.response || 'Need Review',
+                    noDN: transaction.delivery_note || 'N/A',                
+                    transactionDate: transaction.transaction_date || '-',
+                    status: transaction.status || '-',
+                    response: transaction.response || 'Need Review',
                 }));
 
                 setData(TransactionReview);

@@ -1,5 +1,5 @@
-const API = 'https://be-sss-dev.sanohindonesia.co.id:8443/api';
-
+const API = 'https://apiv2.edutrashgo.com/api';
+// const API = 'https://be-sss-dev.sanohindonesia.co.id:8443/api';
 
 const getRolePath = () => {
     const userRole = localStorage.getItem('role');
@@ -72,6 +72,9 @@ export const API_Manage_Item_Subcont_Admin = () => API + getRolePath() + `/item/
 export const API_Update_Item_Subcont_Admin = () => API + getRolePath() + `/item/update`;
 export const API_Delete_Item_Subcont_Admin = () => API + getRolePath() + `/item/delete`;
 export const API_Create_Transaction_Subcont_Admin = () => API + getRolePath() + `/transaction/store/`;
+export const API_Transaction_Review_Subcont_Admin = () => API + getRolePath() + `/transaction-review/header/`;
+export const API_Transaction_Review_Detail_Subcont_Admin = () => API + getRolePath() + `/transaction-review/detail/`;
+export const API_Transaction_Review_Update_Subcont_Admin = () => API + getRolePath() + `/transaction-review/update`;
 
 // Purchase Order Supplier
 export const API_PO = () => API + getRolePath() + `/po/index`;
