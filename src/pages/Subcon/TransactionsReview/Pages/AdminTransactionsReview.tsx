@@ -6,7 +6,9 @@ import Pagination from '../../../../components/Table/Pagination';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_DN_Admin, API_List_Partner_Admin, API_Transaction_Review_Subcont_Admin } from '../../../../api/api';
+import { 
+    API_List_Partner_Admin, 
+    API_Transaction_Review_Subcont_Admin } from '../../../../api/api';
 
 const AdminTransactionReview = () => {
     interface TransactionReview {
@@ -77,7 +79,7 @@ const AdminTransactionReview = () => {
             if (result.data && Array.isArray(result.data) && result.data.length > 0) {
                 const TransactionReview = result.data.map((transaction: any) => ({
                     noDN: transaction.delivery_note || 'N/A',                
-                    transactionDate: transaction.transaction_date || '-',
+                    transactionDate: transaction.date_time || '-',
                     status: transaction.status || '-',
                     response: transaction.response || 'Need Review',
                 }));

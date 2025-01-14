@@ -80,10 +80,10 @@ const TransactionReviewDetail = () => {
             oldPartName: detail.old_part_name || '-',
             qtyOk: detail.qty_ok,
             qtyNg: detail.qty_ng,
-            qtyTotal: detail.qty_ok + detail.qty_ng || '-',
+            qtyTotal: detail.qty_total || '-',
             actualQtyOk: detail.actual_qty_ok || '-',
             actualQtyNg: detail.actual_qty_ng || '-',
-            actualQtyTotal: detail.actual_qty_ok + detail.actual_qty_ng || '-',
+            actualQtyTotal: detail.actual_qty_total || '-',
           };
         });
         setFilteredData(details);
@@ -154,12 +154,8 @@ const TransactionReviewDetail = () => {
       const data = filteredData.map(detail => ({
         sub_transaction_id: detail.transactionId,
         sub_item_id: detail.itemId,
-        delivery_note: noDN,
-        part_number: detail.partNumber,
-        status: "Fresh",
         actual_qty_ok: detail.actualQtyOk,
         actual_qty_ng: detail.actualQtyNg,
-        response: "Received"
       }));
 
       const payload = {
@@ -303,7 +299,7 @@ const TransactionReviewDetail = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyOk}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyNg}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
-                          {detail.qtyOk + detail.qtyNg}
+                          {detail.qtyTotal}
                         </td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">
                           {confirmMode ? (

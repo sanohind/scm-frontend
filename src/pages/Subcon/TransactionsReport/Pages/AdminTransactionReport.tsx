@@ -150,9 +150,11 @@ const AdminTransactionReport = () => {
                     partNumber: item.part_number,
                     qtyOk: item.qty_ok,
                     qtyNg: item.qty_ng,
+                    qtyTotal: item.qty_total,
                     deliveryNote: item.delivery_note,
                     actualQtyOk: item.actual_qty_ok,
                     actualQtyNg: item.actual_qty_ng,
+                    actualQtyTotal: item.actual_qty_total,
                     response: item.response,
                 }));
                 setAllData(logs);
