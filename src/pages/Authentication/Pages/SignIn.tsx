@@ -1,10 +1,10 @@
 import FotoSanoh from '../../../images/cover/foto-sanoh-2.png';
 import Logo from '../../../images/logo-sanoh.png'
 import PasswordInput from '../../../components/PasswordInput';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -19,6 +19,17 @@ const SignIn: React.FC = () => {
       navigate('/dashboard');
     }
   };
+
+  useEffect(() => {
+    const loginError = localStorage.getItem('login_error');
+
+    if (loginError) {
+      setTimeout(() => {
+        toast.error(loginError);
+        localStorage.removeItem('login_error');
+      }, 100);
+    }
+  }, []);
 
   return (
     <>
@@ -52,7 +63,7 @@ const SignIn: React.FC = () => {
                       id="username"
                       autoFocus
                       placeholder="Enter Username"
-                      className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] shadow-[0px_4px_8px_rgba(70,95,241,0.1)] text-sm text-zinc-400"
+                      className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] shadow-[0px_4px_8px_rgba(70,95,241,0.1)] text-base text-black"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
