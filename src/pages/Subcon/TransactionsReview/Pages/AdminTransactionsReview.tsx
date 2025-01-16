@@ -298,8 +298,8 @@ const AdminTransactionReview = () => {
                                             <td className="px-3 py-3 text-center whitespace-nowrap">
                                                 {row.status}
                                             </td>
-                                            <td className="px-3 py-3 text-center whitespace-nowrap">
-                                                {row.response}
+                                            <td className="px-3 py-3 text-center font-medium text-primary whitespace-nowrap">
+                                                Need Review
                                             </td>
                                         </tr>
                                         ))

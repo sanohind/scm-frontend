@@ -515,7 +515,7 @@ const AdminTransactionReport = () => {
                                 ) : paginatedData.length > 0 ? (
                                     paginatedData.map((row, index) => (
                                     <tr key={index} 
-                                    className={`hover:bg-gray-50 ${row.deliveryNote?.startsWith('System-') ? 'bg-red-200' : ''}`}>
+                                    className={`hover:bg-gray-50 ${row.deliveryNote?.startsWith('System-') ? 'bg-danger bg-opacity-20' : ''}`}>
                                         <td className="px-1 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.type}</td>

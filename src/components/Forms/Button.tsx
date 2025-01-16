@@ -19,14 +19,14 @@ const Button: React.FC<ButtonProps> = ({
     className = '',
     type = 'button',
     disabled = false,
-    color = 'bg-[#1e3a8a]',
+    color = '',
     iconClassName = '',
 }) => {
     return (
         <button
             type={type}
             disabled={disabled}
-            className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-center text-white ${color} rounded-lg focus:ring-4 hover:ring-4 focus:outline-none focus:ring-blue-300 ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-center text-white ${color || 'bg-primary'} rounded-lg focus:ring-4 hover:ring-4 focus:outline-none focus:ring-blue-300 ${
                 disabled ? 'opacity-50 cursor-not-allowed' : ''
             } ${className}`}
             onClick={onClick}

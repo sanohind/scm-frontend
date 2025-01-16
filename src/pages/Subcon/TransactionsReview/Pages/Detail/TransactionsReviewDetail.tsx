@@ -294,15 +294,15 @@ const TransactionReviewDetail = () => {
                   ) : filteredData.length > 0 ? (
                     filteredData.map((detail, index) => (
                       <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.no}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partNumber}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.partName}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyOk}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{detail.qtyNg}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{5%}">{detail.no}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{17%}">{detail.partNumber}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{18%}">{detail.partName}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">{detail.qtyOk}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">{detail.qtyNg}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">
                           {detail.qtyTotal}
                         </td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">
                           {confirmMode ? (
                             <input
                               type="number"
@@ -315,7 +315,7 @@ const TransactionReviewDetail = () => {
                             detail.actualQtyOk
                           )}
                         </td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">
                           {confirmMode ? (
                             <input
                               type="number"
@@ -328,7 +328,7 @@ const TransactionReviewDetail = () => {
                             detail.actualQtyNg
                           )}
                         </td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                        <td className="px-3 py-3 text-center whitespace-nowrap w-{10%}">
                             {(parseInt(detail.actualQtyOk) + parseInt(detail.actualQtyNg)) || '-'}
                         </td>
                       </tr>

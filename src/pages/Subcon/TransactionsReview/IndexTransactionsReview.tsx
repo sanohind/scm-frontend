@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import TransactionsReview from "./Pages/TransactionsReview";
 import AdminTransactionsReview from "./Pages/AdminTransactionsReview";
 
 
@@ -11,9 +10,7 @@ const IndexTransactionsReview: React.FC = () => {
         setUserRole(role);
     }, []);
 
-    if (userRole === 'supplier-subcont-marketing' || userRole === 'supplier-subcont') {
-        return <TransactionsReview />;
-    } else if (userRole === 'admin-subcont' || userRole === 'super-user') {
+    if (userRole === 'admin-subcont' || userRole === 'super-user') {
         return <AdminTransactionsReview />;
     } else {
         return <div>No dashboard available for your role.</div>;
