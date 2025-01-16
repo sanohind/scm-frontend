@@ -41,6 +41,7 @@ const TransactionReviewDetail = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
+  const isDisableConfirm = filteredData.some((detail) => detail.actualQtyOk !== '-' || detail.actualQtyNg !== '-');
 
   // Fetch transaction review Details
   const fetchTransactionReviewDetail = async () => {
@@ -351,6 +352,8 @@ const TransactionReviewDetail = () => {
                 <Button
                   title="QTY Confirm"
                   onClick={handleConfirmMode}
+                  disabled={isDisableConfirm}
+                  className={`mr-2 px-6 ${isDisableConfirm ? 'bg-gray-300 cursor-not-allowed text-white' : ''}`}
                 />
               </>
             )}
