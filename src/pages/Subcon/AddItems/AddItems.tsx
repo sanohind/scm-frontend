@@ -213,7 +213,13 @@ export const AddItems = () => {
 
     const handleExcelDataChange = (index: number, field: string, value: string) => {
         const updatedData = [...excelData];
-        updatedData[index][field] = value;
+        const fieldMap: {[key: string]: string} = {
+            'bp_code': 'bp_code',
+            'part_number': 'part_number', // Changed from item_code
+            'part_name': 'part_name',     // Changed from item_name  
+            'old_part_name': 'old_part_name' // Changed from old_item_name
+        };
+        updatedData[index][fieldMap[field] || field] = value;
         setExcelData(updatedData);
     };
 
@@ -303,9 +309,10 @@ export const AddItems = () => {
             toast.success('Item added successfully');
             
             // Clear form fields
-            
+            setSelectedSupplier(null);
             setPartName('');
             setPartNumber('');
+            setOldPartName('');
             
         } catch (error) {
             toast.error('Failed to add item');
@@ -468,7 +475,7 @@ export const AddItems = () => {
                                                         <input
                                                             type="text"
                                                             value={item.part_number}
-                                                            onChange={(e) => handleExcelDataChange(index, 'item_code', e.target.value)}
+                                                            onChange={(e) => handleExcelDataChange(index, 'part_number', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
                                                     </td>
@@ -476,7 +483,7 @@ export const AddItems = () => {
                                                         <input
                                                             type="text"
                                                             value={item.part_name}
-                                                            onChange={(e) => handleExcelDataChange(index, 'item_name', e.target.value)}
+                                                            onChange={(e) => handleExcelDataChange(index, 'part_name', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
                                                     </td>
@@ -484,7 +491,7 @@ export const AddItems = () => {
                                                         <input
                                                             type="text"
                                                             value={item.old_part_name}
-                                                            onChange={(e) => handleExcelDataChange(index, 'old_item_name', e.target.value)}
+                                                            onChange={(e) => handleExcelDataChange(index, 'old_part_name', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
                                                     </td>

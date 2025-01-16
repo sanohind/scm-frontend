@@ -363,12 +363,11 @@ const AddUser = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
-              className="w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
-            >
-              Create User
-            </button>
+            <Button
+              title="Create User"
+              type="submit"
+              className="w-full justify-center"
+            />
           </div>
         </form>
       </div>
