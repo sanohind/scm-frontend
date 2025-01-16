@@ -421,10 +421,12 @@ const AdminTransactions = () => {
                                 </td>
                                 <td className="px-3 py-3 text-center border">
                                     <input
-                                    type="number"
-                                    value={part.qtyNg}
-                                    onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
-                                    className="border border-gray-300 rounded p-1 w-full"
+                                        type="number"
+                                        value={part.qtyNg}
+                                        onFocus={(e) => { if (e.target.value === '0') e.target.value = '' }}
+                                        onBlur={(e) => { if (e.target.value === '') e.target.value = '0' }}
+                                        onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
+                                        className="border border-gray-300 rounded p-1 w-full"
                                     />
                                 </td>
                                 <td className="px-3 py-3 text-center border">
