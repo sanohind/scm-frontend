@@ -24,6 +24,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     const role = localStorage.getItem('role');
+    const loginError = sessionStorage.getItem('login_error');
+
+    if (loginError) {
+      setTimeout(() => {
+      toast.error(loginError);
+      sessionStorage.removeItem('login_error');
+      }, 100);
+    }
 
     if (token && role) {
       const roleValue = role === 'super-admin' ? '1' :
@@ -123,10 +131,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return true;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        localStorage.setItem('login_error', error.response.data.message);
+        sessionStorage.setItem('login_error', error.response.data.message);
         setTimeout(() => window.location.reload(), 100);
       } else {
-        localStorage.setItem('login_error', 'An unexpected error occurred');
+        sessionStorage.setItem('login_error', 'An unexpected error occurred');
         setTimeout(() => window.location.reload(), 100);
       }
       return false;

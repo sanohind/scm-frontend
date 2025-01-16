@@ -1,10 +1,10 @@
 import FotoSanoh from '../../../images/cover/foto-sanoh-2.png';
 import Logo from '../../../images/logo-sanoh.png'
 import PasswordInput from '../../../components/PasswordInput';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 const SignIn: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -19,17 +19,6 @@ const SignIn: React.FC = () => {
       navigate('/dashboard');
     }
   };
-
-  useEffect(() => {
-    const loginError = localStorage.getItem('login_error');
-
-    if (loginError) {
-      setTimeout(() => {
-        toast.error(loginError);
-        localStorage.removeItem('login_error');
-      }, 100);
-    }
-  }, []);
 
   return (
     <>
