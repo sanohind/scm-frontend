@@ -20,9 +20,11 @@ const AdminTransactionReport = () => {
         partNumber: string;
         qtyOk: number;
         qtyNg: number;
+        qtyTotal: number;
         deliveryNote: string;
         actualQtyOk: number;
         actualQtyNg: number;
+        actualQtyTotal: number;
         response: string;
     }
     
@@ -110,16 +112,13 @@ const AdminTransactionReport = () => {
             const savedSupplier = suppliers.find(
                 (sup: Supplier) => sup.value === savedSupplierCode
             );
-            if (savedSupplier) {      
-                // setLoading(true);
+            if (savedSupplier) { 
                 setSelectedSupplier(savedSupplier);
                 fetchPartOptions(savedSupplierCode);
-                // fetchTransactionLogs(savedSupplierCode, startDate, endDate);
             }
         }
     }, [suppliers]);
 
-    // Modified fetchTransactionLogs to include supplier
     const fetchTransactionLogs = async (
         supplierCode: string, 
         startDateParam: Date, 
@@ -196,18 +195,10 @@ const AdminTransactionReport = () => {
 
     const handleStartDateChange = async (date: Date) => {
         setStartDate(date);
-        
-        // if (selectedSupplier) {
-        //     await fetchTransactionLogs(selectedSupplier.value, date, endDate);
-        // }
     };
 
     const handleEndDateChange = async (date: Date) => {
         setEndDate(date);
-        
-        // if (selectedSupplier) {
-        //     await fetchTransactionLogs(selectedSupplier.value, startDate, date);
-        // }
     };
 
     const handleSearch = async () => {
@@ -225,24 +216,24 @@ const AdminTransactionReport = () => {
 
         // Filter by transaction type
         if (selectedTransactionTypes.length > 0) {
-        filtered = filtered.filter((row: any) => selectedTransactionTypes.includes(row.type));
+            filtered = filtered.filter((row: any) => selectedTransactionTypes.includes(row.type));
         }
 
         // Filter by status
         if (selectedStatuses.length > 0) {
-        filtered = filtered.filter((row: any) => selectedStatuses.includes(row.status));
+            filtered = filtered.filter((row: any) => selectedStatuses.includes(row.status));
         }
         
         // Filter by part name
         if (selectedParts.length > 0) {
-        filtered = filtered.filter((row: any) => selectedParts.includes(row.partNumber));
+            filtered = filtered.filter((row: any) => selectedParts.includes(row.partNumber));
         }
         
         // Filter by delivery note
         if (searchQuery) {
-        filtered = filtered.filter((row) =>
-            row.deliveryNote.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+            filtered = filtered.filter((row) =>
+                row.deliveryNote.toLowerCase().includes(searchQuery.toLowerCase())
+            );
         }
 
         // Apply sorting
@@ -257,40 +248,71 @@ const AdminTransactionReport = () => {
     const handlePageChange = (page: number) => setCurrentPage(page);
 
     const handleDownloadExcel = () => {
+
+        const formatDate = (date: Date) => {
+            return date.toLocaleDateString('en-CA');
+        };
+
+        const startDateString = formatDate(startDate);
+        const endDateString = formatDate(endDate);
+    
         const ws = XLSX.utils.json_to_sheet(
-        filteredData.map((row) => ({
-            Date: new Date(row.timestamp).toLocaleString(),
+            filteredData.map((row) => ({
+            'Transaction Date': new Date(row.timestamp).toLocaleString(),
+            'Delivery Note': row.deliveryNote,
             'Transaction Type': row.type,
-            Status: row.status,
+            'Status': row.status,
             'Part Name': row.partName,
             'Part Number': row.partNumber,
             'Quantity OK': row.qtyOk,
             'Quantity NG': row.qtyNg,
-            Total: row.qtyOk + row.qtyNg,
-        }))
+            'Total Quantity': row.qtyTotal,
+            'Actual Quantity OK': row.actualQtyOk,
+            'Actual Quantity NG': row.actualQtyNg,
+            'Actual Total Quantity': row.actualQtyTotal,
+            }))
         );
 
+        ws['!cols'] = [
+            { wch: 20 }, // Transaction Date
+            { wch: 25 }, // Delivery Note
+            { wch: 20 }, // Transaction Type
+            { wch: 15 }, // Status
+            { wch: 20 }, // Part Name
+            { wch: 20 }, // Part Number
+            { wch: 15 }, // Quantity OK
+            { wch: 15 }, // Quantity NG
+            { wch: 18 }, // Total Quantity
+            { wch: 18 }, // Actual Quantity OK
+            { wch: 18 }, // Actual Quantity NG
+            { wch: 20 }, // Actual Total Quantity
+        ];
+    
         // Add totals row
         XLSX.utils.sheet_add_aoa(
-        ws,
-        [
+            ws,
             [
-            'Totals:',
-            '',
-            '',
-            '',
-            '',
-            filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
-            filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
-            filteredData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0),
+                [
+                    'Totals:',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    filteredData.reduce((sum, row) => sum + row.qtyOk, 0),
+                    filteredData.reduce((sum, row) => sum + row.qtyNg, 0),
+                    filteredData.reduce((sum, row) => sum + row.qtyTotal, 0),
+                    filteredData.reduce((sum, row) => sum + row.actualQtyOk, 0),
+                    filteredData.reduce((sum, row) => sum + row.actualQtyNg, 0),
+                    filteredData.reduce((sum, row) => sum + row.actualQtyTotal, 0),
+                ],
             ],
-        ],
-        { origin: -1 }
+            { origin: -1 }
         );
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, `${selectedSupplier?.value}`);
-        XLSX.writeFile(wb, `transaction_report_${selectedSupplier?.value}_${startDate.toISOString().split('T')[0]}_${endDate.toISOString().split('T')[0]}.xlsx`);
+        XLSX.writeFile(wb, `transaction_report_${selectedSupplier?.value}__${startDateString}_to_${endDateString}.xlsx`);
     };
 
     return (
@@ -300,13 +322,13 @@ const AdminTransactionReport = () => {
             <div className="font-poppins bg-white text-black">
                 <div className="p-2 md:p-4 lg:p-6 space-y-6">
                     {/* Add Supplier Selection at the top */}
-                    <div className="w-full">
+                    <div className="w-full relative z-20">
                         <Select
-                        options={suppliers}
-                        value={selectedSupplier}
-                        onChange={handleSupplierChange}
-                        placeholder="Select Supplier"
-                        className="w-80"
+                            options={suppliers}
+                            value={selectedSupplier}
+                            onChange={handleSupplierChange}
+                            placeholder="Select Supplier"
+                            className="w-80"
                         />
                     </div>
 
@@ -348,35 +370,35 @@ const AdminTransactionReport = () => {
                             {/* Transaction Type */}
                             <div className="w-full">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Transaction Type
+                                    Transaction Type
                                 </label>
                                 <MultiSelect
-                                id="transactionTypeSelect"
-                                label="Filter by Transaction Type"
-                                options={[
-                                    { value: 'Incoming', text: 'Incoming' },
-                                    { value: 'Process', text: 'Process' },
-                                    { value: 'Outgoing', text: 'Outgoing' },
-                                ]}
-                                selectedOptions={selectedTransactionTypes}
-                                onChange={setSelectedTransactionTypes}
+                                    id="transactionTypeSelect"
+                                    placeholder="Filter by Transaction Type"
+                                    options={[
+                                        { value: 'Incoming', text: 'Incoming' },
+                                        { value: 'Process', text: 'Process' },
+                                        { value: 'Outgoing', text: 'Outgoing' },
+                                    ]}
+                                    selectedOptions={selectedTransactionTypes}
+                                    onChange={setSelectedTransactionTypes}
                                 />
                             </div>
 
                             {/* Status */}
                             <div className="w-full">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Status
+                                    Status
                                 </label>
                                 <MultiSelect
-                                id="statusSelect"
-                                label="Filter by Status"
-                                options={[
-                                    { value: 'Fresh', text: 'Fresh' },
-                                    { value: 'Replating', text: 'Replating' },
-                                ]}
-                                selectedOptions={selectedStatuses}
-                                onChange={setSelectedStatuses}
+                                    id="statusSelect"
+                                    placeholder="Filter by Status"
+                                    options={[
+                                        { value: 'Fresh', text: 'Fresh' },
+                                        { value: 'Replating', text: 'Replating' },
+                                    ]}
+                                    selectedOptions={selectedStatuses}
+                                    onChange={setSelectedStatuses}
                                 />
                             </div>
 
@@ -387,7 +409,7 @@ const AdminTransactionReport = () => {
                                 </label>
                                 <MultiSelect
                                     id="partNumberSelect"
-                                    label="Filter by Part Number"
+                                    placeholder="Filter by Part Number"
                                     options={partOptions}
                                     selectedOptions={selectedParts}
                                     onChange={setSelectedParts}
@@ -492,7 +514,8 @@ const AdminTransactionReport = () => {
                                     ))
                                 ) : paginatedData.length > 0 ? (
                                     paginatedData.map((row, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
+                                    <tr key={index} 
+                                    className={`hover:bg-gray-50 ${row.deliveryNote?.startsWith('System-') ? 'bg-red-200' : ''}`}>
                                         <td className="px-1 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.type}</td>
@@ -501,11 +524,23 @@ const AdminTransactionReport = () => {
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyNg}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk + row.qtyNg}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.actualQtyOk || '-'}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.actualQtyNg || '-'}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{(row.actualQtyOk + row.actualQtyNg) || '-'}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{(row.response) || '-'}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyTotal}</td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            {row.actualQtyOk === null ? '-' : row.actualQtyOk}
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            {row.actualQtyNg === null ? '-' : row.actualQtyNg}
+                                        </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            {row.actualQtyTotal === null ? '-' : row.actualQtyTotal}
+                                        </td>
+                                        <td
+                                            className={`px-3 py-3 text-center whitespace-nowrap ${
+                                                row.response === 'Under Review' || row.response?.startsWith('System Review-') ? 'text-primary' : ''
+                                            }`}
+                                        >
+                                            {row.response || '-'}
+                                        </td>
                                     </tr>
                                     ))
                                 ) : (

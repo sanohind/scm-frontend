@@ -7,13 +7,14 @@ interface Option {
 
 interface MultiSelectProps {
   id: string;
-  label: string;
+  label?: string;
+  placeholder?: string;
   options: Option[];
   selectedOptions: string[];
   onChange: (selected: string[]) => void;
 }
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedOptions, onChange }) => {
+const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, placeholder, options, selectedOptions, onChange }) => {
   const [show, setShow] = useState(false);
   const dropdownRef = useRef<any>(null);
   const trigger = useRef<any>(null);
@@ -48,7 +49,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
   }, [show]);
 
   return (
-    <div className="relative z-50">
+    <div className="relative z-10">
       <div>
         <select className="hidden" id={id}>
           {options.map((option, index) => (
@@ -60,7 +61,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
 
         <div className="flex flex-col items-center">
           <input name="values" type="hidden" defaultValue={selectedOptions.join(',')} />
-          <div className="relative z-20 inline-block w-full">
+          <div className="relative z-10 inline-block w-full">
             <div className="relative flex flex-col items-center">
               <div ref={trigger} onClick={open} className="w-full">
                 <div className="mb-2 flex rounded border border-stroke py-2 pl-3 pr-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input min-h-[42px] max-h-[120px] overflow-y-auto">
@@ -102,13 +103,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
                       ) : null;
                     })}
                     {selectedOptions.length === 0 && (
-                      <div className="flex-1 flex items-center min-h-[28px]">
+                        <div className="flex-1 flex items-center min-h-[28px]">
                         <input
-                          placeholder={label}
+                          placeholder={label || placeholder}
                           className="h-full w-full appearance-none bg-transparent p-1 px-2 outline-none"
                           readOnly
                         />
-                      </div>
+                        </div>
                     )}
                   </div>
                   <div className="flex w-8 items-center py-1 pl-1 pr-1">
@@ -139,7 +140,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ id, label, options, selectedO
               </div>
               <div className="w-full px-4">
                 <div
-                  className={`max-h-select absolute top-full left-0 z-40 w-full overflow-y-auto rounded bg-white shadow dark:bg-form-input ${
+                  className={`max-h-select absolute top-full left-0 z-20 w-full overflow-y-auto rounded bg-white shadow dark:bg-form-input ${
                     isOpen() ? '' : 'hidden'
                   }`}
                   ref={dropdownRef}
