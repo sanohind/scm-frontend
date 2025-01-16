@@ -92,8 +92,9 @@ const AddUser = () => {
       const codeAfterThree = bpCode.substring(3, 7);
 
       // Generate random characters for the remaining 6 characters
+      const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
       const randomChars = Array.from({ length: 6 }, () => 
-        'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]
+        characters[Math.floor(Math.random() * characters.length)]
       ).join('');
 
       // Put supplier code first, then random chars (total 10 chars)
