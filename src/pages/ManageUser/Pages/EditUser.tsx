@@ -7,6 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Edit_User_Admin, API_List_Partner_Admin, API_Update_User_Admin } from "../../../api/api";
 import Button from "../../../components/Forms/Button";
+import { roles } from "../../Authentication/Role";
 
 
 const EditUser = () => {
@@ -298,15 +299,11 @@ const EditUser = () => {
                   required
                 >
                   <option value="" disabled>Select a role</option>
-                  <option value="1">Super Admin</option>
-                  <option value="9">Super User</option>
-                  <option value="2">Admin Purchasing</option>
-                  <option value="3">Admin Warehouse</option>
-                  <option value="4">Admin Subcont</option>
-                  <option value="5">Supplier Marketing</option>
-                  <option value="6">Supplier Subcont Marketing</option>
-                  <option value="7">Supplier Warehouse</option>
-                  <option value="8">Supplier Subcont</option>
+                  {roles.map((role) => (
+                      <option key={role.value} value={role.value}>
+                          {role.label}
+                      </option>
+                  ))}
                 </select>
               </div>
 

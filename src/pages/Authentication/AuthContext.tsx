@@ -3,8 +3,7 @@ import { API_Logout } from '../../api/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Login } from '../../api/api';
 import axios from 'axios';
-
-type Role = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | null;
+import { getRolePath, getRoleValue, Role } from './Role';
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -34,16 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (token && role) {
-      const roleValue = role === 'super-admin' ? '1' :
-        role === 'admin-purchasing' ? '2' :
-        role === 'admin-warehouse' ? '3' :
-        role === 'admin-subcont' ? '4' :
-        role === 'supplier-marketing' ? '5' :
-        role === 'supplier-subcont-marketing' ? '6' :
-        role === 'supplier-warehouse' ? '7' :
-        role === 'supplier-subcont' ? '8' :
-        role === 'super-user' ? '9' : 
-        null;
+      const roleValue = getRoleValue(role);
       setUserRole(roleValue);
       setIsAuthenticated(true);
     } else {
@@ -89,38 +79,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('bp_code', bp_code);
       localStorage.setItem('supplier_name', supplier_name);
   
-      switch (role) {
-        case '1':
-          localStorage.setItem("role", "super-admin");          
-          break;
-        case '2':
-          localStorage.setItem("role", "admin-purchasing");
-          break;
-        case '3':
-          localStorage.setItem("role", "admin-warehouse");          
-          break;
-        case '4':
-          localStorage.setItem("role", "admin-subcont");          
-          break;
-        case '5':
-          localStorage.setItem("role", "supplier-marketing");          
-          break;
-        case '6':
-          localStorage.setItem("role", "supplier-subcont-marketing");          
-          break;
-        case '7':
-          localStorage.setItem("role", "supplier-warehouse");          
-          break;
-        case '8':
-          localStorage.setItem("role", "supplier-subcont");          
-          break;
-        case '9':
-          localStorage.setItem("role", "super-user");          
-          break;
-        default:
-          toast.error('Role not found!');
-          break;
-      }
+      localStorage.setItem("role", getRolePath(role));
+      
       setIsAuthenticated(true);
       setUserRole(role);
 

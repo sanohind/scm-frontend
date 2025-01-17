@@ -8,6 +8,7 @@ import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_List_User_Admin, API_Update_Status_Admin } from '../../../api/api';
 import Button from '../../../components/Forms/Button';
+import { getRoleName } from '../../Authentication/Role';
 
 interface User {
     UserID: string;
@@ -191,30 +192,30 @@ const ManageUser: React.FC = () => {
         setSortConfig({ key, direction });
     };
 
-    const getRoleName = (role: string) => {
-        switch (role) {
-            case '1':
-                return 'Super Admin';
-            case '2':
-                return 'Admin Purchasing';
-            case '3':
-                return 'Admin Warehouse';
-            case '4':
-                return 'Admin Subcont';
-            case '5':
-                return 'Supplier Marketing';
-            case '6':
-                return 'Supplier Subcont Marketing';
-            case '7':
-                return 'Supplier Warehouse';
-            case '8':
-                return 'Supplier Subcont';
-            case '9':
-                return 'Super User';
-            default:
-                return 'Unknown Role';
-        }
-    };
+    // const getRoleName = (role: string) => {
+    //     switch (role) {
+    //         case '1':
+    //             return 'Super Admin';
+    //         case '2':
+    //             return 'Admin Purchasing';
+    //         case '3':
+    //             return 'Admin Warehouse';
+    //         case '4':
+    //             return 'Admin Subcont';
+    //         case '5':
+    //             return 'Supplier Marketing';
+    //         case '6':
+    //             return 'Supplier Subcont Marketing';
+    //         case '7':
+    //             return 'Supplier Warehouse';
+    //         case '8':
+    //             return 'Supplier Subcont';
+    //         case '9':
+    //             return 'Super User';
+    //         default:
+    //             return 'Unknown Role';
+    //     }
+    // };
 
     const handleEditPage = (UserId: string) => {
         navigate(`/edit-user?userId=${UserId}`);
