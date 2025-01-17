@@ -6,7 +6,7 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_List_Item_Subcont_Admin, API_List_Partner_Admin } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_List_Partner_Admin, API_Stock_Item_Subcont_Admin } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
@@ -17,7 +17,17 @@ const AdminTransactions = () => {
     const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
     const [status, setStatus] = useState('');
     const [deliveryNote, setDeliveryNote] = useState('');
-    const [apiData, setApiData] = useState<{ partNumber: string; partName: string; oldPartName: string }[]>([]);
+    const [apiData, setApiData] = useState<{
+        partNumber: string;
+        partName: string;
+        oldPartName: string;
+        incomingFreshStock: number;
+        readyFreshStock: number;
+        ngFreshStock: number;
+        incomingReplatingStock: number;
+        readyReplatingStock: number;
+        ngReplatingStock: number;
+    }[]>([]);
     const [transactionDate, setTransactionDate] = useState<Date>(new Date());
     const [partList, setPartList] = useState<any[]>([]);
     const [suppliers, setSuppliers] = useState([]);
@@ -28,6 +38,12 @@ const AdminTransactions = () => {
         part_number: string;
         part_name: string;
         old_part_name: string;
+        incoming_fresh_stock: number;
+        ready_fresh_stock: number;
+        ng_fresh_stock: number;
+        incoming_replating_stock: number;
+        ready_replating_stock: number;
+        ng_replating_stock: number;
     }
 
     useEffect(() => {
@@ -50,7 +66,7 @@ const AdminTransactions = () => {
     const fetchData = async (supplierCode: string) => {
         try {
             const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_List_Item_Subcont_Admin()}${supplierCode}`, {
+            const response = await fetch(`${API_Stock_Item_Subcont_Admin()}${supplierCode}`, {
             headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -61,6 +77,12 @@ const AdminTransactions = () => {
                     partNumber: item.part_number,
                     partName: item.part_name,
                     oldPartName : item.old_part_name || '-',
+                    incomingFreshStock: item.incoming_fresh_stock,
+                    readyFreshStock: item.ready_fresh_stock,
+                    ngFreshStock: item.ng_fresh_stock,
+                    incomingReplatingStock: item.incoming_replating_stock,
+                    readyReplatingStock: item.ready_replating_stock,
+                    ngReplatingStock: item.ng_replating_stock,
                 }));
                 setApiData(transformedData);
             }
@@ -102,6 +124,7 @@ const AdminTransactions = () => {
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
+        setPartList([]); 
         if (selectedOption) {
             localStorage.setItem('selected_supplier', selectedOption.value);
             fetchData(selectedOption.value);
@@ -141,6 +164,21 @@ const AdminTransactions = () => {
             return;
         }
 
+        const selectedPartData = apiData.find(item => item.partNumber === selectedPart.value);
+
+        // Jika berada di tabs "Record Outgoing" (value === 2), tentukan stok saat ini berdasarkan status
+        let currentStock = 0;
+        let currentNgStock = 0;
+        if (value === 2) {
+            if (status === 'Fresh') {
+            currentStock = selectedPartData?.readyFreshStock ?? 0;
+            currentNgStock = selectedPartData?.ngFreshStock ?? 0;
+            } else if (status === 'Replating') {
+            currentStock = selectedPartData?.readyReplatingStock ?? 0;
+            currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
+            }
+        }
+
         // Lanjutkan menambahkan part jika tidak duplikat
         setPartList([
             ...partList,
@@ -150,9 +188,37 @@ const AdminTransactions = () => {
                 oldPartName: selectedPart.label.split(' | ')[2],
                 qtyOk: '',
                 qtyNg: '0',
+                currentStock: currentStock,
+                currentNgStock: currentNgStock,
             },
         ]);
         setSelectedPart(null);
+    };
+
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newStatus = e.target.value;
+        setStatus(newStatus);
+        if (value === 2) {
+            setPartList((prev) =>
+            prev.map((pt) => {
+                const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+                if (!matched) return pt;
+                if (newStatus === 'Fresh') {
+                return {
+                    ...pt,
+                    currentStock: matched.readyFreshStock ?? 0,
+                    currentNgStock: matched.ngFreshStock ?? 0,
+                };
+                } else {
+                return {
+                    ...pt,
+                    currentStock: matched.readyReplatingStock ?? 0,
+                    currentNgStock: matched.ngReplatingStock ?? 0,
+                };
+                }
+            })
+            );
+        }
     };
 
     const handlePartListChange = (index: number, field: 'qtyOk' | 'qtyNg', value: string) => {
@@ -333,7 +399,7 @@ const AdminTransactions = () => {
                         </label>
                         <select
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={handleStatusChange}
                             className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                             required
                         >
@@ -413,11 +479,16 @@ const AdminTransactions = () => {
                                 <td className="px-3 py-3 text-center border">{part.oldPartName}</td>
                                 <td className="px-3 py-3 text-center border">
                                     <input
-                                    type="number"
-                                    value={part.qtyOk}
-                                    onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
-                                    className="border border-gray-300 rounded p-1 w-full"
+                                        type="number"
+                                        value={part.qtyOk}
+                                        onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
+                                        className="border border-gray-300 rounded p-1 w-full"
                                     />
+                                    {value === 2 && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                        Stock: {part.currentStock}
+                                        </p>
+                                    )}
                                 </td>
                                 <td className="px-3 py-3 text-center border">
                                     <input
@@ -428,13 +499,18 @@ const AdminTransactions = () => {
                                         onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
                                         className="border border-gray-300 rounded p-1 w-full"
                                     />
+                                    {value === 2 && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                        Stock: {part.currentNgStock}
+                                        </p>
+                                    )}
                                 </td>
                                 <td className="px-3 py-3 text-center border">
                                     <button
-                                    onClick={() => handleDeletePart(index)}
-                                    className="bg-red-600 text-white px-2 py-1 rounded"
+                                        onClick={() => handleDeletePart(index)}
+                                        className="bg-red-600 text-white px-2 py-1 rounded"
                                     >
-                                    Delete
+                                        Delete
                                     </button>
                                 </td>
                                 </tr>

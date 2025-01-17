@@ -6,7 +6,7 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_Item_Subcont, API_List_Item_Subcont } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_Item_Subcont } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
@@ -17,7 +17,17 @@ const Transactions = () => {
   const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
   const [status, setStatus] = useState('');
   const [deliveryNote, setDeliveryNote] = useState('');
-  const [apiData, setApiData] = useState<{ partNumber: string; partName: string; oldPartName: string }[]>([]);
+  const [apiData, setApiData] = useState<{
+    partNumber: string;
+    partName: string;
+    oldPartName: string;
+    incomingFreshStock: number;
+    readyFreshStock: number;
+    ngFreshStock: number;
+    incomingReplatingStock: number;
+    readyReplatingStock: number;
+    ngReplatingStock: number;
+  }[]>([]);
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [partList, setPartList] = useState<any[]>([]);
 
@@ -104,11 +114,14 @@ const Transactions = () => {
 
     // Jika berada di tabs "Record Outgoing" (value === 2), tentukan stok saat ini berdasarkan status
     let currentStock = 0;
+    let currentNgStock = 0;
     if (value === 2) {
       if (status === 'Fresh') {
         currentStock = selectedPartData?.readyFreshStock ?? 0;
+        currentNgStock = selectedPartData?.ngFreshStock ?? 0;
       } else if (status === 'Replating') {
         currentStock = selectedPartData?.readyReplatingStock ?? 0;
+        currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
       }
     }
 
@@ -121,9 +134,37 @@ const Transactions = () => {
         oldPartName: selectedPartData?.oldPartName || '-',
         qtyOk: '',
         qtyNg: '0',
+        currentStock: currentStock,
+        currentNgStock: currentNgStock,
       },
     ]);
     setSelectedPart(null);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+    if (value === 2) {
+      setPartList((prev) =>
+        prev.map((pt) => {
+          const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+          if (!matched) return pt;
+          if (newStatus === 'Fresh') {
+            return {
+              ...pt,
+              currentStock: matched.readyFreshStock ?? 0,
+              currentNgStock: matched.ngFreshStock ?? 0,
+            };
+          } else {
+            return {
+              ...pt,
+              currentStock: matched.readyReplatingStock ?? 0,
+              currentNgStock: matched.ngReplatingStock ?? 0,
+            };
+          }
+        })
+      );
+    }
   };
 
   const handlePartListChange = (index: number, field: 'qtyOk' | 'qtyNg', value: string) => {
@@ -251,7 +292,7 @@ const Transactions = () => {
             <Tab label="Record Outgoing" />
           </Tabs>
           <div className="rounded-sm border-t-2 border-stroke bg-white">
-            <div className="max-w-[1024px] mx-auto">
+            <div className="max-w-[1224px] mx-auto">
               {(value === 0 || value === 1 || value === 2) && (
                 <div className="p-4 md:p-6.5 gap-4">
                   {/* Date Picker */}
@@ -273,7 +314,7 @@ const Transactions = () => {
                       </label>
                       <select
                         value={status}
-                        onChange={(e) => setStatus(e.target.value)}
+                        onChange={handleStatusChange}
                         className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                         required
                       >
@@ -325,26 +366,31 @@ const Transactions = () => {
                       <table className="w-full text-sm text-center">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[17%]">
                               PART NUMBER
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[17%]">
                               PART NAME
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[16%]">
                               OLD PART NAME
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
+                            {/* {value === 2 && (
+                              <>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
+                                  CURRENT STOCK OK
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
+                                  CURRENT STOCK NG
+                                </th>
+                              </>
+                            )} */}
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                               QTY OK
                             </th>
-                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
+                            <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                               QTY NG
                             </th>
-                            {value === 2 && (
-                              <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
-                                CURRENT STOCK
-                              </th>
-                            )}
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                               ACTION
                             </th>
@@ -356,6 +402,16 @@ const Transactions = () => {
                               <td className="px-3 py-3 text-center border">{part.partNumber}</td>
                               <td className="px-3 py-3 text-center border">{part.partName}</td>
                               <td className="px-3 py-3 text-center border">{part.oldPartName}</td>
+                              {/* {value === 2 && (
+                                <>
+                                  <td className="px-3 py-3 text-center border">
+                                    {part.currentStock}
+                                  </td>
+                                  <td className="px-3 py-3 text-center border">
+                                    {part.currentNgStock}
+                                  </td>
+                                </>
+                              )} */}
                               <td className="px-3 py-3 text-center border">
                                 <input
                                   type="number"
@@ -363,22 +419,27 @@ const Transactions = () => {
                                   onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
                                   className="border border-gray-300 rounded p-1 w-full"
                                 />
+                                {value === 2 && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Stock: {part.currentStock}
+                                  </p>
+                                )}
                               </td>
                               <td className="px-3 py-3 text-center border">
-                              <input
-                                type="number"
-                                value={part.qtyNg}
-                                onFocus={(e) => { if (e.target.value === '0') e.target.value = '' }}
-                                onBlur={(e) => { if (e.target.value === '') e.target.value = '0' }}
-                                onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
-                                className="border border-gray-300 rounded p-1 w-full"
-                              />
+                                <input
+                                  type="number"
+                                  value={part.qtyNg}
+                                  onFocus={(e) => { if (e.target.value === '0') e.target.value = '' }}
+                                  onBlur={(e) => { if (e.target.value === '') e.target.value = '0' }}
+                                  onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
+                                  className="border border-gray-300 rounded p-1 w-full"
+                                />
+                                {value === 2 && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Stock: {part.currentNgStock}
+                                  </p>
+                                )}
                               </td>
-                              {value === 2 && (
-                                <td className="px-3 py-3 text-center border">
-                                  {part.currentStock}
-                                </td>
-                              )}
                               <td className="px-3 py-3 text-center border">
                                 <button
                                   onClick={() => handleDeletePart(index)}
@@ -391,16 +452,13 @@ const Transactions = () => {
                           ))}
                         </tbody>
                       </table>
-                      <button
+                      <Button
+                        title="Submit"
                         onClick={handleSubmit}
-                        className="mt-4 w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
-                      >
-                        Submit
-                      </button>
+                        className="mt-4 w-full font-medium"
+                      />
                     </div>
                   )}
-
-                  {/* Submit Button */}
                 </div>
               )}
             </div>

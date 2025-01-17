@@ -24,5 +24,3 @@ export const getRolePath = (role: string): string => {
     const foundRole = roles.find(r => r.value === role);
     return foundRole ? foundRole.label.toLowerCase().replace(/ /g, '-') : 'unknown-role';
 };
-
-export type Role = (typeof roles[number]['value']) | null;

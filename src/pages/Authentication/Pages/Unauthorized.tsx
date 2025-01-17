@@ -7,7 +7,7 @@ const Unauthorized = () => {
   const { logout } = useAuth();
 
   const handleRedirect = () => {
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleLogout = () => {
