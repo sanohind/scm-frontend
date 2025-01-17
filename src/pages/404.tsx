@@ -1,11 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Forms/Button';
+import { useAuth } from './Authentication/AuthContext';
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const logout = useAuth
 
   const handleRedirect = () => {
     navigate('/'); // Mengarahkan ke halaman dashboard
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login');
   };
 
   return (
@@ -21,10 +28,19 @@ const NotFound = () => {
           <p className="mb-4 text-lg text-gray-500 dark:text-gray-400">
             Sorry, we can't find that page. You'll find lots to explore on the home page.
           </p>
-          <div className="flex justify-center">
+          <div className="flex justify-center space-x-4">
             <Button
               title="Go to Dashboard"
               onClick={handleRedirect}
+            />
+            <Button
+              title="Back"
+              onClick={() => navigate(-1)}
+            />
+            <Button
+              title="Logout"
+              onClick={handleLogout}
+              color='bg-danger'
             />
           </div>
         </div>

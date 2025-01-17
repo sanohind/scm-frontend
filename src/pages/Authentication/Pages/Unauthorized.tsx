@@ -1,11 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Forms/Button";
+import { useAuth } from "../AuthContext";
 
 const Unauthorized = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleRedirect = () => {
     navigate('/');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login');
   };
   
   return (
@@ -21,10 +28,19 @@ const Unauthorized = () => {
           <p className="mb-4 text-lg text-gray-500 dark:text-gray-400">
             Sorry, you don't have permission to access this menu.
           </p>
-          <div className="flex justify-center">
+          <div className="flex justify-center space-x-4">
             <Button
               title="Go to Dashboard"
               onClick={handleRedirect}
+            />
+            <Button
+              title="Back"
+              onClick={() => navigate(-1)}
+            />
+            <Button
+              color="bg-red-500"
+              title="Logout"
+              onClick={handleLogout}
             />
           </div>
         </div>
