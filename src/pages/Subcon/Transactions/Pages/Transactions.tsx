@@ -6,7 +6,7 @@ import Select from 'react-select';
 import 'react-datepicker/dist/react-datepicker.css';
 import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Transaction_Subcont, API_List_Item_Subcont } from '../../../../api/api';
+import { API_Create_Transaction_Subcont, API_Item_Subcont, API_List_Item_Subcont } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import { FaPlus } from 'react-icons/fa';
@@ -25,13 +25,19 @@ const Transactions = () => {
     part_number: string;
     part_name: string;
     old_part_name: string;
+    incoming_fresh_stock: number;
+    ready_fresh_stock: number;
+    ng_fresh_stock: number;
+    incoming_replating_stock: number;
+    ready_replating_stock: number;
+    ng_replating_stock: number;
   }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch(API_List_Item_Subcont(), {
+        const response = await fetch(API_Item_Subcont(), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -42,6 +48,12 @@ const Transactions = () => {
             partNumber: item.part_number,
             partName: item.part_name,
             oldPartName : item.old_part_name || '-',
+            incomingFreshStock: item.incoming_fresh_stock,
+            readyFreshStock: item.ready_fresh_stock,
+            ngFreshStock: item.ng_fresh_stock,
+            incomingReplatingStock: item.incoming_replating_stock,
+            readyReplatingStock: item.ready_replating_stock,
+            ngReplatingStock: item.ng_replating_stock,
           }));
           setApiData(transformedData);
         }
@@ -89,6 +101,16 @@ const Transactions = () => {
     }
 
     const selectedPartData = apiData.find(item => item.partNumber === selectedPart.value);
+
+    // Jika berada di tabs "Record Outgoing" (value === 2), tentukan stok saat ini berdasarkan status
+    let currentStock = 0;
+    if (value === 2) {
+      if (status === 'Fresh') {
+        currentStock = selectedPartData?.readyFreshStock ?? 0;
+      } else if (status === 'Replating') {
+        currentStock = selectedPartData?.readyReplatingStock ?? 0;
+      }
+    }
 
     // Lanjutkan menambahkan part jika tidak duplikat
     setPartList([
@@ -318,6 +340,11 @@ const Transactions = () => {
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
                               QTY NG
                             </th>
+                            {value === 2 && (
+                              <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
+                                CURRENT STOCK
+                              </th>
+                            )}
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                               ACTION
                             </th>
@@ -347,6 +374,11 @@ const Transactions = () => {
                                 className="border border-gray-300 rounded p-1 w-full"
                               />
                               </td>
+                              {value === 2 && (
+                                <td className="px-3 py-3 text-center border">
+                                  {part.currentStock}
+                                </td>
+                              )}
                               <td className="px-3 py-3 text-center border">
                                 <button
                                   onClick={() => handleDeletePart(index)}
