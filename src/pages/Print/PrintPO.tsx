@@ -469,7 +469,7 @@ const PurchaseOrderDocument = ({ data }: { data: PurchaseOrderData }) => (
               <View style={styles.value}>
                 <Text>:   PT. SANOH INDONESIA</Text>
                   <Text style={{ marginLeft: 4 }}>  JL. INTI II BLOK C4 NO. 10 KAWASAN INDUSTRI HYUNDAI,</Text>
-                  <Text style={{ marginLeft: 4 }}>  LEMAH ABANG - BEKASI 17750</Text>
+                  <Text style={{ marginLeft: 4 }}>  CIKARANG - BEKASI 17750, INDONESIA</Text>
                   <Text style={{ marginLeft: 4 }}>  {data.header.phone_number} {data.header.fax_number}</Text>
               </View>
             </View>
