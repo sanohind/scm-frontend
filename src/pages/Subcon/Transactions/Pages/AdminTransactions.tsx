@@ -328,9 +328,22 @@ const AdminTransactions = () => {
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to submit');
+            const result = await response.json();
 
-            toast.success('Data submitted successfully!');
+            if (!result.status) {
+                if (Array.isArray(result.error)) {
+                // Show each error message as a separate toast
+                    result.error.forEach((errorMsg: string) => {
+                        toast.error(errorMsg);
+                    });
+                } else {
+                    console.error(result);
+                    toast.error(result.message || 'Error submitting data');
+                }
+                return;
+            }
+
+            toast.success(result.message || 'Data submitted successfully!');
 
             // Reset form
             setPartList([]);

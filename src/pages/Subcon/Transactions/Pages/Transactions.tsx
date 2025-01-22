@@ -243,7 +243,6 @@ const Transactions = () => {
         const actualTransactionDate = `${transactionDateTime.getFullYear()}-${String(transactionDateTime.getMonth() + 1).padStart(2, '0')}-${String(transactionDateTime.getDate()).padStart(2, '0')}`;
         const actualTransactionTime = `${String(transactionDateTime.getHours()).padStart(2, '0')}:${String(transactionDateTime.getMinutes()).padStart(2, '0')}:${String(transactionDateTime.getSeconds()).padStart(2, '0')}`;
 
-
         return {
           actual_transaction_date: actualTransactionDate,
           actual_transaction_time: actualTransactionTime,
@@ -274,6 +273,7 @@ const Transactions = () => {
             toast.error(errorMsg);
           });
         } else {
+          console.error(result);
           toast.error(result.message || 'Error submitting data');
         }
         return;
