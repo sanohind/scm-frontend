@@ -16,6 +16,7 @@ const StockItems = () => {
   interface StockItem {
     part_number: string;
     part_name: string;
+    old_part_name: string;
     incoming_fresh_stock: number;
     ready_fresh_stock: number;
     ng_fresh_stock: number;
@@ -57,7 +58,8 @@ const StockItems = () => {
     if (searchQuery) {
       filtered = filtered.filter((row) =>
         row.part_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.part_name.toLowerCase().includes(searchQuery.toLowerCase())
+        row.part_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.old_part_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -118,8 +120,9 @@ const StockItems = () => {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[18%]" rowSpan={2}>Part Number</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[22%]" rowSpan={2}>Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[12%]" rowSpan={2}>Part Number</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[14%]" rowSpan={2}>Part Name</th>
+                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[14%]" rowSpan={2}>Old Part Name</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Fresh</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Replating</th>
                   </tr>
@@ -142,6 +145,7 @@ const StockItems = () => {
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.old_part_name}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_fresh_stock}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_fresh_stock}</td>
