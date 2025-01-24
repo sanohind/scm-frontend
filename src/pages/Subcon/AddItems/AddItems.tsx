@@ -2,7 +2,7 @@ import { useEffect, useState, ChangeEvent, useRef } from 'react';
 import Select from 'react-select';
 import Breadcrumb from "../../../components/Breadcrumbs/Breadcrumb";
 import { toast, ToastContainer } from 'react-toastify';
-import { API_Create_Item_Subcont_Admin,  API_List_Item_ERP_Subcont_Admin,  API_List_Partner_Admin } from '../../../api/api';
+import { API_Create_Item_Subcont_Admin,  API_Initial_Stock_Subcont_Admin,  API_List_Item_ERP_Subcont_Admin,  API_List_Partner_Admin } from '../../../api/api';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -28,6 +28,9 @@ export const AddItems = () => {
     const [excelData, setExcelData] = useState<any[]>([]);
     const [isExcelMode, setIsExcelMode] = useState(false);
     const [itemOptions, setItemOptions] = useState<ItemOption[]>([]);
+    const [isInitialStockMode, setIsInitialStockMode] = useState(false);
+    const [initialStockExcelData, setInitialStockExcelData] = useState<any[]>([]);
+
 
     const fileInputRef = useRef<HTMLInputElement>(null); // Menambahkan useRef
 
@@ -128,6 +131,29 @@ export const AddItems = () => {
         const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
         saveAs(data, 'item_template.xlsx');
     };
+    const downloadTemplateInitialStock = () => {
+        const ws = XLSX.utils.json_to_sheet([
+            { bp_code: ' ', part_number: ' ', fresh_unprocess_incoming_items: ' ', fresh_ready_delivery_items: ' ', fresh_ng_items: ' ', replating_unprocess_incoming_items: ' ', replating_ready_delivery_items: ' ', replating_ng_items: ' ' }
+        ]);
+
+        // Set column widths
+        ws['!cols'] = [
+            { wch: 15 },  // bp_code width
+            { wch: 20 },  // item_code width
+            { wch: 20 },  // fresh_unprocess_incoming_items
+            { wch: 20 },  // fresh_ready_delivery_items
+            { wch: 20 },  // fresh_ng_items
+            { wch: 20 },  // replating_unprocess_incoming_items
+            { wch: 20 },  // replating_ready_delivery_items
+            { wch: 20 }   // replating_ng_items
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Template');
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
+        saveAs(data, 'initial_stock_template.xlsx');
+    };
 
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -151,6 +177,24 @@ export const AddItems = () => {
             // }
         }
     };
+
+    const handleInitialFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                if (evt.target) {
+                const bstr = evt.target.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                setInitialStockExcelData(data);
+                }
+            };
+            reader.readAsBinaryString(file);
+        }
+      };
 
     const handleExcelSubmit = async () => {
         if (excelData.length === 0) {
@@ -211,6 +255,8 @@ export const AddItems = () => {
         }
     };
 
+
+
     const handleExcelDataChange = (index: number, field: string, value: string) => {
         const updatedData = [...excelData];
         const fieldMap: {[key: string]: string} = {
@@ -223,6 +269,12 @@ export const AddItems = () => {
         setExcelData(updatedData);
     };
 
+    const handleInitialDataChange = (index: number, field: string, value: string) => {
+        const updatedData = [...initialStockExcelData];
+        updatedData[index][field] = value;
+        setInitialStockExcelData(updatedData);
+    };
+
     const handleExcelItemDelete = (index: number) => {
         const updatedData = excelData.filter((_, i) => i !== index);
         setExcelData(updatedData);
@@ -233,8 +285,29 @@ export const AddItems = () => {
         }
     };
 
+    const handleInitialItemDelete = (index: number) => {
+        const updatedData = initialStockExcelData.filter((_, i) => i !== index);
+        setInitialStockExcelData(updatedData);
+    };
+
     const handleAddExcelItem = () => {
         setExcelData([...excelData, { bp_code: '', part_number: '', part_name: '', old_part_name: '' }]);
+    };
+
+    const handleAddInitialStockItem = () => {
+        setInitialStockExcelData([
+            ...initialStockExcelData,
+            {
+                bp_code: '',
+                part_number: '',
+                fresh_unprocess_incoming_items: '',
+                fresh_ready_delivery_items: '',
+                fresh_ng_items: '',
+                replating_unprocess_incoming_items: '',
+                replating_ready_delivery_items: '',
+                replating_ng_items: ''
+            }
+        ]);
     };
 
     const handlePartNumberChange = (selectedOption: ItemOption | null) => {
@@ -320,18 +393,75 @@ export const AddItems = () => {
         }
     };
 
+    const handleInitialStockSubmit = async () => {
+        if (initialStockExcelData.length === 0) {
+            toast.error('No data to submit');
+            return;
+        }
+        const confirm = await Swal.fire({
+            title: 'Confirm Submission',
+            html: `<p>Are you sure you want to submit ${initialStockExcelData.length} items?</p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1e3a8a',
+            cancelButtonColor: '#dc2626',
+            confirmButtonText: 'Yes, Submit It!'
+        });
+        if (!confirm.isConfirmed) return;
+        try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                toast.error('Authentication token not found');
+                return;
+            }
+            const submissionData = {
+                data: initialStockExcelData.map(item => ({
+                    bp_code: item.bp_code.trim(),
+                    part_number: String(item.part_number).trim(),
+                    fresh_unprocess_incoming_items: item.fresh_unprocess_incoming_items,
+                    fresh_ready_delivery_items: item.fresh_ready_delivery_items,
+                    fresh_ng_items: item.fresh_ng_items,
+                    replating_unprocess_incoming_items: item.replating_unprocess_incoming_items,
+                    replating_ready_delivery_items: item.replating_ready_delivery_items,
+                    replating_ng_items: item.replating_ng_items
+                }))
+            };
+            const response = await fetch(API_Initial_Stock_Subcont_Admin(), {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(submissionData),
+            });
+            if (!response.ok) throw new Error('Failed to submit');
+            toast.success('Initial stocks added successfully');
+            setInitialStockExcelData([]);
+            setIsInitialStockMode(false);
+        } catch (error) {
+            toast.error('Failed to add initial stocks');
+            console.error(error);
+        }
+    };
+
     return (
         <>
             <ToastContainer position="top-right" />
             <Breadcrumb pageName="Add Items" />
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark p-2 md:p-4 lg:p-6 space-y-6">
-                {!isExcelMode ? (
+                {!isExcelMode && !isInitialStockMode ? (
                     <>
                         <div className="flex justify-end">
                             <Button
                                 title="Upload via Excel"
                                 onClick={() => setIsExcelMode(true)}
                                 icon={FaUpload}
+                            />
+                            <Button
+                                title="Initialize Stock"
+                                onClick={() => setIsInitialStockMode(true)}
+                                icon={FaUpload}
+                                className="ml-2"
                             />
                         </div>
                         <form onSubmit={handleSubmit} className="max-w-[1024px] mx-auto">
@@ -406,7 +536,7 @@ export const AddItems = () => {
                             </div>
                         </form>
                     </>
-                ) : (
+                ) : isExcelMode ? (
                     <>
                         <div className="flex justify-end">
                             <Button
@@ -513,6 +643,143 @@ export const AddItems = () => {
                                         onClick={handleExcelSubmit}
                                         className="mt-4 w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
                                     >
+                                        Submit All Items
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="flex justify-end">
+                            <Button
+                                title="Cancel"
+                                onClick={() => {
+                                    setIsInitialStockMode(false);
+                                    setInitialStockExcelData([]);
+                                }}
+                                icon={FaTimes}
+                                color='bg-red-600'
+                            />
+                        </div>
+                        <div className="max-w-[1024px] mx-auto space-y-4">
+                            <div className="flex items-center gap-4">
+                                <Button
+                                    title="Excel Template"
+                                    onClick={downloadTemplateInitialStock}
+                                    icon={FaDownload}
+                                />
+                                <input
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    className="text-sm cursor-pointer rounded-lg border-2 border-gray-300 bg-transparent outline-none transition file:mr-5 file:border-0 file:bg-blue-900 file:text-white file:py-2 file:px-4 file:rounded-md file:cursor-pointer hover:file:bg-blue-800 focus:border-primary active:border-primary"
+                                    onChange={handleInitialFileUpload}
+                                />
+                            </div>
+                            {initialStockExcelData.length > 0 && (
+                                <>
+                                    <h2 className="text-lg font-bold">Preview Initial Stock</h2>
+                                    <Button
+                                        title="Add Rows"
+                                        onClick={handleAddInitialStockItem}
+                                        icon={FaPlus}
+                                    />
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-3 py-3.5 border">Supplier Code</th>
+                                                <th className="px-3 py-3.5 border">Part Number</th>
+                                                <th className="px-3 py-3.5 border">Fresh Unprocess</th>
+                                                <th className="px-3 py-3.5 border">Fresh Ready</th>
+                                                <th className="px-3 py-3.5 border">Fresh NG</th>
+                                                <th className="px-3 py-3.5 border">Replating Unprocess</th>
+                                                <th className="px-3 py-3.5 border">Replating Ready</th>
+                                                <th className="px-3 py-3.5 border">Replating NG</th>
+                                                <th className="px-3 py-3.5 border">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200 bg-white">
+                                            {initialStockExcelData.map((item, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.bp_code}
+                                                        onChange={(e) => handleInitialDataChange(index, 'bp_code', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.part_number}
+                                                        onChange={(e) => handleInitialDataChange(index, 'part_number', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.fresh_unprocess_incoming_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'fresh_unprocess_incoming_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.fresh_ready_delivery_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'fresh_ready_delivery_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.fresh_ng_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'fresh_ng_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.replating_unprocess_incoming_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'replating_unprocess_incoming_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.replating_ready_delivery_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'replating_ready_delivery_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <input
+                                                        type="text"
+                                                        value={item.replating_ng_items}
+                                                        onChange={(e) => handleInitialDataChange(index, 'replating_ng_items', e.target.value)}
+                                                        className="border border-gray-300 rounded p-1 w-full"
+                                                    />
+                                                </td>
+                                                <td className="px-3 py-3 border">
+                                                    <Button
+                                                        title="Delete"
+                                                        onClick={() => handleInitialItemDelete(index)}
+                                                        color='bg-red-600'
+                                                    />
+                                                </td>
+                                            </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    <button
+                                        onClick={handleInitialStockSubmit}
+                                        className="mt-4 w-full justify-center rounded bg-blue-900 p-3 font-medium text-white hover:bg-opacity-90"
+                                        >
                                         Submit All Items
                                     </button>
                                 </>
