@@ -539,6 +539,7 @@ export const AddItems = () => {
                 ) : isExcelMode ? (
                     <>
                         <div className="flex justify-end">
+                            <h2 className="text-2xl font-bold mr-auto">Upload From Excel</h2>
                             <Button
                                 title="Cancel"
                                 onClick={() => setIsExcelMode(false)}
@@ -547,6 +548,10 @@ export const AddItems = () => {
                             />
                         </div>
                         <div className="max-w-[1024px] mx-auto space-y-4">
+                            <div className="p-4 my-2 bg-blue-100 border-l-4 border-primary text-black">
+                                <p className="font-semibold">Attention!</p>
+                                <p>Make sure the supplier code or bp_code is correct, no duplicate part, no empty part, and no space behind text</p>
+                            </div>
                             <div className="flex items-center gap-4">
                                 <Button
                                     title="Excel Template"
@@ -651,18 +656,25 @@ export const AddItems = () => {
                     </>
                 ) : (
                     <>
-                        <div className="flex justify-end">
-                            <Button
-                                title="Cancel"
-                                onClick={() => {
-                                    setIsInitialStockMode(false);
-                                    setInitialStockExcelData([]);
-                                }}
-                                icon={FaTimes}
-                                color='bg-red-600'
-                            />
-                        </div>
+                        <>
+                            <div className="flex justify-end">
+                                <h2 className="text-2xl font-bold mr-auto">Initialize Stock</h2>
+                                <Button
+                                    title="Cancel"
+                                    onClick={() => {
+                                        setIsInitialStockMode(false);
+                                        setInitialStockExcelData([]);
+                                    }}
+                                    icon={FaTimes}
+                                    color='bg-red-600'
+                                />
+                            </div>
+                        </>
                         <div className="max-w-[1024px] mx-auto space-y-4">
+                            <div className="p-4 my-2 bg-blue-100 border-l-4 border-primary text-black">
+                                <p className="font-semibold">Attention!</p>
+                                <p>Make sure the supplier code or bp_code is correct and the part items must be registered first for that supplier.</p>
+                            </div>
                             <div className="flex items-center gap-4">
                                 <Button
                                     title="Excel Template"

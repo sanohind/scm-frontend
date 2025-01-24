@@ -188,7 +188,7 @@ const AdminStockItems = () => {
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Items</th>
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Unprocess Incoming Items</th>
                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">Ready Delivery Items</th>
-                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Stock</th>
+                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200">NG Items</th>
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
