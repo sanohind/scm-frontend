@@ -1,4 +1,5 @@
-const API = 'https://apiv2.edutrashgo.com/api';
+const API = 'https://apiv2.profileporto.site/api';
+// const API = 'http://127.0.0.1:8000/api';
 // const API = 'https://be-sss-dev.sanohindonesia.co.id:8443/api';
 
 const getRolePath = () => {
@@ -71,7 +72,7 @@ export const API_List_Item_ERP_Subcont_Admin = () => API + getRolePath() + `/ite
 export const API_Manage_Item_Subcont_Admin = () => API + getRolePath() + `/item/all-list/`;
 export const API_Update_Item_Subcont_Admin = () => API + getRolePath() + `/item/update`;
 export const API_Delete_Item_Subcont_Admin = () => API + getRolePath() + `/item/delete`;
-export const API_Initial_Stock_Subcont_Admin = () => API + getRolePath() + `item/stok/initial`;
+export const API_Initial_Stock_Subcont_Admin = () => API + getRolePath() + `/item/stock/initial`;
 export const API_Create_Transaction_Subcont_Admin = () => API + getRolePath() + `/transaction/store/`;
 export const API_Transaction_Review_Subcont_Admin = () => API + getRolePath() + `/transaction-review/header/`;
 export const API_Transaction_Review_Detail_Subcont_Admin = () => API + getRolePath() + `/transaction-review/detail/`;
