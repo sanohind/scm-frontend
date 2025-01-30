@@ -114,15 +114,13 @@ export const AddItems = () => {
 
     const downloadTemplate = () => {
         const ws = XLSX.utils.json_to_sheet([
-            { bp_code: ' ', part_number: ' ', part_name: ' ', old_part_name: ' ' }
+            { bp_code: '', part_number: '' }
         ]);
 
         // Set column widths
         ws['!cols'] = [
             { wch: 15 },  // bp_code width
             { wch: 20 },  // item_code width
-            { wch: 30 },   // item_name width
-            { wch: 30 }   // item_name width
         ];
 
         const wb = XLSX.utils.book_new();
@@ -133,7 +131,7 @@ export const AddItems = () => {
     };
     const downloadTemplateInitialStock = () => {
         const ws = XLSX.utils.json_to_sheet([
-            { bp_code: ' ', part_number: ' ', fresh_unprocess_incoming_items: ' ', fresh_ready_delivery_items: ' ', fresh_ng_items: ' ', replating_unprocess_incoming_items: ' ', replating_ready_delivery_items: ' ', replating_ng_items: ' ' }
+            { bp_code: '', part_number: '', fresh_unprocess_incoming_items: '', fresh_ready_delivery_items: '', fresh_ng_items: '', replating_unprocess_incoming_items: '', replating_ready_delivery_items: '', replating_ng_items: '' }
         ]);
 
         // Set column widths
@@ -227,8 +225,6 @@ export const AddItems = () => {
                 data: excelData.map(item => ({
                     bp_code: item.bp_code,
                     part_number: String(item.part_number),
-                    part_name: item.part_name,
-                    old_part_name: item.old_part_name
                 }))
             };
 
@@ -262,8 +258,8 @@ export const AddItems = () => {
         const fieldMap: {[key: string]: string} = {
             'bp_code': 'bp_code',
             'part_number': 'part_number', // Changed from item_code
-            'part_name': 'part_name',     // Changed from item_name  
-            'old_part_name': 'old_part_name' // Changed from old_item_name
+            // 'part_name': 'part_name',     // Changed from item_name  
+            // 'old_part_name': 'old_part_name' // Changed from old_item_name
         };
         updatedData[index][fieldMap[field] || field] = value;
         setExcelData(updatedData);
@@ -291,7 +287,7 @@ export const AddItems = () => {
     };
 
     const handleAddExcelItem = () => {
-        setExcelData([...excelData, { bp_code: '', part_number: '', part_name: '', old_part_name: '' }]);
+        setExcelData([...excelData, { bp_code: '', part_number: '' }]);
     };
 
     const handleAddInitialStockItem = () => {
@@ -507,9 +503,9 @@ export const AddItems = () => {
                                         type="text"
                                         value={partName}
                                         onChange={(e) => setPartName(e.target.value)}
-                                        placeholder="Enter Part Name"
-                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
-                                        required
+                                        placeholder="-"
+                                        className="w-full rounded border-[1.5px] border-stroke bg-gray-200 py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
+                                        readOnly
                                     />
                                 </div>
 
@@ -522,8 +518,9 @@ export const AddItems = () => {
                                         type="text"
                                         value={oldPartName}
                                         onChange={(e) => setOldPartName(e.target.value)}
-                                        placeholder="Enter Old Part Name"
-                                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
+                                        placeholder="-"
+                                        className="w-full rounded border-[1.5px] border-stroke bg-gray-200 py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
+                                        readOnly
                                     />
                                 </div>
 
@@ -585,12 +582,6 @@ export const AddItems = () => {
                                                     Part Number
                                                 </th>
                                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider border">
-                                                    Part Name
-                                                </th>
-                                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider border">
-                                                    Old Part Name
-                                                </th>
-                                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider border">
                                                     Actions
                                                 </th>
                                             </tr>
@@ -611,22 +602,6 @@ export const AddItems = () => {
                                                             type="text"
                                                             value={item.part_number}
                                                             onChange={(e) => handleExcelDataChange(index, 'part_number', e.target.value)}
-                                                            className="border border-gray-300 rounded p-1 text-center w-full"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 text-center border">
-                                                        <input
-                                                            type="text"
-                                                            value={item.part_name}
-                                                            onChange={(e) => handleExcelDataChange(index, 'part_name', e.target.value)}
-                                                            className="border border-gray-300 rounded p-1 text-center w-full"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 text-center border">
-                                                        <input
-                                                            type="text"
-                                                            value={item.old_part_name}
-                                                            onChange={(e) => handleExcelDataChange(index, 'old_part_name', e.target.value)}
                                                             className="border border-gray-300 rounded p-1 text-center w-full"
                                                         />
                                                     </td>
