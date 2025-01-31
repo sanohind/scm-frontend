@@ -4,6 +4,7 @@ import SearchBar from '../../../../components/Table/SearchBar';
 import Pagination from '../../../../components/Table/Pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Item_Subcont } from '../../../../api/api';
+import { FaSortDown, FaSortUp } from 'react-icons/fa';
 
 const StockItems = () => {
   const [data, setData] = useState<StockItem[]>([]);
@@ -12,6 +13,7 @@ const StockItems = () => {
   const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
 
   interface StockItem {
     part_number: string;
@@ -55,6 +57,16 @@ const StockItems = () => {
 
   useEffect(() => {
     let filtered = [...data];
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+          let aValue = a[sortConfig.key as keyof StockItem];
+          let bValue = b[sortConfig.key as keyof StockItem];
+
+          if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+          return 0;
+      });
+  }
     if (searchQuery) {
         filtered = filtered.filter((row) =>
             (row.part_number?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
@@ -64,7 +76,7 @@ const StockItems = () => {
     }
 
     setFilteredData(filtered);
-  }, [searchQuery, data]);
+  }, [searchQuery, sortConfig, data]);
 
 
   const paginatedData = filteredData.slice(
@@ -103,6 +115,14 @@ const StockItems = () => {
     </tr>
   );
 
+  const handleSort = (key: keyof StockItem) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+        direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
   return (
     <>
       <ToastContainer />
@@ -121,8 +141,42 @@ const StockItems = () => {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[12%]" rowSpan={2}>Part Number</th>
-                    <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[14%]" rowSpan={2}>Part Name</th>
+                    <th
+                        rowSpan={2}
+                        className="cursor-pointer px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[12%]"
+                        onClick={() => handleSort('part_number')}
+                        >
+                            <span className="flex items-center justify-center">
+                                Part Number
+                                {sortConfig.key === 'part_number' ? (
+                                sortConfig.direction === 'asc' ? (
+                                    <FaSortUp className="mr-1" />
+                                ) : (
+                                    <FaSortDown className="mr-1" />
+                                )
+                                ) : (
+                                <FaSortDown className="opacity-50 mr-1" />
+                                )}
+                            </span>
+                    </th>
+                    <th
+                        rowSpan={2}
+                        className="cursor-pointer px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[14%]"
+                        onClick={() => handleSort('part_name')}
+                        >
+                        <span className="flex items-center justify-center">
+                            Part Name
+                            {sortConfig.key === 'part_name' ? (
+                            sortConfig.direction === 'asc' ? (
+                                <FaSortUp className="mr-1" />
+                            ) : (
+                                <FaSortDown className="mr-1" />
+                            )
+                            ) : (
+                            <FaSortDown className="opacity-50 mr-1" />
+                            )}
+                        </span>
+                    </th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[14%]" rowSpan={2}>Old Part Name</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Fresh</th>
                     <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b border-gray-200 w-[30%]" colSpan={3}>Replating</th>

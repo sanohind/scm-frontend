@@ -32,6 +32,7 @@ const ManageItems: React.FC = () => {
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
 
     useEffect(() => {
         fetchSuppliers();
@@ -248,41 +249,54 @@ const ManageItems: React.FC = () => {
         }
     };
 
-    const handleDelete = async (itemId: string) => {
+    const handleSelectItem = (id: string) => {
+        setSelectedItemIds((prev) =>
+            prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedItemIds.length === items.length) {
+            setSelectedItemIds([]);
+        } else {
+            setSelectedItemIds(items.map(item => item.item_id));
+        }
+    };
+
+    const handleDeleteSelected = async () => {
         const confirm = await Swal.fire({
             title: 'Are you sure?',
-            text: 'This item will be deleted permanently!',
+            text: 'These items will be deleted permanently!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#1e3a8a',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, delete them!',
         });
-
         if (!confirm.isConfirmed) return;
+        for (const id of selectedItemIds) {
+            await handleDelete(id);
+        }
+        setSelectedItemIds([]);
+    };
 
+    const handleDelete = async (itemId: string) => {
         const token = localStorage.getItem('access_token');
         try {
-        const response = await fetch(API_Delete_Item_Subcont_Admin(), {
-            method: 'DELETE',
-            headers: {
+            const response = await fetch(API_Delete_Item_Subcont_Admin(), {
+                method: 'DELETE',
+                headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                sub_item_id: itemId
-            }),
-        });
-
-        const responseData = await response.json();
-
-        if (responseData.status === true) {
-            setItems((prevItems) => prevItems.filter((item) => item.item_id !== itemId));
-            toast.success(responseData.message);
-        }
-
-        if (!response.ok) throw new Error('Failed to delete item');
-
+                },
+                body: JSON.stringify({ sub_item_id: itemId }),
+            });
+            const responseData = await response.json();
+            if (responseData.status === true) {
+                setItems((prevItems) => prevItems.filter((item) => item.item_id !== itemId));
+                toast.success(responseData.message);
+            }
+            if (!response.ok) throw new Error('Failed to delete item');
         } catch (error) {
             console.error('Error deleting item:', error);
             toast.error('Failed to delete item');
@@ -297,11 +311,24 @@ const ManageItems: React.FC = () => {
         <div className="bg-white">
             <div className="p-2 md:p-4 lg:p-6 space-y-6">
             {/* Header Section */}
-            <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
                 <Button
                     title="Add Items"
                     onClick={() => navigate('/add-items')}
                     icon={FaPlus}
+                />
+                {selectedItemIds.length > 0 && (
+                    <Button
+                        title="Delete Selected"
+                        color="bg-danger"
+                        onClick={handleDeleteSelected}
+                        icon={FaTrash}
+                    />
+                )}
+                <Button
+                    title={selectedItemIds.length === items.length ? 'Unselect All' : 'Select All'}
+                    onClick={handleSelectAll}
+                    className="bg-primary text-white font-medium px-4 py-2 rounded-md transition duration-200 ease-in-out flex items-center gap-2"
                 />
             </div>
 
@@ -327,6 +354,9 @@ const ManageItems: React.FC = () => {
                     <table className="w-full text-sm ">
                         <thead className="bg-gray-50 text-center font-bold">
                             <tr>
+                                <th className="px-1 py-3.5 text-sm font-bold text-gray-700 border w-[5%]">
+                                    SELECT
+                                </th>
                                 <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">
                                     NO
                                 </th>
@@ -339,10 +369,10 @@ const ManageItems: React.FC = () => {
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
                                     OLD PART NAME
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                                     STATUS
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                                     ACTION
                                 </th>
                             </tr>
@@ -350,6 +380,13 @@ const ManageItems: React.FC = () => {
                         <tbody className="divide-y divide-gray-200 bg-white">
                             {items.map((item, index) => (
                                 <tr key={item.item_id} className="hover:bg-gray-50">
+                                    <td className="px-3 py-3 text-center border">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedItemIds.includes(item.item_id)}
+                                            onChange={() => handleSelectItem(item.item_id)}
+                                        />
+                                    </td>
                                     <td className="px-3 py-3 text-center border">
                                         {index + 1}
                                     </td>
@@ -436,12 +473,6 @@ const ManageItems: React.FC = () => {
                                                 className="hover:opacity-80 transition-opacity"
                                                 >
                                                 <FaEdit className='text-2xl text-blue-900' />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(item.item_id)}
-                                                className="hover:opacity-80 transition-opacity"
-                                                >
-                                                <FaTrash className='text-2xl text-red-900'/>
                                             </button>
                                         </div>
                                     )}
