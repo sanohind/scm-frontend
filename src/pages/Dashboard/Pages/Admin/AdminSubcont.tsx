@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ChartTwo from "../../../../components/Charts/ChartTwo";
 import Select from 'react-select';
-import { API_List_Partner_Admin, API_Performance_Report_Admin } from "../../../../api/api";
+import { API_Dashboard_Performance_Subcont_Admin, API_List_Partner_Admin } from "../../../../api/api";
 import { toast } from "react-toastify";
 
 const DashboardAdminSubcont = () => {
@@ -12,7 +12,6 @@ const DashboardAdminSubcont = () => {
     }
     const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-    const [loading, setLoading] = useState(false);
 
     const [freshData, setFreshData] = useState<{
         fresh_incoming: number[];
@@ -65,59 +64,56 @@ const DashboardAdminSubcont = () => {
     
     const fetchData = async (supplierCode: string) => {
         try {
-            // const token = localStorage.getItem('access_token');
-            // const response = await fetch(`${API_Performance_Report_Admin()}${supplierCode}`, {
-            //     method: 'GET',
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            // });
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`${API_Dashboard_Performance_Subcont_Admin()}${supplierCode}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-            // if (response.ok) {
-            //     const result = await response.json();
-            //     if (result.success) {
-            //         const data = result.data;
-            //         setFreshData({
-            //             fresh_incoming: data.fresh_incoming.map((item: { count: number }) => item.count).slice(-12),
-            //             fresh_process: data.fresh_process.map((item: { count: number }) => item.count).slice(-12),
-            //             fresh_outgoing: data.fresh_outgoing.map((item: { count: number }) => item.count).slice(-12),
-            //         });
-            //         setreplatingData({
-            //             replating_incoming: data.replating_incoming.map((item: { count: number }) => item.count).slice(-12),
-            //             replating_process: data.replating_process.map((item: { count: number }) => item.count).slice(-12),
-            //             replating_outgoing: data.replating_outgoing.map((item: { count: number }) => item.count).slice(-12),
-            //         });
-            //     } else {
-            //         console.error('Failed to load data:', result.message);
-            //     }
-            // } else {
-            //     console.error('Failed to fetch data:', response.status);
-            // }
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    const data = result.data;
+                    setFreshData({
+                        fresh_incoming: data.fresh_incoming.map((item: { count: number }) => item.count).slice(-12),
+                        fresh_process: data.fresh_process.map((item: { count: number }) => item.count).slice(-12),
+                        fresh_outgoing: data.fresh_outgoing.map((item: { count: number }) => item.count).slice(-12),
+                    });
+                    setreplatingData({
+                        replating_incoming: data.replating_incoming.map((item: { count: number }) => item.count).slice(-12),
+                        replating_process: data.replating_process.map((item: { count: number }) => item.count).slice(-12),
+                        replating_outgoing: data.replating_outgoing.map((item: { count: number }) => item.count).slice(-12),
+                    });
+                } else {
+                    console.error('Failed to load data:', result.message);
+                }
+            } else {
+                console.error('Failed to fetch data:', response.status);
+            }
 
             // Dummy data
-            setFreshData({
-                fresh_incoming: [20, 30, 25, 40, 35, 60, 45, 55, 50, 65, 70, 80],
-                fresh_process: [15, 25, 20, 35, 30, 50, 40, 45, 60, 75, 85, 90],
-                fresh_outgoing: [10, 20, 15, 30, 25, 45, 35, 40, 50, 65, 75, 85],
-            });
-            setreplatingData({
-                replating_incoming: [5, 15, 10, 20, 25, 30, 45, 35, 40, 55, 60, 70],
-                replating_process: [8, 18, 12, 28, 32, 38, 48, 36, 47, 60, 72, 88],
-                replating_outgoing: [3, 13, 9, 19, 23, 29, 39, 28, 38, 50, 60, 65],
-            });
+            // setFreshData({
+            //     fresh_incoming: [20, 30, 25, 40, 35, 60, 45, 55, 50, 65, 70, 80],
+            //     fresh_process: [15, 25, 20, 35, 30, 50, 40, 45, 60, 75, 85, 90],
+            //     fresh_outgoing: [10, 20, 15, 30, 25, 45, 35, 40, 50, 65, 75, 85],
+            // });
+            // setreplatingData({
+            //     replating_incoming: [5, 15, 10, 20, 25, 30, 45, 35, 40, 55, 60, 70],
+            //     replating_process: [8, 18, 12, 28, 32, 38, 48, 36, 47, 60, 72, 88],
+            //     replating_outgoing: [3, 13, 9, 19, 23, 29, 39, 28, 38, 50, 60, 65],
+            // });
         } catch (error) {
             console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
+        } 
     };
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
         if (selectedOption) {
             localStorage.setItem('selected_supplier', selectedOption.value);
-            setLoading(true);
             fetchData(selectedOption.value);
         } else {
             localStorage.removeItem('selected_supplier');

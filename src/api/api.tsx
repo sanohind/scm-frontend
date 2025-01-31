@@ -77,6 +77,7 @@ export const API_Create_Transaction_Subcont_Admin = () => API + getRolePath() + 
 export const API_Transaction_Review_Subcont_Admin = () => API + getRolePath() + `/transaction-review/header/`;
 export const API_Transaction_Review_Detail_Subcont_Admin = () => API + getRolePath() + `/transaction-review/detail/`;
 export const API_Transaction_Review_Update_Subcont_Admin = () => API + getRolePath() + `/transaction-review/update`;
+export const API_Dashboard_Performance_Subcont_Admin = () => API + getRolePath() + `/dashboard/performance-subcont/`;
 
 // Purchase Order Supplier
 export const API_PO = () => API + getRolePath() + `/po/index`;
