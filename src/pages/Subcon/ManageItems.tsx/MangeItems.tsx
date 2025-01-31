@@ -124,17 +124,20 @@ const ManageItems: React.FC = () => {
 
     const handleEdit = (itemId: string) => {
         setItems((prevItems) =>
-        prevItems.map((item) =>
-            item.item_id === itemId
-            ? {
-                ...item,
-                isEditing: true,
-                editedPartNumber: item.part_number,
-                editedPartName: item.part_name,
-                editedOldPartName: item.old_part_name,
+            prevItems.map((item) =>
+                item.item_id === itemId
+                ? {
+                    ...item,
+                    isEditing: true,
+                    editedPartNumber: item.part_number === '-' ? '' : item.part_number,
+                    editedPartName: item.part_name === '-' ? '' : item.part_name,
+                    editedOldPartName: item.old_part_name === '-' ? '' : item.old_part_name,
+                    part_number: item.part_number === '-' ? '' : item.part_number, 
+                    part_name: item.part_name === '-' ? '' : item.part_name,
+                    old_part_name: item.old_part_name === '-' ? '' : item.old_part_name
                 }
-            : item
-        )
+                : item
+            )
         );
     };
 
