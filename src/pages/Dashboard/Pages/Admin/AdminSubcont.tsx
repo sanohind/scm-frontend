@@ -168,7 +168,7 @@ const DashboardAdminSubcont = () => {
                     {(() => {
                         const days = [];
                         const today = new Date();
-                        for (let i = 9; i >= 0; i--) {
+                        for (let i = 11; i >= 0; i--) {
                             const d = new Date();
                             d.setDate(today.getDate() - i);
                             days.push(d.toLocaleDateString('default', { day: '2-digit', month: 'short' }));
@@ -179,21 +179,21 @@ const DashboardAdminSubcont = () => {
                                 titleOne="Fresh Incoming"
                                 titleTwo="Fresh Process"
                                 titleThree="Fresh Outgoing"
-                                dataOne={freshData.fresh_incoming.slice(-10)}
-                                dataTwo={freshData.fresh_process.slice(-10)}
-                                dataThree={freshData.fresh_outgoing.slice(-10)}
+                                dataOne={freshData.fresh_incoming.slice(-12)}
+                                dataTwo={freshData.fresh_process.slice(-12)}
+                                dataThree={freshData.fresh_outgoing.slice(-12)}
                                 categories={days}
-                                dateRange={`${new Date(today.getTime() - 9 * 24 * 60 * 60 * 1000).toLocaleDateString()} - ${today.toLocaleDateString()}`}
+                                dateRange={`${new Date(today.getTime() - 11 * 24 * 60 * 60 * 1000).toLocaleDateString()} - ${today.toLocaleDateString()}`}
                             />
                             <ChartTwo
                                 titleOne="Replating Incoming"
                                 titleTwo="Replating Process"
                                 titleThree="Replating Outgoing"
-                                dataOne={replatingData.replating_incoming.slice(-10)}
-                                dataTwo={replatingData.replating_process.slice(-10)}
-                                dataThree={replatingData.replating_outgoing.slice(-10)}
+                                dataOne={replatingData.replating_incoming.slice(-12)}
+                                dataTwo={replatingData.replating_process.slice(-12)}
+                                dataThree={replatingData.replating_outgoing.slice(-12)}
                                 categories={days}
-                                dateRange={`${new Date(today.getTime() - 9 * 24 * 60 * 60 * 1000).toLocaleDateString()} - ${today.toLocaleDateString()}`}
+                                dateRange={`${new Date(today.getTime() - 11 * 24 * 60 * 60 * 1000).toLocaleDateString()} - ${today.toLocaleDateString()}`}
                             />
                         </>
                         );

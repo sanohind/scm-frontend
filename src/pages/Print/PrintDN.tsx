@@ -278,6 +278,7 @@ interface DeliveryNoteData {
         part_name: string;
         pcs_per_kamban: string;
         qty_confirm: string;
+        qty_receipt: string;
         no_of_kamban: string;
         total_quantity: string;
         box_quantity: string;
@@ -381,7 +382,7 @@ const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
                             <Text style={styles.tableRowNormal}>{item.no_of_kamban}</Text>
                             <Text style={styles.tableRowNormal}>{item.total_quantity}</Text>
                             <Text style={[styles.tableRowNormal, {width: '7%'}]}>{item.qty_confirm}</Text>
-                            <Text style={[styles.tableRowNormal, {width: '7%'}]}></Text>
+                            <Text style={[styles.tableRowNormal, {width: '7%'}]}>{item.qty_receipt}</Text>
                             <Text style={styles.tableRowEnd}>{item.box_quantity}</Text>
                         </View>
                     ))}
@@ -526,7 +527,8 @@ const PrintDN = () => {
                     internal_part_number: item.internal_part_number,
                     part_name: item.part_name,
                     pcs_per_kamban: item.pcs_per_kamban,
-                    qty_confirm: item.qty_confirm,
+                    qty_confirm: item.qty_confirm || '',
+                    qty_receipt: item.qty_receipt || '',
                     no_of_kamban: item.no_of_kamban,
                     total_quantity: item.total_quantity,
                     box_quantity: item.box_quantity,
