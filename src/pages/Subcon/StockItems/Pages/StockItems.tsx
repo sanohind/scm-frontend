@@ -56,15 +56,16 @@ const StockItems = () => {
   useEffect(() => {
     let filtered = [...data];
     if (searchQuery) {
-      filtered = filtered.filter((row) =>
-        row.part_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.part_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.old_part_name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+        filtered = filtered.filter((row) =>
+            (row.part_number?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
+            (row.part_name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
+            (row.old_part_name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase())
+        );
     }
 
     setFilteredData(filtered);
   }, [searchQuery, data]);
+
 
   const paginatedData = filteredData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -146,11 +147,11 @@ const StockItems = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.old_part_name}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_fresh_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.incoming_fresh_stock}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_fresh_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ng_fresh_stock}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_replating_stock}</td>
+                        <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ready_replating_stock}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
                       </tr>
                     ))
