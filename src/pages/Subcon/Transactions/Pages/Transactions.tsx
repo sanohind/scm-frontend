@@ -30,6 +30,9 @@ const Transactions = () => {
   }[]>([]);
   const [transactionDate, setTransactionDate] = useState<Date>(new Date());
   const [partList, setPartList] = useState<any[]>([]);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isFetchingEnabled, setIsFetchingEnabled] = useState(true);
+
 
   interface ApiItem {
     part_number: string;
@@ -43,37 +46,65 @@ const Transactions = () => {
     ng_replating_stock: number;
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(API_Item_Subcont(), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = await response.json();
-        if (result.status) {
-          const transformedData = result.data.map((item: ApiItem) => ({
-            partNumber: item.part_number,
-            partName: item.part_name,
-            oldPartName : item.old_part_name || '-',
-            incomingFreshStock: item.incoming_fresh_stock,
-            readyFreshStock: item.ready_fresh_stock,
-            ngFreshStock: item.ng_fresh_stock,
-            incomingReplatingStock: item.incoming_replating_stock,
-            readyReplatingStock: item.ready_replating_stock,
-            ngReplatingStock: item.ng_replating_stock,
-          }));
-          setApiData(transformedData);
-        }
-      } catch (error) {
-        console.error('Error fetching parts:', error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch(API_Item_Subcont(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    fetchData();
-  }, []);
+      if (!response.ok) {
+        handleFetchError('Failed to fetch data');
+        return;
+      }
+
+      const result = await response.json();
+      if (result.status) {
+        const transformedData = result.data.map((item: ApiItem) => ({
+          partNumber: item.part_number,
+          partName: item.part_name,
+          oldPartName : item.old_part_name || '-',
+          incomingFreshStock: item.incoming_fresh_stock,
+          readyFreshStock: item.ready_fresh_stock,
+          ngFreshStock: item.ng_fresh_stock,
+          incomingReplatingStock: item.incoming_replating_stock,
+          readyReplatingStock: item.ready_replating_stock,
+          ngReplatingStock: item.ng_replating_stock,
+        }));
+        setApiData(transformedData);
+        setFailedAttempts(0);
+      }
+    } catch (error) {
+      handleFetchError('Network error while fetching data');
+    }
+  };
+
+  useEffect(() => {
+    if (isFetchingEnabled && failedAttempts < 3) {
+      fetchData();
+      
+      const interval = setInterval(() => {
+        if (isFetchingEnabled && failedAttempts < 3) {
+          fetchData();
+        }
+      }, 3000); // 3 seconds
+  
+      return () => clearInterval(interval);
+    }
+  }, [isFetchingEnabled, failedAttempts])
+
+  const handleFetchError = (message: string) => {
+    const newFailedAttempts = failedAttempts + 1;
+    setFailedAttempts(newFailedAttempts);
+    
+    if (newFailedAttempts >= 3) {
+      setIsFetchingEnabled(false);
+      toast.error('Stopped fetching after 3 failed attempts');
+    }
+    toast.error(message);
+  };
 
   const partOptions = apiData.map((item) => ({
     value: item.partNumber,
@@ -124,6 +155,16 @@ const Transactions = () => {
         currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
       }
     }
+    
+    if (value === 1) {
+      if (status === 'Fresh') {
+        currentStock = selectedPartData?.incomingFreshStock ?? 0;
+        currentNgStock = selectedPartData?.ngFreshStock ?? 0;
+      } else if (status === 'Replating') {
+        currentStock = selectedPartData?.incomingReplatingStock ?? 0;
+        currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
+      }
+    }
 
     // Lanjutkan menambahkan part jika tidak duplikat
     setPartList([
@@ -141,30 +182,95 @@ const Transactions = () => {
     setSelectedPart(null);
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStatus = e.target.value;
-    setStatus(newStatus);
-    if (value === 2) {
+  useEffect(() => {
+    if (status && partList.length > 0) {
       setPartList((prev) =>
         prev.map((pt) => {
           const matched = apiData.find((item) => item.partNumber === pt.partNumber);
           if (!matched) return pt;
-          if (newStatus === 'Fresh') {
-            return {
-              ...pt,
-              currentStock: matched.readyFreshStock ?? 0,
-              currentNgStock: matched.ngFreshStock ?? 0,
-            };
-          } else {
-            return {
-              ...pt,
-              currentStock: matched.readyReplatingStock ?? 0,
-              currentNgStock: matched.ngReplatingStock ?? 0,
-            };
+          
+          if (value === 2) {
+            if (status === 'Fresh') {
+              return {
+                ...pt,
+                currentStock: matched.readyFreshStock ?? 0,
+                currentNgStock: matched.ngFreshStock ?? 0,
+              };
+            } else {
+              return {
+                ...pt,
+                currentStock: matched.readyReplatingStock ?? 0,
+                currentNgStock: matched.ngReplatingStock ?? 0,
+              };
+            }
           }
+          
+          if (value === 1) {
+            if (status === 'Fresh') {
+              return {
+                ...pt,
+                currentStock: matched.incomingFreshStock ?? 0,
+                currentNgStock: matched.ngFreshStock ?? 0,
+              };
+            } else {
+              return {
+                ...pt,
+                currentStock: matched.incomingReplatingStock ?? 0,
+                currentNgStock: matched.ngReplatingStock ?? 0,
+              };
+            }
+          }
+          return pt;
         })
       );
     }
+  }, [apiData, status, value]);
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value;
+    setStatus(newStatus);
+    // if (value === 2) {
+    //   setPartList((prev) =>
+    //     prev.map((pt) => {
+    //       const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+    //       if (!matched) return pt;
+    //       if (newStatus === 'Fresh') {
+    //         return {
+    //           ...pt,
+    //           currentStock: matched.readyFreshStock ?? 0,
+    //           currentNgStock: matched.ngFreshStock ?? 0,
+    //         };
+    //       } else {
+    //         return {
+    //           ...pt,
+    //           currentStock: matched.readyReplatingStock ?? 0,
+    //           currentNgStock: matched.ngReplatingStock ?? 0,
+    //         };
+    //       }
+    //     })
+    //   );
+    // }
+    // if (value === 1) {
+    //   setPartList((prev) =>
+    //     prev.map((pt) => {
+    //       const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+    //       if (!matched) return pt;
+    //       if (newStatus === 'Fresh') {
+    //         return {
+    //           ...pt,
+    //           currentStock: matched.incomingFreshStock ?? 0,
+    //           currentNgStock: matched.ngFreshStock ?? 0,
+    //         };
+    //       } else {
+    //         return {
+    //           ...pt,
+    //           currentStock: matched.incomingReplatingStock ?? 0,
+    //           currentNgStock: matched.ngReplatingStock ?? 0,
+    //         };
+    //       }
+    //     })
+    //   );
+    // }
   };
 
   const handlePartListChange = (index: number, field: 'qtyOk' | 'qtyNg', value: string) => {
@@ -387,16 +493,6 @@ const Transactions = () => {
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[16%]">
                               OLD PART NAME
                             </th>
-                            {/* {value === 2 && (
-                              <>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
-                                  CURRENT STOCK OK
-                                </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
-                                  CURRENT STOCK NG
-                                </th>
-                              </>
-                            )} */}
                             <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                               QTY OK
                             </th>
@@ -414,16 +510,6 @@ const Transactions = () => {
                               <td className="px-3 py-3 text-center border">{part.partNumber}</td>
                               <td className="px-3 py-3 text-center border">{part.partName}</td>
                               <td className="px-3 py-3 text-center border">{part.oldPartName}</td>
-                              {/* {value === 2 && (
-                                <>
-                                  <td className="px-3 py-3 text-center border">
-                                    {part.currentStock}
-                                  </td>
-                                  <td className="px-3 py-3 text-center border">
-                                    {part.currentNgStock}
-                                  </td>
-                                </>
-                              )} */}
                               <td className="px-3 py-3 text-center border">
                                 <input
                                   type="number"
@@ -431,7 +517,7 @@ const Transactions = () => {
                                   onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
                                   className="border border-gray-300 rounded p-1 w-full"
                                 />
-                                {value === 2 && (
+                                {(value === 1 ||value === 2) && (
                                   <p className="text-xs text-gray-500 mt-1">
                                     Stock: {part.currentStock}
                                   </p>
@@ -446,7 +532,7 @@ const Transactions = () => {
                                   onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
                                   className="border border-gray-300 rounded p-1 w-full"
                                 />
-                                {value === 2 && (
+                                {(value === 1 || value === 2) && (
                                   <p className="text-xs text-gray-500 mt-1">
                                     Stock: {part.currentNgStock}
                                   </p>
