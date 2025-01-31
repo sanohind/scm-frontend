@@ -178,6 +178,15 @@ const AdminTransactions = () => {
             currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
             }
         }
+        if (value === 1) {
+            if (status === 'Fresh') {
+            currentStock = selectedPartData?.incomingFreshStock ?? 0;
+            currentNgStock = selectedPartData?.ngFreshStock ?? 0;
+            } else if (status === 'Replating') {
+            currentStock = selectedPartData?.incomingReplatingStock ?? 0;
+            currentNgStock = selectedPartData?.ngReplatingStock ?? 0;
+            }
+        }
 
         // Lanjutkan menambahkan part jika tidak duplikat
         setPartList([
@@ -200,23 +209,44 @@ const AdminTransactions = () => {
         setStatus(newStatus);
         if (value === 2) {
             setPartList((prev) =>
-            prev.map((pt) => {
-                const matched = apiData.find((item) => item.partNumber === pt.partNumber);
-                if (!matched) return pt;
-                if (newStatus === 'Fresh') {
-                return {
-                    ...pt,
-                    currentStock: matched.readyFreshStock ?? 0,
-                    currentNgStock: matched.ngFreshStock ?? 0,
-                };
-                } else {
-                return {
-                    ...pt,
-                    currentStock: matched.readyReplatingStock ?? 0,
-                    currentNgStock: matched.ngReplatingStock ?? 0,
-                };
-                }
-            })
+                prev.map((pt) => {
+                    const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+                    if (!matched) return pt;
+                    if (newStatus === 'Fresh') {
+                    return {
+                        ...pt,
+                        currentStock: matched.readyFreshStock ?? 0,
+                        currentNgStock: matched.ngFreshStock ?? 0,
+                    };
+                    } else {
+                    return {
+                        ...pt,
+                        currentStock: matched.readyReplatingStock ?? 0,
+                        currentNgStock: matched.ngReplatingStock ?? 0,
+                    };
+                    }
+                })
+            );
+        }
+        if (value === 1) {
+            setPartList((prev) =>
+                prev.map((pt) => {
+                    const matched = apiData.find((item) => item.partNumber === pt.partNumber);
+                    if (!matched) return pt;
+                    if (newStatus === 'Fresh') {
+                    return {
+                        ...pt,
+                        currentStock: matched.incomingFreshStock ?? 0,
+                        currentNgStock: matched.ngFreshStock ?? 0,
+                    };
+                    } else {
+                    return {
+                        ...pt,
+                        currentStock: matched.incomingReplatingStock ?? 0,
+                        currentNgStock: matched.ngReplatingStock ?? 0,
+                    };
+                    }
+                })
             );
         }
     };
@@ -497,7 +527,7 @@ const AdminTransactions = () => {
                                         onChange={(e) => handlePartListChange(index, 'qtyOk', e.target.value)}
                                         className="border border-gray-300 rounded p-1 w-full"
                                     />
-                                    {value === 2 && (
+                                    {(value === 1 ||value === 2) && (
                                         <p className="text-xs text-gray-500 mt-1">
                                         Stock: {part.currentStock}
                                         </p>
@@ -512,7 +542,7 @@ const AdminTransactions = () => {
                                         onChange={(e) => handlePartListChange(index, 'qtyNg', e.target.value)}
                                         className="border border-gray-300 rounded p-1 w-full"
                                     />
-                                    {value === 2 && (
+                                    {(value === 1 || value === 2) && (
                                         <p className="text-xs text-gray-500 mt-1">
                                         Stock: {part.currentNgStock}
                                         </p>

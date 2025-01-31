@@ -5,6 +5,7 @@ import CardDataStats from '../../../../components/CardDataStats';
 import { FaUserCheck, FaUserClock, FaUsers, FaUserTimes } from 'react-icons/fa';
 import UserOnline from '../../../../components/UserOnline';
 import BarChart from '../../../../components/Charts/BarChart';
+import { getRoleName } from '../../../Authentication/Role';
 
 interface LoginData {
   username: string;
@@ -19,12 +20,14 @@ const DashboardSuperAdmin: React.FC = () => {
   });
 
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
-  const [errorCount, setErrorCount] = useState(0);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isFetchingEnabled, setIsFetchingEnabled] = useState(true);
+  const [dailyLoginData, setDailyLoginData] = useState<LoginData[]>([]);
+  const [monthlyLoginData, setMonthlyLoginData] = useState<LoginData[]>([]);
 
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('access_token');
-
       const response = await fetch(API_Dashboard(), {
         method: 'GET',
         headers: {
@@ -33,38 +36,39 @@ const DashboardSuperAdmin: React.FC = () => {
         },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-
-        if (result.success) {
-          const data = result.data;
-          setDashboardData({
-            user_online: data.active_tokens,
-            total_user: data.total_users,
-            user_active: data.active_users,
-            user_deactive: data.deactive_users,
-          });
-        } else {
-          console.error('Error fetching dashboard data:', result.message);
-          toast.error(`Error fetching dashboard data: ${result.message}`);
-          setErrorCount((prevCount) => prevCount + 1);
-        }
+      if (!response.ok || !response) {
+        handleFetchError('Failed to fetch dashboard data');
+        return;
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        setFailedAttempts(0); // Reset error count on success
+        const data = result.data;
+        setDashboardData({
+          user_online: data.active_tokens,
+          total_user: data.total_users,
+          user_active: data.active_users,
+          user_deactive: data.deactive_users,
+        });
       } else {
-        console.error('Gagal mengambil data:', response.status);
-        toast.error(`Gagal mengambil data: ${response.status}`);
-        setErrorCount((prevCount) => prevCount + 1);
+        handleFetchError(result.message || 'Failed to fetch dashboard data');
       }
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setErrorCount((prevCount) => prevCount + 1);
-      if (error instanceof Error) {
-        toast.error(`Error fetching dashboard data: ${error.message}`);
-      } else {
-        toast.error('Error fetching dashboard data');
-      }
+      handleFetchError('Network error while fetching dashboard data');
     }
   };
   
+  const handleFetchError = (message: string) => {
+    const newFailedAttempts = failedAttempts + 1;
+    setFailedAttempts(newFailedAttempts);
+    
+    if (newFailedAttempts >= 3) {
+      setIsFetchingEnabled(false);
+      toast.error('Stopped fetching after 3 failed attempts');
+    }
+    toast.error(message);
+  };
 
   const fetchOnlineUsers = async () => {
     try {
@@ -77,22 +81,20 @@ const DashboardSuperAdmin: React.FC = () => {
         },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-
-        if (result.success) {
-          setOnlineUsers(result.data);
-        } else {
-          console.error('Error fetching online users:', result.message);
-          setErrorCount((prevCount) => prevCount + 1);
-        }
+      if (!response.ok) {
+        handleFetchError('Failed to fetch online users');
+        return;
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        setFailedAttempts(0); // Reset error count on success
+        setOnlineUsers(result.data);
       } else {
-        console.error('Error fetching online users:', response.status);
-        setErrorCount((prevCount) => prevCount + 1);
+        handleFetchError(result.message || 'Failed to fetch online users');
       }
     } catch (error) {
-      console.error('Error fetching online users:', error);
-      setErrorCount((prevCount) => prevCount + 1);
+      handleFetchError('Network error while fetching online users');
     }
   };
 
@@ -129,34 +131,6 @@ const DashboardSuperAdmin: React.FC = () => {
     }
   };
 
-  const getRoleName = (role: string) => {
-    switch (role) {
-      case '1':
-        return 'Super Admin';
-      case '2':
-        return 'Admin Purchasing';
-      case '3':
-        return 'Admin Warehouse';
-      case '4':
-        return 'Admin Subcont';
-      case '5':
-        return 'Supplier Marketing';
-      case '6':
-        return 'Supplier Subcont Marketing';
-      case '7':
-        return 'Supplier Subcont';
-      case '8':
-        return 'Supplier Warehouse';
-      case '9':
-        return 'Super User';
-      default:
-        return 'Unknown Role';
-    }
-  };
-
-  const [dailyLoginData, setDailyLoginData] = useState<LoginData[]>([]);
-  const [monthlyLoginData, setMonthlyLoginData] = useState<LoginData[]>([]);
-
   const fetchLoginData = async () => {
     try {
       const token = localStorage.getItem('access_token');
@@ -168,51 +142,53 @@ const DashboardSuperAdmin: React.FC = () => {
         },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          // Sort daily data by login_count in descending order and take top 10
-          const sortedDailyData = result.data.daily
-            .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
-            .slice(0, 10);
-          
-          // Sort monthly data by login_count in descending order and take top 10
-          const sortedMonthlyData = result.data.monthly
-            .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
-            .slice(0, 10);
-
-          setDailyLoginData(sortedDailyData);
-          setMonthlyLoginData(sortedMonthlyData);
-        } else {
-          console.error('Error fetching login data:', result.message);
-        }
+      if (!response.ok) {
+        handleFetchError('Failed to fetch login data');
+        return;
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        setFailedAttempts(0); // Reset error count on success
+        const sortedDailyData = result.data.daily
+          .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
+          .slice(0, 10);
+        
+        const sortedMonthlyData = result.data.monthly
+          .sort((a: LoginData, b: LoginData) => b.login_count - a.login_count)
+          .slice(0, 10);
+  
+        setDailyLoginData(sortedDailyData);
+        setMonthlyLoginData(sortedMonthlyData);
       } else {
-        console.error('Error fetching login data:', response.status);
+        handleFetchError(result.message || 'Failed to fetch login data');
       }
     } catch (error) {
-      console.error('Error fetching login data:', error);
+      handleFetchError('Network error while fetching login data');
     }
   };
 
 
 
   useEffect(() => {
-    fetchLoginData();
-    fetchDashboardData();
-    fetchOnlineUsers();
-
-    const intervalId = setInterval(() => {
-      if (errorCount < 3) {
-        fetchOnlineUsers();
-        fetchDashboardData();
-        fetchLoginData();
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 2000);
-
-    return () => clearInterval(intervalId);
-  }, []);
+    if (isFetchingEnabled && failedAttempts < 3) {
+      fetchLoginData();
+      fetchDashboardData();
+      fetchOnlineUsers();
+  
+      const intervalId = setInterval(() => {
+        if (isFetchingEnabled && failedAttempts < 3) {
+          fetchOnlineUsers();
+          fetchDashboardData();
+          fetchLoginData();
+        } else {
+          clearInterval(intervalId);
+        }
+      }, 2000);
+  
+      return () => clearInterval(intervalId);
+    }
+  }, [isFetchingEnabled, failedAttempts]);
 
   const categoriesDaily = dailyLoginData.map(item => item.username);
   const dataDaily = dailyLoginData.map(item => item.login_count);
@@ -284,7 +260,7 @@ const DashboardSuperAdmin: React.FC = () => {
         <UserOnline
           onlineUsers={onlineUsers}
           handleLogoutUser={handleLogoutUser}
-          getRoleName={getRoleName}
+          getRoleName={(role: string) => getRoleName(role)}
         />
       </div>
     </>

@@ -160,7 +160,7 @@ const DashboardAdminSubcont = () => {
                 if (isFetchingEnabled && failedAttempts < 3) {
                     fetchData(selectedSupplier.value);
                 }
-            }, 2000);
+            }, 3000);
 
             return () => clearInterval(interval);
         }
