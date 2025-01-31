@@ -12,6 +12,9 @@ const DashboardAdminSubcont = () => {
     }
     const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [isFetchingEnabled, setIsFetchingEnabled] = useState(true);
+
 
     const [freshData, setFreshData] = useState<{
         fresh_incoming: number[];
@@ -87,21 +90,22 @@ const DashboardAdminSubcont = () => {
                         replating_process: data.replating_process.slice(-12),
                         replating_outgoing: data.replating_outgoing.slice(-12),
                     });
+                    setFailedAttempts(0);
                 } else {
-                    toast.error(`Failed to load data: ${result.message}`);
-                    console.error('Failed to load data:', result.message);
+                    handleFetchError('Failed to fetch data.');
                 }
             } else {
-                toast.error('Failed to fetch data.');
-                console.error('Failed to fetch data:', response.status);
+                handleFetchError('Failed to fetch data.');
             }
         } catch (error) {
-            console.error('Error fetching data:', error);
+            handleFetchError('Error fetching data');
         } 
     };
 
     const handleSupplierChange = (selectedOption: { value: string; label: string } | null) => {
         setSelectedSupplier(selectedOption);
+        setFailedAttempts(0);
+        setIsFetchingEnabled(true);
         if (selectedOption) {
             localStorage.setItem('selected_supplier', selectedOption.value);
             fetchData(selectedOption.value);
@@ -137,21 +141,30 @@ const DashboardAdminSubcont = () => {
         }
     }, [suppliers]);
 
-    // useEffect(() => {
-    //     // Only setup interval if we have a selected supplier
-    //     if (selectedSupplier?.value) {
-    //         // Initial fetch
-    //         fetchData(selectedSupplier.value);
+    const handleFetchError = (message: string) => {
+        const newFailedAttempts = failedAttempts + 1;
+        setFailedAttempts(newFailedAttempts);
+        
+        if (newFailedAttempts >= 3) {
+            setIsFetchingEnabled(false);
+            toast.error('Stopped fetching after 3 failed attempts');
+        }
+        toast.error(message);
+    };
+
+    useEffect(() => {
+        if (selectedSupplier?.value && isFetchingEnabled && failedAttempts < 3) {
+            fetchData(selectedSupplier.value);
             
-    //         // Setup interval for every 2 seconds
-    //         const interval = setInterval(() => {
-    //             fetchData(selectedSupplier.value);
-    //         }, 2000);
-    
-    //         // Cleanup interval on unmount or when supplier changes
-    //         return () => clearInterval(interval);
-    //     }
-    // }, [selectedSupplier]);
+            const interval = setInterval(() => {
+                if (isFetchingEnabled && failedAttempts < 3) {
+                    fetchData(selectedSupplier.value);
+                }
+            }, 2000);
+
+            return () => clearInterval(interval);
+        }
+    }, [selectedSupplier, isFetchingEnabled, failedAttempts]); 
 
     return (
         <>
