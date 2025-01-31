@@ -88,9 +88,11 @@ const DashboardAdminSubcont = () => {
                         replating_outgoing: data.replating_outgoing.map((item: { count: number }) => item.count).slice(-12),
                     });
                 } else {
+                    toast.error(`Failed to load data: ${result.message}`);
                     console.error('Failed to load data:', result.message);
                 }
             } else {
+                toast.error('Failed to fetch data.');
                 console.error('Failed to fetch data:', response.status);
             }
 
