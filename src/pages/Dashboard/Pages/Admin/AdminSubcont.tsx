@@ -78,14 +78,14 @@ const DashboardAdminSubcont = () => {
                 if (result.success) {
                     const data = result.data;
                     setFreshData({
-                        fresh_incoming: data.fresh_incoming.map((item: { count: number }) => item.count).slice(-12),
-                        fresh_process: data.fresh_process.map((item: { count: number }) => item.count).slice(-12),
-                        fresh_outgoing: data.fresh_outgoing.map((item: { count: number }) => item.count).slice(-12),
+                        fresh_incoming: data.fresh_incoming.slice(-12),
+                        fresh_process: data.fresh_process.slice(-12),
+                        fresh_outgoing: data.fresh_outgoing.slice(-12),
                     });
                     setreplatingData({
-                        replating_incoming: data.replating_incoming.map((item: { count: number }) => item.count).slice(-12),
-                        replating_process: data.replating_process.map((item: { count: number }) => item.count).slice(-12),
-                        replating_outgoing: data.replating_outgoing.map((item: { count: number }) => item.count).slice(-12),
+                        replating_incoming: data.replating_incoming.slice(-12),
+                        replating_process: data.replating_process.slice(-12),
+                        replating_outgoing: data.replating_outgoing.slice(-12),
                     });
                 } else {
                     toast.error(`Failed to load data: ${result.message}`);
@@ -95,18 +95,6 @@ const DashboardAdminSubcont = () => {
                 toast.error('Failed to fetch data.');
                 console.error('Failed to fetch data:', response.status);
             }
-
-            // Dummy data
-            // setFreshData({
-            //     fresh_incoming: [20, 30, 25, 40, 35, 60, 45, 55, 50, 65, 70, 80],
-            //     fresh_process: [15, 25, 20, 35, 30, 50, 40, 45, 60, 75, 85, 90],
-            //     fresh_outgoing: [10, 20, 15, 30, 25, 45, 35, 40, 50, 65, 75, 85],
-            // });
-            // setreplatingData({
-            //     replating_incoming: [5, 15, 10, 20, 25, 30, 45, 35, 40, 55, 60, 70],
-            //     replating_process: [8, 18, 12, 28, 32, 38, 48, 36, 47, 60, 72, 88],
-            //     replating_outgoing: [3, 13, 9, 19, 23, 29, 39, 28, 38, 50, 60, 65],
-            // });
         } catch (error) {
             console.error('Error fetching data:', error);
         } 
@@ -144,9 +132,26 @@ const DashboardAdminSubcont = () => {
             );
             if (savedSupplier) { 
                 setSelectedSupplier(savedSupplier);
+                fetchData(savedSupplier.value);
             }
         }
     }, [suppliers]);
+
+    // useEffect(() => {
+    //     // Only setup interval if we have a selected supplier
+    //     if (selectedSupplier?.value) {
+    //         // Initial fetch
+    //         fetchData(selectedSupplier.value);
+            
+    //         // Setup interval for every 2 seconds
+    //         const interval = setInterval(() => {
+    //             fetchData(selectedSupplier.value);
+    //         }, 2000);
+    
+    //         // Cleanup interval on unmount or when supplier changes
+    //         return () => clearInterval(interval);
+    //     }
+    // }, [selectedSupplier]);
 
     return (
         <>
