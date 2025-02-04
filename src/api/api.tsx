@@ -45,6 +45,9 @@ export const API_Update_User_Admin = () => API + getRolePath() + '/user/update/'
 export const API_List_User_Admin = () => API + getRolePath() + '/user/index';
 export const API_Update_Status_Admin = () => API + getRolePath() + `/user/update/status/`;
 
+export const API_Email_Organization_Admin = () => API + getRolePath() + `/organization/email/`;
+export const API_Update_Email_Organization_Admin = () => API + getRolePath() + `/organization/email/update/`;
+
 // Purchase Order Admin
 export const API_PO_Admin = () => API + getRolePath() + `/po/index/`;
 export const API_PO_Detail_Admin = () => API + getRolePath() + `/po/detail/`;

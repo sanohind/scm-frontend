@@ -1,6 +1,7 @@
 import Dashboard from "./component/Dashboard";
 import ListUser from "./component/ListUser";
 import AddUser from "./component/AddUser";
+import ManageEmailNotification from "./component/ManageOrganization";
 
 export const SuperAdmin = () => {
 
@@ -22,6 +23,10 @@ export const SuperAdmin = () => {
                     {/* <!-- Menu Add User --> */}
                     <AddUser />
                     {/* <!-- Menu Add User --> */}
+
+                    {/* <!-- Menu Manage Organization --> */}
+                    <ManageEmailNotification />
+                    {/* <!-- Menu Manage Organization --> */}
                 </ul>
             </div>
         </div>

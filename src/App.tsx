@@ -29,6 +29,7 @@ import ManageItems from "./pages/Subcon/ManageItems.tsx/MangeItems";
 import IndexTransactions from "./pages/Subcon/Transactions/IndexTransactions";
 import IndexTransactionsReview from "./pages/Subcon/TransactionsReview/IndexTransactionsReview";
 import TransactionsReviewDetail from "./pages/Subcon/TransactionsReview/Pages/Detail/TransactionsReviewDetail";
+import ManageOrganization from "./pages/ManageUser/Pages/ManageOrganization";
 
 const App: React.FC = () => {
   return (
@@ -112,6 +113,15 @@ const App: React.FC = () => {
                 <ProtectedRoute allowedRoles={['1']}>
                   <PageTitle title="Edit User | PT SANOH INDONESIA" />
                   <EditUser />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manage-email-notification"
+              element={
+                <ProtectedRoute allowedRoles={['1']}>
+                  <PageTitle title="Manage Email Notification | PT SANOH INDONESIA" />
+                  <ManageOrganization />
                 </ProtectedRoute>
               }
             />
