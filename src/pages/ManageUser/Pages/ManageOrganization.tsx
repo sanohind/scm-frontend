@@ -12,7 +12,7 @@ const ManageOrganization = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const userId = queryParams.get('userId');
-    const [emails, setEmails] = useState<string[]>([""]);
+    const [emails, setEmails] = useState<string[]>([]);
 
 
     useEffect(() => {

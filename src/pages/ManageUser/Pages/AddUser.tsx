@@ -16,7 +16,15 @@ const AddUser = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [emails, setEmails] = useState<string[]>([]);
+  // Change emails state to single email string
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (value: string) => {
+    const atPos = value.indexOf("@");
+    const dotPos = value.lastIndexOf(".");
+    return atPos > 0 && dotPos > atPos + 1 && dotPos < value.length - 1;
+  };
 
   useEffect(() => {
     fetchSuppliers();
@@ -52,8 +60,6 @@ const AddUser = () => {
     setSelectedSupplier(selectedOption);
     if (selectedOption) {
       fetchEmails(selectedOption.value);
-    } else {
-      setEmails([]); // Clear emails when supplier is cleared
     }
   };
 
@@ -72,19 +78,22 @@ const AddUser = () => {
       
       const result = await response.json();
       if (result.success && result.data) {
-        if (result.data.length === 0) {
+        // If result.data is an array, take the first email; otherwise use returned value
+        const fetchedEmail = Array.isArray(result.data)
+          ? result.data.length > 0
+            ? result.data[0]
+            : ""
+          : result.data;
+        if (!fetchedEmail) {
           toast.warning('No emails found for this supplier');
-          setEmails(result.data);
-        } else {
-          setEmails(result.data);
         }
+        setEmail(fetchedEmail);
       }
     } catch (error) {
       console.error('Error fetching emails:', error);
       toast.error(`Error fetching emails: ${error}`);
     }
   };
-
 
   const generateRandomPassword = () => {
     if (selectedSupplier) {
@@ -103,13 +112,13 @@ const AddUser = () => {
 
       setPassword(finalPassword);
     } else {
-      Swal.fire('Error', 'Please select a supplier first', 'error');
+      toast.warning('Please select a supplier first to generate a password');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!selectedSupplier || !firstName || !role || !username || !password) {
+    if (!selectedSupplier || !firstName || !role || !username || !password || !email) {
       Swal.fire('Error', 'Please fill all required fields correctly.', 'error');
       return;
     }
@@ -121,7 +130,7 @@ const AddUser = () => {
       status: "1",  // Default status for new users, can be adjusted as needed
       username,
       password,
-      email: emails.filter(email => email.trim() !== ""),
+      email, // Send email as a string
     };
 
     try {
@@ -151,87 +160,15 @@ const AddUser = () => {
   };
 
   const resetForm = () => {
+    // Optionally, reset supplier if needed
     // setSelectedSupplier(null);
     setFirstName("");
     setUsername("");
-    // setEmails([]);
+    setEmail("");
     setPassword("");
     setRole("");
   };
 
-  
-  const EmailInput = () => {
-    const [inputValue, setInputValue] = useState('');
-    
-    const handleEmailRemove = (index: number) => {
-      setEmails(emails.filter((_, i) => i !== index));
-    };
-    
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setInputValue(value);
-
-      if (value.includes('@') && (value.endsWith('.com') || value.endsWith('.co.id') || value.endsWith('.net') || value.endsWith('.org'))) {
-        setEmails(prev => [...prev, value.trim()]);
-        setInputValue('');
-        setTimeout(() => {
-          document.getElementById('email-input')?.focus();
-        }, 0);
-      }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
-          setEmails(prev => [...prev, inputValue.trim()]);
-          setInputValue('');
-          setTimeout(() => {
-            document.getElementById('email-input')?.focus();
-          }, 0);
-        }
-      }
-    };
-
-    const handleBlur = () => {
-      if (inputValue.includes('@') && (inputValue.endsWith('.com') || inputValue.endsWith('.co.id') || inputValue.endsWith('.net') || inputValue.endsWith('.org') || inputValue.endsWith('.edu') || inputValue.endsWith('.gov') || inputValue.endsWith('.io') || inputValue.endsWith('.tech'))) {
-      setEmails(prev => [...prev, inputValue.trim()]);
-      setInputValue('');
-      setTimeout(() => {
-        document.getElementById('email-input')?.focus();
-      }, 0);
-      }
-    };
-
-    return (
-      <div className="w-full">
-        <div className="flex flex-wrap gap-2 p-2 mb-2 rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
-          {emails.map((email, index) => (
-            <span key={index} className="bg-blue-100 px-2 py-1 rounded-md flex items-center gap-2">
-              {email}
-              <button 
-                type="button"
-                onClick={() => handleEmailRemove(index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                ×
-              </button>
-            </span>
-          ))}
-          <input
-            type="text"
-            id="email-input"
-            value={inputValue}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-            placeholder="Type email ..."
-            className="outline-none border-none flex-1 min-w-[200px]"
-          />
-        </div>
-      </div>
-    );
-  };
 
   return (
     <>
@@ -245,7 +182,7 @@ const AddUser = () => {
               <label className="mb-2.5 block text-black dark:text-white">
                 Select Supplier <span className="text-meta-1">*</span>
               </label>
-              <div className="w-full max-w-[600px]">
+              <div className="w-full">
                 <Select
                   id="supplier_id"
                   options={suppliers}
@@ -260,7 +197,7 @@ const AddUser = () => {
 
             {/* Name and Role in one row */}
             <div className="mb-4.5 flex flex-col md:flex-row gap-4 md:gap-6">
-              <div className="w-full md:w-[300px]">
+              <div className="w-full ">
                 <label className="mb-2.5 block text-black dark:text-white">
                   Name <span className="text-meta-1">*</span>
                 </label>
@@ -272,9 +209,9 @@ const AddUser = () => {
                   required
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
-                    </div>
+              </div>
 
-                    <div className="w-full md:w-[300px]">
+              <div className="w-full ">
                 <label className="mb-2.5 block text-black dark:text-white">
                   Role <span className="text-meta-1">*</span>
                 </label>
@@ -285,36 +222,55 @@ const AddUser = () => {
                   required
                 >
                   <option value="" disabled>Select a role</option>
-                    {roles.map((role) => (
-                        <option key={role.value} value={role.value}>
-                            {role.label}
-                        </option>
+                  {roles.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
                   ))}
                 </select>
-                    </div>
-                  </div>
+              </div>
+            </div>
 
-                  {/* Username and Email in one row */}
-                  <div className="mb-4.5 flex flex-col md:flex-row gap-4 md:gap-6">
-                    <div className="w-full md:w-[300px]">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Username <span className="text-meta-1">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter username"
-                        required
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
+            {/* Username and Email in one row */}
+            <div className="mb-4.5 flex flex-col md:flex-row gap-4 md:gap-6">
+              <div className="w-full ">
+                <label className="mb-2.5 block text-black dark:text-white">
+                  Username <span className="text-meta-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter username"
+                  required
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                />
+              </div>
 
-              <div className="w-full md:w-[600px]">
+              <div className="w-full ">
                 <label className="mb-2.5 block text-black dark:text-white">
                   Email <span className="text-meta-1">*</span>
                 </label>
-                  <EmailInput />
+                <div className="w-full">
+                  <input
+                    type="text"
+                    id="email-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onBlur={() => {
+                      if (!validateEmail(email)) {
+                        setEmailError("Please enter a valid email address");
+                      } else {
+                        setEmailError("");
+                      }
+                    }}
+                    placeholder="Enter email..."
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                  {emailError && (
+                    <span className="text-red-500 text-sm mt-1">{emailError}</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -324,7 +280,7 @@ const AddUser = () => {
                 Password
               </label>
               <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-                <div className="relative w-full md:w-[300px]">
+                <div className="relative w-full md:w[1/2]">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
@@ -347,15 +303,17 @@ const AddUser = () => {
                     )}
                   </button>
                   {password.length > 0 && password.length < 8 && (
-                  <span className="text-meta-1 text-sm mt-1">Password must be at least 8 characters</span>
+                    <span className="text-meta-1 text-sm mt-1">Password must be at least 8 characters</span>
                   )}
                 </div>
                 
-                <Button
+                <div className="w-full md:w[1/2] flex items-center">
+                  <Button
                   title="Generate Password"
                   onClick={generateRandomPassword}
-                  className="md:self-center"
-                />
+                  className="w-full md:w-auto"
+                  />
+                </div>
               </div>
             </div>
 
