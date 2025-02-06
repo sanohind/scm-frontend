@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { API_Email_Organization_Admin, API_List_Partner_Admin, API_Update_Email_Organization_Admin } from "../../../api/api";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from "sweetalert2";
@@ -9,9 +8,6 @@ import Select from "react-select";
 const ManageOrganization = () => {
     const [suppliers, setSuppliers] = useState<{ value: string; label: string }[]>([]);
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get('userId');
     const [emails, setEmails] = useState<string[]>([]);
 
 
@@ -94,7 +90,7 @@ const ManageOrganization = () => {
 
         try {
             const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_Update_Email_Organization_Admin()}${userId}`, {
+            const response = await fetch(`${API_Update_Email_Organization_Admin()}${selectedSupplier.value}`, {
                 method: 'PUT',
                 headers: {
                 'Authorization': `Bearer ${token}`,
