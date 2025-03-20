@@ -9,8 +9,11 @@ import { toast, ToastContainer } from 'react-toastify';
 import { API_Create_Transaction_Subcont, API_Item_Subcont } from '../../../../api/api';
 import Swal from 'sweetalert2';
 import DatePicker from '../../../../components/Forms/DatePicker';
-import { FaPlus } from 'react-icons/fa';
+import { FaExclamationCircle, FaPlus } from 'react-icons/fa';
 import Button from '../../../../components/Forms/Button';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import { FaUpload, FaDownload } from 'react-icons/fa';
 
 const Transactions = () => {
   const [value, setValue] = useState(0);
@@ -32,6 +35,7 @@ const Transactions = () => {
   const [partList, setPartList] = useState<any[]>([]);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isFetchingEnabled, setIsFetchingEnabled] = useState(true);
+  const [isTemplateDownloadable, setIsTemplateDownloadable] = useState(false);
 
 
   interface ApiItem {
@@ -94,6 +98,7 @@ const Transactions = () => {
       return () => clearInterval(interval);
     }
   }, [isFetchingEnabled, failedAttempts])
+
 
   const handleFetchError = (message: string) => {
     const newFailedAttempts = failedAttempts + 1;
@@ -398,6 +403,165 @@ const Transactions = () => {
     }
   };
 
+  
+  useEffect(() => {
+    // For incoming and outgoing, need status and delivery note
+    if ((value === 0 || value === 2) && status && deliveryNote) {
+      setIsTemplateDownloadable(true);
+    } 
+    // For process, only need status
+    else if (value === 1 && status) {
+      setIsTemplateDownloadable(true);
+    } else {
+      setIsTemplateDownloadable(false);
+    }
+  }, [value, status, deliveryNote]);
+
+  const generateExcelTemplate = () => {
+    // Create data for Excel template
+    const worksheetData = [
+      [
+        'actual_transaction_date',
+        'actual_transaction_time',
+        'status',
+        'delivery_note',
+        'item_code',
+        'item_name',
+        'old_part_name',
+        'qty_ok',
+        'qty_ng',
+        'transaction_type'
+      ]
+    ];
+
+      // Get current date and time strings
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    
+    // Add item data rows
+    apiData.forEach(item => {
+      worksheetData.push([
+        dateStr, // actual_transaction_date
+        timeStr, // actual_transaction_time
+        status, // status
+        deliveryNote || '', // delivery_note
+        item.partNumber, // item_code
+        item.partName, // item_name
+        item.oldPartName, // old_part_name
+        '', // qty_ok - user will fill this
+        '0', // qty_ng - default to 0
+        value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing' // transaction_type
+      ]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // Set column widths
+    const colWidths = [
+      { wch: 20 }, // actual_transaction_date
+      { wch: 15 }, // actual_transaction_time
+      { wch: 10 }, // status
+      { wch: 15 }, // delivery_note
+      { wch: 30 }, // item_code
+      { wch: 30 }, // item_name
+      { wch: 30 }, // old_part_name
+      { wch: 8 }, // qty_ok
+      { wch: 8 }, // qty_ng
+      { wch: 12 } // transaction_type
+    ];
+    ws['!cols'] = colWidths;
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Transaction Template');
+    
+    // Generate Excel file
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const fileData = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    
+    // Download file
+    const fileName = `${value === 0 ? 'Incoming' : value === 1 ? 'Process' : 'Outgoing'}_${status}_Template.xlsx`;
+    saveAs(fileData, fileName);
+  };
+
+  const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const binaryStr = evt.target?.result;
+        const wb = XLSX.read(binaryStr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        
+        // Convert sheet to JSON
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        
+        // Skip header row
+        const rows = data.slice(1) as any[];
+        
+        // Map rows to part objects
+        const newPartList: any[] = [];
+        
+        rows.forEach((row: any) => {
+          if (row.length < 8) return; // Skip incomplete rows
+          
+          const partNumber = row[4]; // item_code
+          const partName = row[5]; // item_name
+          const oldPartName = row[6]; // old_part_name
+          const qtyOk = row[7] ? row[7].toString() : ''; // qty_ok
+          const qtyNg = row[8] ? row[8].toString() : '0'; // qty_ng
+          
+          // Skip rows without part numbers or quantities
+          if (!partNumber || qtyOk === '') return;
+          
+          // Find part data in apiData
+          const partData = apiData.find(item => item.partNumber === partNumber);
+          if (!partData) return;
+          
+          // Determine current stock based on current tab and status
+          let currentStock = 0;
+          let currentNgStock = 0;
+          
+          if (value === 2) {
+            currentStock = status === 'Fresh' ? partData.readyFreshStock : partData.readyReplatingStock;
+            currentNgStock = status === 'Fresh' ? partData.ngFreshStock : partData.ngReplatingStock;
+          } else if (value === 1) {
+            currentStock = status === 'Fresh' ? partData.incomingFreshStock : partData.incomingReplatingStock;
+            currentNgStock = status === 'Fresh' ? partData.ngFreshStock : partData.ngReplatingStock;
+          }
+          
+          // Add to new part list
+          newPartList.push({
+            partNumber,
+            partName,
+            oldPartName: oldPartName || '-',
+            qtyOk,
+            qtyNg,
+            currentStock,
+            currentNgStock
+          });
+        });
+        
+        // Update part list
+        setPartList(newPartList);
+        toast.success(`Imported ${newPartList.length} parts from Excel`);
+        
+      } catch (error) {
+        console.error('Error parsing Excel:', error);
+        toast.error('Error parsing Excel file. Please check the format.');
+      }
+      
+      // Reset the file input
+      e.target.value = '';
+    };
+    
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <>
       <ToastContainer position="top-right" />
@@ -472,11 +636,58 @@ const Transactions = () => {
                       isClearable
                     />
                   </div>
-                  <Button
-                    title="Add Part"
-                    onClick={handleAddPart}
-                    icon={FaPlus}
-                  />
+                  <div className='justify-between flex items-center mb-4'>
+                    <Button
+                      title="Add Part"
+                      onClick={handleAddPart}
+                      icon={FaPlus}
+                    />
+
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <div className="relative flex items-center gap-2">
+                        <div className="group relative">
+                          <div className="text-yellow-500 cursor-help">
+                            <FaExclamationCircle size={20} />
+                          </div>
+                          <div className="absolute z-10 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-2 px-3 right-0 w-64 md:w-72">
+                            <p className="font-bold mb-1">Requirements :</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                              <li>Complete the required {(value === 0 || value === 2) ? "Status and Delivery Note" : "Status"} fields before downloading the template</li>
+                              <li>In the template, only modify the Qty OK and Qty NG columns</li>
+                              <li>If you need to change transaction details, update the form fields and download a new template</li>
+                              <li>For items not included in your transaction, leave the Qty OK field blank</li>
+                              <li>The system will ignore rows with empty Qty OK values</li>
+                              <li>Always review the preview after upload to confirm data accuracy before submission</li>
+                            </ul>
+                          </div>
+                        </div>
+                        <Button
+                          title="Download Template"
+                          onClick={generateExcelTemplate}
+                          icon={FaDownload}
+                          disabled={!isTemplateDownloadable}
+                          className={`${!isTemplateDownloadable ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        
+                        
+                      </div>
+                      
+                      <div className="relative">
+                      <Button
+                        title="Upload Excel"
+                        icon={FaUpload}
+                        onClick={() => document.getElementById('excel-upload')?.click()}
+                      />
+                      <input
+                        type="file"
+                        id="excel-upload"
+                        accept=".xlsx, .xls"
+                        onChange={handleExcelUpload}
+                        className="hidden"
+                      />
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Preview List */}
                   {partList.length > 0 && (
