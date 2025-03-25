@@ -374,22 +374,24 @@ const CreatePerformanceReport = () => {
 
         try {
             await downloadPromise();
-            toast.update(toastId, {
-                render: 'Download complete!',
-                type: 'success',
-                isLoading: false,
-                autoClose: 3000
+            toast.success('Download complete!', {
+                toastId,
+                autoClose: 3000,
             });
+            Swal.fire({
+                title: 'Success',
+                text: 'File downloaded successfully',
+                icon: 'success',
+                confirmButtonColor: '#1e3a8a'
+            })
         } catch (error) {
-            toast.update(toastId, {
-                render: `Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                type: 'error',
-                isLoading: false,
-                autoClose: 3000
+            toast.error(`Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+                toastId,
+                autoClose: 3000,
             });
             Swal.fire({
                 title: 'Error',
-                text: 'Failed to download file',
+                text: `Failed to download file, Download failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
                 icon: 'error',
                 confirmButtonColor: '#1e3a8a'
             });

@@ -668,8 +668,6 @@ const Transactions = () => {
                           disabled={!isTemplateDownloadable}
                           className={`${!isTemplateDownloadable ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
-                        
-                        
                       </div>
                       
                       <div className="relative">
