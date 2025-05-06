@@ -20,6 +20,8 @@ const AdminStockItems = () => {
         incoming_replating_stock: number;
         ready_replating_stock: number;
         ng_replating_stock: number;
+        min_stock_incoming?: number; // Added
+        min_stock_outgoing?: number; // Added
     }
 
     interface Supplier {
@@ -81,8 +83,14 @@ const AdminStockItems = () => {
             const result = await response.json();
             
             if (result.status && Array.isArray(result.data)) {
-                setData(result.data);
-                setFilteredData(result.data);
+                // Assuming API returns min_stock_incoming and min_stock_outgoing
+                const itemsWithMinStock = result.data.map((item: any) => ({
+                    ...item,
+                    min_stock_incoming: item.min_stock_incoming ?? null, // Use null or a default if not provided
+                    min_stock_outgoing: item.min_stock_outgoing ?? null, // Use null or a default if not provided
+                }));
+                setData(itemsWithMinStock);
+                setFilteredData(itemsWithMinStock);
             } else {
                 throw new Error('Invalid response format');
             }
@@ -115,11 +123,18 @@ const AdminStockItems = () => {
         let sorted = [...data];
         if (sortConfig.key) {
             sorted.sort((a, b) => {
-                let aValue = a[sortConfig.key as keyof StockItem];
-                let bValue = b[sortConfig.key as keyof StockItem];
+                // Provide default values for comparison to avoid undefined errors
+                let aValue = a[sortConfig.key as keyof StockItem] ?? ''; 
+                let bValue = b[sortConfig.key as keyof StockItem] ?? '';
 
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                // Handle numeric comparison specifically if needed, assuming string comparison for now
+                if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+
+                // Default to localeCompare for strings
+                if (String(aValue) < String(bValue)) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (String(aValue) > String(bValue)) return sortConfig.direction === 'asc' ? 1 : -1;
                 return 0;
             });
         }
@@ -205,6 +220,13 @@ const AdminStockItems = () => {
         // Generate buffer
         XLSX.writeFile(workbook, `Stock_Items_${selectedSupplier?.label.split(' | ')[0] || 'All'}_${new Date().toISOString().slice(0,10)}.xlsx`);
         toast.success('Exported to Excel successfully!');
+    };
+
+    const getStockCellStyle = (currentStock: number, minStock: number | undefined | null): string => {
+        if (minStock === undefined || minStock === null) return 'bg-white'; // No minimum defined
+        if (currentStock < minStock) return 'bg-red-300'; // Below minimum
+        if (currentStock === minStock) return 'bg-yellow-300'; // Equal to minimum
+        return 'bg-green-300'; // Above minimum
     };
 
     return (
@@ -304,11 +326,27 @@ const AdminStockItems = () => {
                             <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
                             <td className="px-3 py-3 text-center whitespace-nowrap">{row.old_part_name}</td>
-                            <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.incoming_fresh_stock}</td>
-                            <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
+                            {/* Fresh - Incoming */}
+                            <td className={`px-3 py-2 text-center border whitespace-nowrap ${getStockCellStyle(row.incoming_fresh_stock, row.min_stock_incoming)}`}>
+                                {row.incoming_fresh_stock}
+                                {row.min_stock_incoming !== null && row.min_stock_incoming !== undefined && (
+                                    <div className="text-xs text-gray-500 mt-1">Min: {row.min_stock_incoming}</div>
+                                )}
+                            </td>
+                            {/* Fresh - Ready */}
+                            <td className={`px-3 py-2 text-center border whitespace-nowrap ${getStockCellStyle(row.ready_fresh_stock, row.min_stock_outgoing)}`}>
+                                {row.ready_fresh_stock}
+                                {row.min_stock_outgoing !== null && row.min_stock_outgoing !== undefined && (
+                                    <div className="text-xs text-gray-500 mt-1">Min: {row.min_stock_outgoing}</div>
+                                )}
+                            </td>
+                            {/* Fresh - NG */}
                             <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ng_fresh_stock}</td>
+                            {/* Replating - Incoming */}
                             <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
+                             {/* Replating - Ready */}
                             <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ready_replating_stock}</td>
+                             {/* Replating - NG */}
                             <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
                         </tr>
                         ))

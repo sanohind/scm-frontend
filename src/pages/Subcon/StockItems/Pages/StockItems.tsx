@@ -27,6 +27,8 @@ const StockItems = () => {
     incoming_replating_stock: number;
     ready_replating_stock: number;
     ng_replating_stock: number;
+    min_stock_incoming?: number; // Added
+    min_stock_outgoing?: number; // Added
   }
 
   const fetchStockItems = async () => {
@@ -43,8 +45,14 @@ const StockItems = () => {
 
       if (!response.ok) throw new Error('Network response was not ok');
       const result = await response.json();
-      setData(result.data);
-      setFilteredData(result.data);
+      // Assuming API returns min_stock_incoming and min_stock_outgoing
+      const itemsWithMinStock = result.data.map((item: any) => ({
+          ...item,
+          min_stock_incoming: item.min_stock_incoming ?? null, // Use null or a default if not provided
+          min_stock_outgoing: item.min_stock_outgoing ?? null, // Use null or a default if not provided
+      }));
+      setData(itemsWithMinStock);
+      setFilteredData(itemsWithMinStock);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Error fetching data');
@@ -61,15 +69,23 @@ const StockItems = () => {
     let filtered = [...data];
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-          let aValue = a[sortConfig.key as keyof StockItem];
-          let bValue = b[sortConfig.key as keyof StockItem];
+          // Provide default values for comparison to avoid undefined errors
+          let aValue = a[sortConfig.key as keyof StockItem] ?? '';
+          let bValue = b[sortConfig.key as keyof StockItem] ?? '';
 
-          if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+          // Handle numeric comparison specifically if needed
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+              return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+
+          // Default to localeCompare for strings
+          if (String(aValue) < String(bValue)) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (String(aValue) > String(bValue)) return sortConfig.direction === 'asc' ? 1 : -1;
           return 0;
       });
   }
     if (searchQuery) {
+        // Keep search functionality
         filtered = filtered.filter((row) =>
             (row.part_number?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
             (row.part_name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
@@ -162,6 +178,13 @@ const StockItems = () => {
     toast.success('Exported to Excel successfully!');
   };
 
+  const getStockCellStyle = (currentStock: number, minStock: number | undefined | null): string => {
+    if (minStock === undefined || minStock === null) return 'bg-white'; // No minimum defined
+    if (currentStock < minStock) return 'bg-red-300'; // Below minimum
+    if (currentStock === minStock) return 'bg-yellow-300'; // Equal to minimum
+    return 'bg-green-300'; // Above minimum
+  };
+
   return (
     <>
       <ToastContainer />
@@ -175,14 +198,6 @@ const StockItems = () => {
                 onSearchChange={setSearchQuery}
               />
             </div>
-            {/* <button
-                onClick={handleExportExcel}
-                disabled={!filteredData.length || loading}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Export to Excel"
-            >
-                Export
-            </button> */}
             <Button
                 title="Export Excel"
                 onClick={handleExportExcel}
@@ -258,17 +273,35 @@ const StockItems = () => {
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_number}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.part_name}</td>
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.old_part_name}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.incoming_fresh_stock}</td>
-                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.ready_fresh_stock}</td>
+                        {/* Fresh - Incoming: Apply style and label */}
+                        <td className={`px-3 py-2 text-center border whitespace-nowrap ${getStockCellStyle(row.incoming_fresh_stock, row.min_stock_incoming)}`}>
+                            {row.incoming_fresh_stock}
+                            {/* Correct conditional rendering for label */}
+                            {(row.min_stock_incoming !== null && row.min_stock_incoming !== undefined) && (
+                                <div className="text-xs text-gray-500 mt-1">Min: {row.min_stock_incoming}</div>
+                            )}
+                        </td>
+                        {/* Fresh - Ready: Apply style and label */}
+                        <td className={`px-3 py-2 text-center border whitespace-nowrap ${getStockCellStyle(row.ready_fresh_stock, row.min_stock_outgoing)}`}>
+                            {row.ready_fresh_stock}
+                            {/* Correct conditional rendering for label */}
+                            {(row.min_stock_outgoing !== null && row.min_stock_outgoing !== undefined) && (
+                                <div className="text-xs text-gray-500 mt-1">Min: {row.min_stock_outgoing}</div>
+                            )}
+                        </td>
+                        {/* Fresh - NG */}
                         <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ng_fresh_stock}</td>
+                        {/* Replating - Incoming */}
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.incoming_replating_stock}</td>
+                        {/* Replating - Ready */}
                         <td className="px-3 py-3 text-center whitespace-nowrap bg-gray-3">{row.ready_replating_stock}</td>
+                        {/* Replating - NG */}
                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.ng_replating_stock}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={8} className="px-3 py-4 text-center text-gray-500">No data available</td>
+                      <td colSpan={9} className="px-3 py-4 text-center text-gray-500">No data available</td>
                     </tr>
                   )}
                 </tbody>
