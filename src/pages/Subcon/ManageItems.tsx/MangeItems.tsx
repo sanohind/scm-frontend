@@ -18,12 +18,16 @@ interface Item {
     part_number: string;
     part_name: string;
     old_part_name: string;
+    min_stock_incoming: number | string; // Added
+    min_stock_outgoing: number | string; // Added
     status: string;
     isEditing?: boolean;
     isLoading?: boolean;
     editedPartNumber?: string;
     editedPartName?: string;
     editedOldPartName?: string;
+    editedMinStockIncoming?: number | string; // Added
+    editedMinStockOutgoing?: number | string; // Added
 }
 
 const ManageItems: React.FC = () => {
@@ -97,6 +101,8 @@ const ManageItems: React.FC = () => {
                 part_number: item.part_number || '-',
                 part_name: item.part_name || '-',
                 old_part_name: item.old_part_name || '-',
+                min_stock_incoming: item.min_stock_incoming ?? 0, // Added - Use ?? 0 to default if null/undefined
+                min_stock_outgoing: item.min_stock_outgoing ?? 0, // Added - Use ?? 0 to default if null/undefined
                 status: item.status === "1" ? 'Active' : 'Deactive',
             }));
 
@@ -132,6 +138,8 @@ const ManageItems: React.FC = () => {
                     editedPartNumber: item.part_number === '-' ? '' : item.part_number,
                     editedPartName: item.part_name === '-' ? '' : item.part_name,
                     editedOldPartName: item.old_part_name === '-' ? '' : item.old_part_name,
+                    editedMinStockIncoming: item.min_stock_incoming, // Added
+                    editedMinStockOutgoing: item.min_stock_outgoing, // Added
                     part_number: item.part_number === '-' ? '' : item.part_number, 
                     part_name: item.part_name === '-' ? '' : item.part_name,
                     old_part_name: item.old_part_name === '-' ? '' : item.old_part_name
@@ -150,7 +158,7 @@ const ManageItems: React.FC = () => {
     const handleInputChange = (
         e: ChangeEvent<HTMLInputElement>,
         itemId: string,
-        field: 'part_number' | 'part_name' | 'old_part_name'
+        field: 'part_number' | 'part_name' | 'old_part_name' | 'min_stock_incoming' | 'min_stock_outgoing' // Added new fields
     ) => {
         const value = e.target.value;
         setItems((prevItems) =>
@@ -175,6 +183,30 @@ const ManageItems: React.FC = () => {
 
         if (item.old_part_name !== item.editedOldPartName) {
             payload.old_part_name = item.old_part_name;
+        }
+
+        // Added checks for new fields
+        if (item.min_stock_incoming !== item.editedMinStockIncoming) {
+             // Convert to number if it's a valid number string, otherwise handle potential errors or send as is depending on API expectation
+            const incomingStock = Number(item.min_stock_incoming);
+            payload.min_stock_incoming = isNaN(incomingStock) ? item.min_stock_incoming : incomingStock;
+        }
+        if (item.min_stock_outgoing !== item.editedMinStockOutgoing) {
+            // Convert to number if it's a valid number string
+            const outgoingStock = Number(item.min_stock_outgoing);
+            payload.min_stock_outgoing = isNaN(outgoingStock) ? item.min_stock_outgoing : outgoingStock;
+        }
+
+
+        // Only send request if there's something to update besides the ID
+        if (Object.keys(payload).length <= 1) {
+             setItems((prevItems) =>
+                prevItems.map((itm) =>
+                    itm.item_id === itemId ? { ...itm, isEditing: false } : itm
+                )
+            );
+            toast.info("No changes detected.");
+            return; // Exit if no actual changes were made
         }
 
         try {
@@ -363,14 +395,20 @@ const ManageItems: React.FC = () => {
                                 <th className="px-1 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">
                                     NO
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]"> {/* Adjusted width */}
                                     PART NUMBER
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]"> {/* Adjusted width */}
                                     PART NAME
                                 </th>
-                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[20%]">
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[15%]"> {/* Adjusted width */}
                                     OLD PART NAME
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]"> {/* Added */}
+                                    MIN STOCK INCOMING
+                                </th>
+                                <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]"> {/* Added */}
+                                    MIN STOCK OUTGOING
                                 </th>
                                 <th className="px-3 py-3.5 text-sm font-bold text-gray-700 border w-[10%]">
                                     STATUS
@@ -427,6 +465,34 @@ const ManageItems: React.FC = () => {
                                             />
                                         ) : (
                                             item.old_part_name
+                                        )}
+                                    </td>
+                                    {/* Added TD for Min Stock Incoming */}
+                                    <td className="px-3 py-3 text-center border">
+                                        {item.isEditing ? (
+                                            <input
+                                                type="number" // Use type number for stock
+                                                value={item.min_stock_incoming}
+                                                onChange={(e) => handleInputChange(e, item.item_id, 'min_stock_incoming')}
+                                                className="border border-gray-300 rounded p-1 w-full"
+                                                min="0" // Optional: prevent negative numbers
+                                            />
+                                        ) : (
+                                            item.min_stock_incoming
+                                        )}
+                                    </td>
+                                    {/* Added TD for Min Stock Outgoing */}
+                                    <td className="px-3 py-3 text-center border">
+                                        {item.isEditing ? (
+                                            <input
+                                                type="number" // Use type number for stock
+                                                value={item.min_stock_outgoing}
+                                                onChange={(e) => handleInputChange(e, item.item_id, 'min_stock_outgoing')}
+                                                className="border border-gray-300 rounded p-1 w-full"
+                                                min="0" // Optional: prevent negative numbers
+                                            />
+                                        ) : (
+                                            item.min_stock_outgoing
                                         )}
                                     </td>
                                     <td className="px-3 py-3 text-center whitespace-nowrap border">
