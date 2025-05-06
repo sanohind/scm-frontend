@@ -71,6 +71,7 @@ export const API_Create_Item_Subcont_Admin = () => API + getRolePath() + `/item/
 export const API_List_Item_Subcont_Admin = () => API + getRolePath() + `/item/list/`;
 export const API_Stock_Item_Subcont_Admin = () => API + getRolePath() + `/item/index/`;
 export const API_Transaction_Report_Subcont_Admin = () => API + getRolePath() + `/transaction/index/`;
+export const API_Edit_Transaction_Report_Subcont_Admin = () => API + getRolePath() + `/transaction/edit`;
 export const API_List_Item_ERP_Subcont_Admin = () => API + getRolePath() + `/item/list/item`;
 export const API_Manage_Item_Subcont_Admin = () => API + getRolePath() + `/item/all-list/`;
 export const API_Update_Item_Subcont_Admin = () => API + getRolePath() + `/item/update`;

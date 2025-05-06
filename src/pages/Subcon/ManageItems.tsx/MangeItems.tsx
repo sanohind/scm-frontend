@@ -101,8 +101,8 @@ const ManageItems: React.FC = () => {
                 part_number: item.part_number || '-',
                 part_name: item.part_name || '-',
                 old_part_name: item.old_part_name || '-',
-                min_stock_incoming: item.min_stock_incoming ?? 0, // Added - Use ?? 0 to default if null/undefined
-                min_stock_outgoing: item.min_stock_outgoing ?? 0, // Added - Use ?? 0 to default if null/undefined
+                min_stock_incoming: item.min_stock_incoming ?? null, // Added - Use ?? 0 to default if null/undefined
+                min_stock_outgoing: item.min_stock_outgoing ?? null, // Added - Use ?? 0 to default if null/undefined
                 status: item.status === "1" ? 'Active' : 'Deactive',
             }));
 

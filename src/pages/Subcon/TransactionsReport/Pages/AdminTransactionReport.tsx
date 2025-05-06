@@ -4,15 +4,16 @@ import Breadcrumb from '../../../../components/Breadcrumbs/Breadcrumb';
 import Pagination from '../../../../components/Table/Pagination';
 import MultiSelect from '../../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
-import { FaFileExcel } from 'react-icons/fa';
+import { FaEdit, FaFileExcel } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import SearchBar from '../../../../components/Table/SearchBar';
-import { API_List_Item_Subcont_Admin, API_List_Partner_Admin, API_Transaction_Report_Subcont_Admin } from '../../../../api/api';
+import { API_List_Item_Subcont_Admin, API_List_Partner_Admin, API_Transaction_Report_Subcont_Admin, API_Edit_Transaction_Report_Subcont_Admin } from '../../../../api/api';
 import DatePicker from '../../../../components/Forms/DatePicker';
 import Button from '../../../../components/Forms/Button';
 
 const AdminTransactionReport = () => {
     interface TransactionLog {
+        id: string; // Added for identifying the transaction
         timestamp: string;
         type: string;
         status: string;
@@ -49,6 +50,9 @@ const AdminTransactionReport = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [selectedSupplier, setSelectedSupplier] = useState<{ value: string; label: string } | null>(null);
     const [isSearchClicked, setIsSearchClicked] = useState(false);
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
+    const [editQtyOk, setEditQtyOk] = useState<string>('');
+    const [editQtyNg, setEditQtyNg] = useState<string>('');
 
     const fetchPartOptions = async (supplierCode?: string) => {
         try {
@@ -142,6 +146,7 @@ const AdminTransactionReport = () => {
             const result = await response.json();
             if (result.status) {
                 const logs = result.data.map((item: any) => ({
+                    id: item.sub_transaction_id, // Corrected to use sub_transaction_id from API
                     timestamp: `${item.transaction_date} ${item.transaction_time}`,
                     type: item.transaction_type,
                     status: item.status,
@@ -205,6 +210,8 @@ const AdminTransactionReport = () => {
         if (selectedSupplier) {
             setIsSearchClicked(true);
             setLoading(true);
+            // Reset editing state on new search
+            setEditingRowId(null); 
             await fetchTransactionLogs(selectedSupplier.value, startDate, endDate);
         } else {
             toast.warning('Please select a supplier');
@@ -314,6 +321,85 @@ const AdminTransactionReport = () => {
         XLSX.utils.book_append_sheet(wb, ws, `${selectedSupplier?.value}`);
         XLSX.writeFile(wb, `transaction_report_${selectedSupplier?.value}__${startDateString}_to_${endDateString}.xlsx`);
     };
+
+    const handleEditClick = (row: TransactionLog) => {
+        setEditingRowId(row.id);
+        setEditQtyOk(String(row.qtyOk));
+        setEditQtyNg(String(row.qtyNg));
+    };
+
+    const handleCancelEdit = () => {
+        setEditingRowId(null);
+        setEditQtyOk('');
+        setEditQtyNg('');
+    };
+
+    const handleSubmitEdit = async () => {
+        if (!editingRowId || !selectedSupplier) {
+            toast.error("Cannot submit edit. Please try again.");
+            return;
+        }
+
+        const originalRow = allData.find(row => row.id === editingRowId);
+        if (!originalRow) {
+            toast.error("Original data not found. Please refresh.");
+            return;
+        }
+
+        const numEditQtyOk = Number(editQtyOk);
+        const numEditQtyNg = Number(editQtyNg);
+
+        if (isNaN(numEditQtyOk) || isNaN(numEditQtyNg) || numEditQtyOk < 0 || numEditQtyNg < 0) {
+            toast.error("Invalid quantity. Please enter valid numbers.");
+            return;
+        }
+        
+        const payload: { transaction_id: string; qty_ok?: number; qty_ng?: number } = { transaction_id: editingRowId };
+        let changed = false;
+
+        if (numEditQtyOk !== originalRow.qtyOk) {
+            payload.qty_ok = numEditQtyOk;
+            changed = true;
+        }
+        if (numEditQtyNg !== originalRow.qtyNg) {
+            payload.qty_ng = numEditQtyNg;
+            changed = true;
+        }
+
+        if (!changed) {
+            toast.info("No changes detected.");
+            handleCancelEdit();
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(API_Edit_Transaction_Report_Subcont_Admin(), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+
+            if (result.status) {
+                toast.success(result.message || 'Transaction updated successfully!');
+                await fetchTransactionLogs(selectedSupplier.value, startDate, endDate); // Refresh data
+                handleCancelEdit();
+            } else {
+                toast.error(result.message || 'Failed to update transaction.');
+            }
+        } catch (error) {
+            console.error('Error updating transaction:', error);
+            toast.error('Error updating transaction.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
         <>
@@ -457,6 +543,7 @@ const AdminTransactionReport = () => {
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]" colSpan={3}>Confirm Supplier</th>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[15%]" colSpan={3}>Actual Received</th>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[7%]" rowSpan={2}>Response</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[10%]" rowSpan={2}>Actions</th>
                                     </tr>
                                     <tr>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-x border-b w-[5%]">QTY OK</th>
@@ -513,8 +600,8 @@ const AdminTransactionReport = () => {
                                     </tr>
                                     ))
                                 ) : paginatedData.length > 0 ? (
-                                    paginatedData.map((row, index) => (
-                                    <tr key={index} 
+                                    paginatedData.map((row) => (
+                                    <tr key={row.id} // Changed key from index to row.id for better reconciliation
                                     className={`hover:bg-gray-50 ${row.deliveryNote?.startsWith('System-') ? 'bg-danger bg-opacity-20' : ''}`}>
                                         <td className="px-1 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
@@ -522,9 +609,34 @@ const AdminTransactionReport = () => {
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partName}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.partNumber}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyNg}</td>
-                                        <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyTotal}</td>
+                                        {editingRowId === row.id ? (
+                                            <>
+                                                <td className="px-1 py-3 text-center whitespace-nowrap">
+                                                    <input
+                                                        type="number"
+                                                        value={editQtyOk}
+                                                        onChange={(e) => setEditQtyOk(e.target.value)}
+                                                        className="text-center border rounded p-1 focus:ring-primary focus:border-primary w-20"
+                                                        min="0"
+                                                    />
+                                                </td>
+                                                <td className="px-1 py-3 text-center whitespace-nowrap">
+                                                    <input
+                                                        type="number"
+                                                        value={editQtyNg}
+                                                        onChange={(e) => setEditQtyNg(e.target.value)}
+                                                        className="w-20 text-center border rounded p-1 focus:ring-primary focus:border-primary"
+                                                        min="0"
+                                                    />
+                                                </td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyOk}</td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">{row.qtyNg}</td>
+                                            </>
+                                        )}
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">{editingRowId === row.id ? (Number(editQtyOk) || 0) + (Number(editQtyNg) || 0) : row.qtyTotal}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">
                                             {row.actualQtyOk === null ? '-' : row.actualQtyOk}
                                         </td>
@@ -541,11 +653,38 @@ const AdminTransactionReport = () => {
                                         >
                                             {row.response || '-'}
                                         </td>
+                                        <td className="px-3 py-3 text-center whitespace-nowrap">
+                                            {editingRowId === row.id ? (
+                                                <div className="flex gap-2 justify-center">
+                                                    <Button
+                                                        title="Submit"
+                                                        onClick={handleSubmitEdit}
+                                                        className="text-xs text-white bg-success hover:bg-success-dark rounded"
+                                                        disabled={loading}
+                                                    />
+                                                    <Button
+                                                        title="Cancel"
+                                                        onClick={handleCancelEdit}
+                                                        className="text-xs text-white bg-red hover:bg-danger-dark rounded"
+                                                    />
+
+                                                </div>
+                                            ) : (
+                                                !row.deliveryNote?.startsWith('System-') && (
+                                                    <Button
+                                                        title="Edit"
+                                                        icon={FaEdit}
+                                                        onClick={() => handleEditClick(row)}
+                                                        className="text-xs text-white bg-primary hover:bg-primary-dark py-1 px-1 rounded"
+                                                    />
+                                                )
+                                            )}
+                                        </td>
                                     </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                    <td colSpan={13} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
+                                    <td colSpan={14} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
                                     </tr>
                                 )}
                                 </tbody>
@@ -569,6 +708,7 @@ const AdminTransactionReport = () => {
                                         {paginatedData.reduce((sum, row) => sum + ((row.actualQtyOk || 0) + (row.actualQtyNg || 0)), 0) || '-'}
                                     </td>
                                     <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td>
+                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td> {/* Cell for Actions column in tfoot */}
                                 </tr>
                                 </tfoot>
                             </table>
