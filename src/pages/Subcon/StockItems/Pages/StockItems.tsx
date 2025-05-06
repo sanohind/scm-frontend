@@ -4,7 +4,9 @@ import SearchBar from '../../../../components/Table/SearchBar';
 import Pagination from '../../../../components/Table/Pagination';
 import { toast, ToastContainer } from 'react-toastify';
 import { API_Item_Subcont } from '../../../../api/api';
-import { FaSortDown, FaSortUp } from 'react-icons/fa';
+import { FaFileExcel, FaSortDown, FaSortUp } from 'react-icons/fa';
+import * as XLSX from 'xlsx'; // Import xlsx
+import Button from '../../../../components/Forms/Button';
 
 const StockItems = () => {
   const [data, setData] = useState<StockItem[]>([]);
@@ -123,16 +125,71 @@ const StockItems = () => {
     setSortConfig({ key, direction });
   };
 
+  const handleExportExcel = () => {
+    if (!filteredData.length) {
+        toast.warn('No data available to export.');
+        return;
+    }
+
+    const header = [
+        "Part Number", "Part Name", "Old Part Name",
+        "Fresh - Unprocess Incoming Items", "Fresh - Ready Delivery Items", "Fresh - NG Items",
+        "Replating - Unprocess Incoming Items", "Replating - Ready Delivery Items", "Replating - NG Items"
+    ];
+
+    const body = filteredData.map(item => ({
+        "Part Number": item.part_number,
+        "Part Name": item.part_name,
+        "Old Part Name": item.old_part_name,
+        "Fresh - Unprocess Incoming Items": item.incoming_fresh_stock,
+        "Fresh - Ready Delivery Items": item.ready_fresh_stock,
+        "Fresh - NG Items": item.ng_fresh_stock,
+        "Replating - Unprocess Incoming Items": item.incoming_replating_stock,
+        "Replating - Ready Delivery Items": item.ready_replating_stock,
+        "Replating - NG Items": item.ng_replating_stock,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(body, { header: header, skipHeader: false });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Stock Items");
+
+    // Adjust column widths (optional, but improves readability)
+    const colWidths = header.map((_, i) => ({ wch: i < 3 ? 20 : 15 })); // Adjust widths as needed
+    worksheet['!cols'] = colWidths;
+
+    // Generate buffer
+    XLSX.writeFile(workbook, `Stock_Items_${new Date().toISOString().slice(0,10)}.xlsx`);
+    toast.success('Exported to Excel successfully!');
+  };
+
   return (
     <>
       <ToastContainer />
       <Breadcrumb pageName="Stock Items" />
       <div className="font-poppins bg-white text-black">
         <div className="p-2 md:p-4 lg:p-6 space-y-6">
-          <div className="flex justify-end md:w-1/2 lg:w-1/3">
-            <SearchBar
-              placeholder="Search part number or name..."
-              onSearchChange={setSearchQuery}
+          <div className="flex justify-end items-center space-x-2 md:w-1/2 lg:w-1/3 ml-auto">
+            <div>
+              <SearchBar
+                placeholder="Search part number or name..."
+                onSearchChange={setSearchQuery}
+              />
+            </div>
+            {/* <button
+                onClick={handleExportExcel}
+                disabled={!filteredData.length || loading}
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Export to Excel"
+            >
+                Export
+            </button> */}
+            <Button
+                title="Export Excel"
+                onClick={handleExportExcel}
+                disabled={!filteredData.length || loading}
+                color="bg-primary"
+                className="px-4 py-2 rounded-md hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                icon={FaFileExcel}
             />
           </div>
 
