@@ -277,13 +277,96 @@ const AdminTransactions = () => {
         }
 
         for (const part of partList) {
-            if (parseInt(part.qtyOk) <= 0) {
-                toast.error(`Qty OK for part ${part.partNumber} must be greater than 0`);
+            if (!part.qtyOk || part.qtyOk.trim() === '') {
+                toast.error(`Part ${part.partNumber}: Qty OK is required.`);
                 return;
             }
-            if (parseInt(part.qtyNg) < 0) {
-                toast.error(`Qty NG for part ${part.partNumber} cannot be negative`);
+
+            const qtyOk = parseInt(part.qtyOk, 10);
+            const qtyNg = parseInt(part.qtyNg || '0', 10); // Default Qty NG to 0 if empty or null
+
+            if (isNaN(qtyOk)) {
+                toast.error(`Part ${part.partNumber}: Qty OK ('${part.qtyOk}') is not a valid number.`);
                 return;
+            }
+            if (isNaN(qtyNg)) {
+                toast.error(`Part ${part.partNumber}: Qty NG ('${part.qtyNg}') is not a valid number.`);
+                return;
+            }
+
+            const currentPartSystemData = apiData.find(p => p.partNumber === part.partNumber);
+            if (!currentPartSystemData) {
+                toast.error(`System data for part ${part.partNumber} not found. Please refresh or re-add the part.`);
+                return;
+            }
+
+            if (value === 0) { // Incoming
+                const systemIncomingStock = status === 'Fresh' ? currentPartSystemData.incomingFreshStock : currentPartSystemData.incomingReplatingStock;
+
+                if (qtyOk < 0) { // Negative Qty OK for Incoming (reduction)
+                    if (Math.abs(qtyOk) > systemIncomingStock) {
+                        toast.error(`Part ${part.partNumber}: Negative Qty OK (${qtyOk}) exceeds current system incoming stock (${systemIncomingStock}).`);
+                        return;
+                    }
+                }
+                // For positive Qty OK on Incoming, no stock check is needed as it's new stock.
+
+                if (qtyNg < 0) {
+                    toast.error(`Part ${part.partNumber}: Qty NG cannot be negative for Incoming transactions.`);
+                    return;
+                }
+                // No specific stock check for positive Qty NG on Incoming.
+
+            } else if (value === 1) { // Process
+                // part.currentStock for Process refers to the stock being taken *from* incoming for processing.
+                // part.currentNgStock for Process refers to the NG stock of the item being processed (usually from incoming if relevant).
+
+                if (qtyOk > 0) { // Positive Qty OK for Process (consuming input stock)
+                    if (qtyOk > part.currentStock) {
+                        toast.error(`Part ${part.partNumber}: Qty OK to process (${qtyOk}) exceeds available input stock (${part.currentStock}).`);
+                        return;
+                    }
+                } else if (qtyOk < 0) { // Negative Qty OK for Process (correction of output/ready stock)
+                    const systemReadyStock = status === 'Fresh' ? currentPartSystemData.readyFreshStock : currentPartSystemData.readyReplatingStock;
+                    if (Math.abs(qtyOk) > systemReadyStock) { 
+                        toast.error(`Part ${part.partNumber}: Negative Qty OK (${qtyOk}) correction for Process exceeds current system ready stock (${systemReadyStock}).`);
+                        return;
+                    }
+                }
+
+                if (qtyNg < 0) { // Negative Qty NG for Process (correction)
+                    // Check against the NG stock that was part of the input batch, if applicable, or general NG stock.
+                    // For simplicity, using part.currentNgStock which is set based on incoming NG stock.
+                    if (Math.abs(qtyNg) > part.currentNgStock) {
+                        toast.error(`Part ${part.partNumber}: Negative Qty NG (${qtyNg}) correction for Process exceeds current NG stock (${part.currentNgStock}).`);
+                        return;
+                    }
+                }
+                // For positive Qty NG on Process, no stock check as these are newly generated NG items.
+
+            } else if (value === 2) { // Outgoing
+                // part.currentStock for Outgoing refers to the ready stock.
+                // part.currentNgStock for Outgoing refers to the ready NG stock.
+
+                if (qtyOk < 0) { // Qty OK must be positive for Outgoing
+                    toast.error(`Part ${part.partNumber}: Qty OK must be positive for Outgoing transactions.`);
+                    return;
+                }
+                if (qtyOk > part.currentStock) {
+                    toast.error(`Part ${part.partNumber}: Qty OK to dispatch (${qtyOk}) exceeds available ready stock (${part.currentStock}).`);
+                    return;
+                }
+
+                if (qtyNg < 0) {
+                    toast.error(`Part ${part.partNumber}: Qty NG cannot be negative for Outgoing transactions.`);
+                    return;
+                }
+                if (qtyNg > 0) { // If dispatching NG items
+                    if (qtyNg > part.currentNgStock) {
+                        toast.error(`Part ${part.partNumber}: Qty NG to dispatch (${qtyNg}) exceeds available NG stock (${part.currentNgStock}).`);
+                        return;
+                    }
+                }
             }
         }
 

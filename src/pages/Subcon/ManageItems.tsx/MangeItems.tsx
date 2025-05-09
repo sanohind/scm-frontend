@@ -478,7 +478,7 @@ const ManageItems: React.FC = () => {
                                                 min="0" // Optional: prevent negative numbers
                                             />
                                         ) : (
-                                            item.min_stock_incoming
+                                            item.min_stock_incoming || '-'
                                         )}
                                     </td>
                                     {/* Added TD for Min Stock Outgoing */}
@@ -492,7 +492,7 @@ const ManageItems: React.FC = () => {
                                                 min="0" // Optional: prevent negative numbers
                                             />
                                         ) : (
-                                            item.min_stock_outgoing
+                                            item.min_stock_outgoing || '-'
                                         )}
                                     </td>
                                     <td className="px-3 py-3 text-center whitespace-nowrap border">

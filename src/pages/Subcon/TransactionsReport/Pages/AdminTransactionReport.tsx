@@ -322,16 +322,24 @@ const AdminTransactionReport = () => {
         XLSX.writeFile(wb, `transaction_report_${selectedSupplier?.value}__${startDateString}_to_${endDateString}.xlsx`);
     };
 
-    const handleEditClick = (row: TransactionLog) => {
-        setEditingRowId(row.id);
-        setEditQtyOk(String(row.qtyOk));
-        setEditQtyNg(String(row.qtyNg));
-    };
-
     const handleCancelEdit = () => {
         setEditingRowId(null);
         setEditQtyOk('');
         setEditQtyNg('');
+    };
+
+    const handleEditClick = (row: TransactionLog) => {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+        if (new Date(row.timestamp) < oneWeekAgo) {
+            toast.warning('You can only edit transactions from the last week.');
+            return;
+        }
+    
+        setEditingRowId(row.id);
+        setEditQtyOk(String(row.qtyOk));
+        setEditQtyNg(String(row.qtyNg));
     };
 
     const handleSubmitEdit = async () => {
@@ -603,7 +611,7 @@ const AdminTransactionReport = () => {
                                     paginatedData.map((row) => (
                                     <tr key={row.id} // Changed key from index to row.id for better reconciliation
                                     className={`hover:bg-gray-50 ${row.deliveryNote?.startsWith('System-') ? 'bg-danger bg-opacity-20' : ''}`}>
-                                        <td className="px-1 py-3 text-center whitespace-nowrap">{new Date(row.timestamp).toLocaleString()}</td>
+                                        <td className="px-1 py-3 text-center whitespace-nowrap">{row.timestamp}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.deliveryNote}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.type}</td>
                                         <td className="px-3 py-3 text-center whitespace-nowrap">{row.status}</td>
@@ -670,13 +678,15 @@ const AdminTransactionReport = () => {
 
                                                 </div>
                                             ) : (
-                                                !row.deliveryNote?.startsWith('System-') && (
-                                                    <Button
-                                                        title="Edit"
-                                                        icon={FaEdit}
-                                                        onClick={() => handleEditClick(row)}
-                                                        className="text-xs text-white bg-primary hover:bg-primary-dark py-1 px-1 rounded"
-                                                    />
+                                                !row.deliveryNote?.startsWith('System-') && row.type !== 'Outgoing' && (
+                                                    new Date(row.timestamp) >= new Date(new Date().setDate(new Date().getDate() - 7)) && (
+                                                        <Button
+                                                            title="Edit"
+                                                            icon={FaEdit}
+                                                            onClick={() => handleEditClick(row)}
+                                                            className="text-xs text-white bg-primary hover:bg-primary-dark py-1 px-1 rounded"
+                                                        />
+                                                    )
                                                 )
                                             )}
                                         </td>

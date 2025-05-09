@@ -189,47 +189,44 @@ const Transactions = () => {
 
   useEffect(() => {
     if (status && partList.length > 0) {
-      setPartList((prev) =>
-        prev.map((pt) => {
-          const matched = apiData.find((item) => item.partNumber === pt.partNumber);
-          if (!matched) return pt;
-          
-          if (value === 2) {
-            if (status === 'Fresh') {
-              return {
-                ...pt,
-                currentStock: matched.readyFreshStock ?? 0,
-                currentNgStock: matched.ngFreshStock ?? 0,
-              };
-            } else {
-              return {
-                ...pt,
-                currentStock: matched.readyReplatingStock ?? 0,
-                currentNgStock: matched.ngReplatingStock ?? 0,
-              };
-            }
+      setPartList(prevPartList => {
+        let hasChanged = false;
+        const newPartList = prevPartList.map(pt => {
+          const matchedApiData = apiData.find(item => item.partNumber === pt.partNumber);
+          if (!matchedApiData) {
+            return pt; // No data to update from, return original part
           }
-          
-          if (value === 1) {
-            if (status === 'Fresh') {
-              return {
-                ...pt,
-                currentStock: matched.incomingFreshStock ?? 0,
-                currentNgStock: matched.ngFreshStock ?? 0,
-              };
-            } else {
-              return {
-                ...pt,
-                currentStock: matched.incomingReplatingStock ?? 0,
-                currentNgStock: matched.ngReplatingStock ?? 0,
-              };
-            }
+
+          let newCurrentStock = pt.currentStock;
+          let newCurrentNgStock = pt.currentNgStock;
+
+          if (value === 1) { // Process Tab
+            newCurrentStock = status === 'Fresh' ? matchedApiData.incomingFreshStock ?? 0 : matchedApiData.incomingReplatingStock ?? 0;
+            newCurrentNgStock = status === 'Fresh' ? matchedApiData.ngFreshStock ?? 0 : matchedApiData.ngReplatingStock ?? 0;
+          } else if (value === 2) { // Outgoing Tab
+            newCurrentStock = status === 'Fresh' ? matchedApiData.readyFreshStock ?? 0 : matchedApiData.readyReplatingStock ?? 0;
+            newCurrentNgStock = status === 'Fresh' ? matchedApiData.ngFreshStock ?? 0 : matchedApiData.ngReplatingStock ?? 0;
           }
-          return pt;
-        })
-      );
+          // For value === 0, stocks are not updated from apiData by this effect.
+
+          if (pt.currentStock !== newCurrentStock || pt.currentNgStock !== newCurrentNgStock) {
+            hasChanged = true;
+            return {
+              ...pt,
+              currentStock: newCurrentStock,
+              currentNgStock: newCurrentNgStock,
+            };
+          }
+          return pt; // Return original part object if no change in stock values
+        });
+
+        if (hasChanged) {
+          return newPartList;
+        }
+        return prevPartList; // Return the original list if no changes, breaking potential loops
+      });
     }
-  }, [apiData, status, value]);
+  }, [apiData, status, value, partList]); // partList is a dependency, careful handling is needed
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value;
@@ -290,19 +287,106 @@ const Transactions = () => {
   };
 
   const handleSubmit = async () => {
+    // Initial checks for status and deliveryNote
+    if (!status && (value === 0 || value === 1 || value === 2)) {
+      toast.error('Please select a status');
+      return;
+    }
+    // Delivery note is required for Incoming (0) and Outgoing (2)
+    if (!deliveryNote && (value === 0 || value === 2)) {
+      toast.error('Please enter a delivery note for Incoming/Outgoing transactions');
+      return;
+    }
+
     if (partList.length === 0) {
       toast.error('Please add at least one part');
       return;
     }
 
     for (const part of partList) {
-      if (parseInt(part.qtyOk) <= 0) {
-        toast.error(`Qty OK for part ${part.partNumber} must be greater than 0`);
+      const qtyOk = parseInt(part.qtyOk || '0', 10);
+      const qtyNg = parseInt(part.qtyNg || '0', 10);
+
+      if (isNaN(qtyOk)) {
+        toast.error(`Invalid Qty OK for part ${part.partNumber}. It must be a number.`);
         return;
       }
-      if (parseInt(part.qtyNg) < 0) {
-        toast.error(`Qty NG for part ${part.partNumber} cannot be negative`);
+      if (isNaN(qtyNg)) {
+        toast.error(`Invalid Qty NG for part ${part.partNumber}. It must be a number.`);
         return;
+      }
+
+      const currentPartSystemData = apiData.find(p => p.partNumber === part.partNumber);
+      if (!currentPartSystemData) {
+        toast.error(`Part data not found for ${part.partNumber}. Please refresh.`);
+        return;
+      }
+
+      // Incoming Transaction (value === 0)
+      if (value === 0) {
+        if (qtyOk < 0) { // Reduction of incoming stock
+          const stockToCheck = status === 'Fresh' ? currentPartSystemData.incomingFreshStock : currentPartSystemData.incomingReplatingStock;
+          if (Math.abs(qtyOk) > stockToCheck) {
+            toast.error(`Qty OK for ${part.partNumber} (${status}) cannot reduce stock by more than available incoming stock (${stockToCheck}).`);
+            return;
+          }
+        }
+        // qtyOk > 0 is adding new stock, no upper bound against current stock.
+        if (qtyNg < 0) {
+          toast.error(`Qty NG for ${part.partNumber} (${status}) cannot be negative for Incoming transactions.`);
+          return;
+        }
+        // qtyNg > 0 is adding new NG stock, no upper bound against current stock.
+      }
+      // Process Transaction (value === 1)
+      else if (value === 1) {
+        if (qtyOk > 0) { // Consuming input for process
+          const stockToConsume = status === 'Fresh' ? currentPartSystemData.incomingFreshStock : currentPartSystemData.incomingReplatingStock;
+          if (qtyOk > stockToConsume) {
+            toast.error(`Qty OK for ${part.partNumber} (${status}) to process cannot exceed available incoming stock (${stockToConsume}).`);
+            return;
+          }
+        } else if (qtyOk < 0) { // Correction of process output (reducing ready stock)
+          const stockToCorrect = status === 'Fresh' ? currentPartSystemData.readyFreshStock : currentPartSystemData.readyReplatingStock;
+          if (Math.abs(qtyOk) > stockToCorrect) {
+            toast.error(`Qty OK for ${part.partNumber} (${status}) correction cannot reduce ready stock by more than available (${stockToCorrect}).`);
+            return;
+          }
+        }
+        // No validation for qtyOk === 0 for Process.
+
+        if (qtyNg < 0) { // Correction of NG stock (reducing NG stock)
+          const ngStockToCorrect = status === 'Fresh' ? currentPartSystemData.ngFreshStock : currentPartSystemData.ngReplatingStock;
+          if (Math.abs(qtyNg) > ngStockToCorrect) {
+            toast.error(`Qty NG for ${part.partNumber} (${status}) correction cannot reduce NG stock by more than available (${ngStockToCorrect}).`);
+            return;
+          }
+        }
+        // If qtyNg > 0, it's generating new NG items from process, no upper bound check against current NG stock.
+      }
+      // Outgoing Transaction (value === 2)
+      else if (value === 2) {
+        if (qtyOk < 0) {
+          toast.error(`Qty OK for ${part.partNumber} (${status}) must be positive for Outgoing transactions.`);
+          return;
+        }
+        const readyStockToDispatch = status === 'Fresh' ? currentPartSystemData.readyFreshStock : currentPartSystemData.readyReplatingStock;
+        if (qtyOk > readyStockToDispatch) {
+          toast.error(`Qty OK for ${part.partNumber} (${status}) cannot exceed available ready stock (${readyStockToDispatch}).`);
+          return;
+        }
+
+        if (qtyNg < 0) {
+          toast.error(`Qty NG for ${part.partNumber} (${status}) cannot be negative for Outgoing transactions.`);
+          return;
+        }
+        if (qtyNg > 0) { // Dispatching NG items
+          const ngStockToDispatch = status === 'Fresh' ? currentPartSystemData.ngFreshStock : currentPartSystemData.ngReplatingStock;
+          if (qtyNg > ngStockToDispatch) {
+            toast.error(`Qty NG for ${part.partNumber} (${status}) to dispatch cannot exceed available NG stock (${ngStockToDispatch}).`);
+            return;
+          }
+        }
       }
     }
 
