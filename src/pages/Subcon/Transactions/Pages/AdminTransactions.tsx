@@ -18,7 +18,7 @@ import { FaUpload, FaDownload, FaExclamationCircle } from 'react-icons/fa';
 const AdminTransactions = () => {
     const [value, setValue] = useState(0);
     const [selectedPart, setSelectedPart] = useState<{ value: string; label: string } | null>(null);
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState('');    
     const [deliveryNote, setDeliveryNote] = useState('');
     const [apiData, setApiData] = useState<{
         partNumber: string;
@@ -30,7 +30,27 @@ const AdminTransactions = () => {
         incomingReplatingStock: number;
         readyReplatingStock: number;
         ngReplatingStock: number;
-    }[]>([]);
+    }[]>([]);    // Handle delivery note input - only allow alphanumeric characters (letters and numbers only)
+    const handleDeliveryNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const originalLength = value.length;
+        // Allow only letters and numbers (no spaces or symbols)
+        const filteredValue = value.replace(/[^a-zA-Z0-9]/g, '');
+        
+        // Show warning if invalid characters were removed
+        if (filteredValue.length < originalLength) {
+            toast.warning('Only letters and numbers are allowed in delivery note', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+        }
+        
+        setDeliveryNote(filteredValue);
+    };
     const [transactionDate, setTransactionDate] = useState<Date>(new Date());
     const [partList, setPartList] = useState<any[]>([]);
     const [suppliers, setSuppliers] = useState([]);
@@ -708,12 +728,12 @@ const AdminTransactions = () => {
                         <div className="mb-4">
                         <label className="mb-2 block text-black">
                             Delivery Note <span className="text-meta-1">*</span>
-                        </label>
+                        </label>                        
                         <input
                             type="text"
                             value={deliveryNote}
-                            onChange={(e) => setDeliveryNote(e.target.value)}
-                            placeholder="Enter Delivery Note"
+                            onChange={handleDeliveryNoteChange}
+                            placeholder="Enter Delivery Note (letters and numbers only)"
                             className="w-full rounded border border-stroke py-3 px-3 text-black outline-none transition focus:border-primary active:border-primary"
                             required
                         />
