@@ -26,11 +26,14 @@ const PasswordInput: FC<PasswordInputProps> = ({ password, setPassword, isRequir
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required={isRequired}
-          />
+          />          
           <button
             type="button"
             onClick={togglePassword}
             className="absolute inset-y-0 right-0 flex items-center z-20 px-3 cursor-pointer text-gray-400 rounded-e-md focus:outline-none focus:text-blue-600"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            tabIndex={0}
           >
             <svg
               id="eye-icon"

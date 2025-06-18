@@ -23,26 +23,35 @@ const SignIn: React.FC = () => {
   return (
     <>
       <ToastContainer position="top-right" />
+      {/* Preload critical images */}
+      <link rel="preload" as="image" href={FotoSanoh} />
+      <link rel="preload" as="image" href={Logo} />
+      
       <div className="">
-        <section className="flex h-screen w-screen overflow-y-auto flex-col p-5 bg-white max-md:pr-12 max-sm:flex max-sm:flex-col max-sm:mx-5 max-sm:mt-5">
+        <section className="flex h-screen w-screen overflow-y-auto flex-col p-5 bg-white max-md:pr-12 max-sm:flex max-sm:flex-col max-sm:mx-5 max-sm:mt-5" role="main" aria-label="Sign in page">
           <div className="flex gap-5 max-md:flex-col my-auto mx-auto">
-            <div className="flex-col ml-auto w-6/12 max-md:ml-0 max-md:w-full hidden md:flex">
-              <img
-                loading="lazy"
-                src={FotoSanoh}
-                alt="Login illustration"
-                className="object-contain grow w-full h-auto aspect-[0.71] max-w-[710px] max-md:mt-10 max-md:max-w-[286px] max-sm:self-stretch max-sm:m-auto max-sm:w-full max-sm:max-w-[296px]"
-              />
+            <div className="flex-col ml-auto w-6/12 max-md:ml-0 max-md:w-full hidden md:flex" aria-hidden="true">
+              <div className="image-container">
+                <img
+                  src={FotoSanoh}
+                  alt="SANOH Indonesia office building illustration"
+                  className="object-contain grow w-full h-auto aspect-[0.71] max-w-[710px] max-md:mt-10 max-md:max-w-[286px] max-sm:self-stretch max-sm:m-auto max-sm:w-full max-sm:max-w-[296px] critical-image"
+                  width="710"
+                  height="1000"
+                  style={{ contentVisibility: 'auto' }}
+                />
+              </div>
             </div>
-            <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full my-auto">
+            <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full my-auto ">
               <div className="flex flex-col mr-auto w-full max-w-[500px] max-md:mt-10 max-md:ml-0 max-sm:mt-5 max-sm:ml-auto max-sm:max-w-[301px]">
                 <img
-                  loading="lazy"
                   src={Logo}
-                  alt="Company logo"
-                  className="object-contain max-w-full aspect-[2.79] w-[120px] max-md:ml-1"
+                  alt="PT SANOH Indonesia company logo"
+                  className="object-contain max-w-full aspect-[2.79] w-[120px] max-md:ml-1 critical-image"
+                  width="120"
+                  height="43"
                 />
-                <form className="flex flex-col mt-6 w-full" onSubmit={onSubmit} autoComplete="off">
+                <form className="flex flex-col mt-6 w-full" onSubmit={onSubmit} autoComplete="off" role="form" aria-label="Sign in form">
                   <div className="flex flex-col">
                     <label htmlFor="username" className="text-base text-slate-800 mb-2">
                       Username
@@ -50,13 +59,19 @@ const SignIn: React.FC = () => {
                     <input
                       type="text"
                       id="username"
+                      name="username"
                       autoFocus
                       placeholder="Enter Username"
-                      className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] shadow-[0px_4px_8px_rgba(70,95,241,0.1)] text-base text-black"
+                      className="px-4 py-3.5 w-full bg-white rounded-lg border border-solid border-indigo-600 border-opacity-40 min-h-[48px] simple-shadow text-base text-black form-input focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
+                      aria-describedby="username-description"
+                      aria-invalid={username.length > 0 && username.length < 3 ? 'true' : 'false'}
                     />
+                    <div id="username-description" className="sr-only">
+                      Enter your username to sign in
+                    </div>
                   </div>
 
                   <div className="flex flex-col mb-5 mt-3">
@@ -66,8 +81,9 @@ const SignIn: React.FC = () => {
                   <button
                     id="login-button"
                     type="submit"
-                    className="gap-2 self-stretch px-5 py-3 mt-7 text-base text-white whitespace-nowrap rounded-lg bg-blue-900 min-h-[48px] hover:bg-blue-950 focus:ring-4 focus:ring-blue-300"
+                    className="gap-2 self-stretch px-5 py-3 mt-7 text-base text-white whitespace-nowrap rounded-lg bg-blue-900 min-h-[48px] hover:bg-blue-950 focus:ring-4 focus:ring-blue-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     disabled={isLoading}
+                    aria-describedby="login-status"
                   >
                     {isLoading ? (
                       <>
@@ -88,20 +104,26 @@ const SignIn: React.FC = () => {
                             fill="currentColor"
                           />
                         </svg>
-                        Loading...
+                        <span>Signing in...</span>
                       </>
                     ) : (
                       'Sign In'
                     )}
                   </button>
+                  <div id="login-status" className="sr-only" aria-live="polite">
+                    {isLoading ? 'Signing in, please wait...' : 'Ready to sign in'}
+                  </div>
                 </form>
                 <p className="self-center mt-9 text-xs font-medium text-center text-slate-800 w-[259px] max-md:mt-10 max-sm:self-center">
-                  <span className="text-zinc-400">By Signing in, I accept the company&apos;s</span>
+                  <span className="text-slate-600">By Signing in, I accept the company&apos;s</span>
                   <br />
                     <button
                     onClick={() => {
                       const modal = document.createElement('div');
-                      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center';
+                      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center gpu-accelerated';
+                      modal.setAttribute('role', 'dialog');
+                      modal.setAttribute('aria-modal', 'true');
+                      modal.setAttribute('aria-labelledby', 'modal-title');
                       
                       // Handle click outside to close
                       modal.addEventListener('click', (e) => {
@@ -110,15 +132,24 @@ const SignIn: React.FC = () => {
                       }
                       });
 
+                      // Handle escape key
+                      const handleEscape = (e: KeyboardEvent) => {
+                        if (e.key === 'Escape') {
+                          modal.remove();
+                          document.removeEventListener('keydown', handleEscape);
+                        }
+                      };
+                      document.addEventListener('keydown', handleEscape);
+
                       modal.innerHTML = `
-                      <div class="bg-white p-8 rounded-lg relative max-w-2xl">
-                        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-800" onclick="this.parentElement.parentElement.remove()">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div class="bg-white p-8 rounded-lg relative max-w-2xl simple-shadow gpu-accelerated" role="document">
+                        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 focus:ring-2 focus:ring-blue-500 rounded p-1" onclick="this.parentElement.parentElement.remove()" aria-label="Close modal">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         </button>
-                        <h2 class="text-xl font-bold mb-4">Terms of Use & Privacy Policy</h2>
-                        <div class="text-gray-700">
+                        <h2 id="modal-title" class="text-xl font-bold mb-4">Terms of Use & Privacy Policy</h2>
+                        <div class="text-gray-700 ">
                         <h3 class="font-semibold mb-2">Terms of Use</h3>
                         <p class="mb-4">By using our service, you agree to follow all applicable laws and regulations. You are responsible for maintaining the confidentiality of your account.</p>
                         <h3 class="font-semibold mb-2">Privacy Policy</h3>
@@ -127,8 +158,13 @@ const SignIn: React.FC = () => {
                       </div>
                       `;
                       document.body.appendChild(modal);
+                      
+                      // Focus the close button for keyboard navigation
+                      const closeButton = modal.querySelector('button');
+                      closeButton?.focus();
                     }}
-                    className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
+                    className="text-blue-600 hover:text-blue-800 underline cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none rounded"
+                    aria-label="Open Terms of Use and Privacy Policy"
                     >
                     Terms of Use & Privacy Policy
                     </button>
