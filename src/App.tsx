@@ -30,6 +30,7 @@ import IndexTransactions from "./pages/Subcon/Transactions/IndexTransactions";
 import IndexTransactionsReview from "./pages/Subcon/TransactionsReview/IndexTransactionsReview";
 import TransactionsReviewDetail from "./pages/Subcon/TransactionsReview/Pages/Detail/TransactionsReviewDetail";
 import ManageOrganization from "./pages/ManageUser/Pages/ManageOrganization";
+import ProfileSetting from "./pages/ProfileSetting";
 
 const App: React.FC = () => {
   return (
@@ -78,14 +79,21 @@ const App: React.FC = () => {
                   <Dashboard />
                 </ProtectedRoute>
               }
-            />
-
-            <Route
+            />            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute allowedRoles={['1','2','3','4','5','6','7','8','9']}>
                   <PageTitle title="Dashboard | PT SANOH INDONESIA" />
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile-setting"
+              element={
+                <ProtectedRoute allowedRoles={['1','2','3','4','5','6','7','8','9']}>
+                  <PageTitle title="Profile Settings | PT SANOH INDONESIA" />
+                  <ProfileSetting />
                 </ProtectedRoute>
               }
             />

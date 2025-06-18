@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import UserLogo from '../../images/user/user_logo_default.png';
 import { useAuth } from '../../pages/Authentication/AuthContext';
 import ClickOutside from '../../components/ClickOutside';
+import { FaGear } from 'react-icons/fa6';
 
 
 const DropdownUser = () => {
@@ -94,11 +95,18 @@ const DropdownUser = () => {
       {/* Dropdown Start */}
       {dropdownOpen && (
         <div
-          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
+          className={`absolute right-0 mt-4 flex w-60 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         > 
+          <Link
+            to="/profile-setting"
+            className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base border-b-2 border-stroke dark:border-strokedark dark:hover:text-primary"
+          >
+            <FaGear />
+            Profile Settings
+          </Link>
           <button
             onClick={handleLogout} // Panggil handleLogout ketika diklik
-            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            className="flex items-center gap-3.5 px-4 py-3 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
           >
             <svg
               className="fill-current"
