@@ -18,6 +18,8 @@ export const API_Dashboard = () => API + getRolePath() + `/dashboard`;
 export const API_PO_DN_Year_Data = () => API + getRolePath() + `/yearData`;
 export const API_Event = () => API + getRolePath() + `/event`;
 
+export const API_Change_Password = () => API + getRolePath() + `/change-password`;
+
 export const API_Print_PO = () => API + getRolePath() + `/po/print/`;
 export const API_Print_DN = () => API + getRolePath() + `/dn/print/`;
 export const API_Print_DN_Confirm = () => API + getRolePath() + `/dn/print/qty-confirm/`;

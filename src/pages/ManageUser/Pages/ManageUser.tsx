@@ -3,12 +3,13 @@ import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '../../../components/Table/Pagination';
 import SearchBar from '../../../components/Table/SearchBar';
-import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit, FaUserPlus } from 'react-icons/fa';
+import { FaSortDown, FaSortUp, FaToggleOff, FaToggleOn, FaUserEdit, FaUserPlus, FaTrash } from 'react-icons/fa';
 import MultiSelect from '../../../components/Forms/MultiSelect';
 import { toast, ToastContainer } from 'react-toastify';
-import { API_List_User_Admin, API_Update_Status_Admin } from '../../../api/api';
+import { API_List_User_Admin, API_Update_Status_Admin, API_Delete_User_Admin } from '../../../api/api';
 import Button from '../../../components/Forms/Button';
 import { getRoleName } from '../../Authentication/Role';
+import Swal from 'sweetalert2';
 
 interface User {
     UserID: string;
@@ -18,6 +19,7 @@ interface User {
     Role: string;
     Status: string;
     RoleCode: string;
+    deleted?: boolean;
     isLoading?: boolean;
 }
 
@@ -62,7 +64,7 @@ const ManageUser: React.FC = () => {
 
             if (!response.ok) throw new Error('Network response was not ok');
 
-            const result = await response.json();
+            const result = await response.json();            
             const users = result.data.map((user: any) => ({
                 UserID: user.user_id,
                 SupplierCode: user.bp_code,
@@ -71,6 +73,7 @@ const ManageUser: React.FC = () => {
                 Role: getRoleName(user.role),
                 RoleCode: user.role,
                 Status: user.status === 1 ? 'Active' : 'Deactive',
+                deleted: user.deleted || false,
             }));
 
             setData(users);
@@ -130,6 +133,64 @@ const ManageUser: React.FC = () => {
             await response.json();
             // await fetchListUser();
             setData(data.map((item) => item.UserID === userId ? { ...item, Status: status === 1 ? 'Active' : 'Deactive', isLoading: false } : item));
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const handleDeleteUser = async (userId: string, username: string) => {
+        const token = localStorage.getItem('access_token');
+
+        const confirmResult = await Swal.fire({
+            title: `Are you sure you want to delete "${username}"?`,
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (!confirmResult.isConfirmed) {
+            setData(data.map((item) => item.UserID === userId ? { ...item, isLoading: false } : item));
+            return;
+        }
+        
+
+        try {
+            const response = await toast.promise(
+                fetch(`${API_Delete_User_Admin()}${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }),
+                {
+                    pending: {
+                        render: `Deleting user "${username}"...`,
+                        autoClose: 3000
+                    },
+                    success: {
+                        render: `User "${username}" Successfully Deleted`,
+                        autoClose: 3000
+                    },
+                    error: {
+                        render({data}) {
+                            return `Failed to delete user "${username}": ${data}`;
+                        },
+                        autoClose: 3000
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}`);
+            }
+
+            await response.json();
+            await fetchListUser();
         } catch (error) {
             throw error;
         }
@@ -292,9 +353,10 @@ const ManageUser: React.FC = () => {
                                                 )}
                                                 Status
                                             </span>
-                                        </th>
+                                        </th>                                        
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%]">Action</th>
                                         <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%]">Edit User</th>
+                                        <th className="px-3 py-3.5 text-sm font-bold text-gray-700 uppercase tracking-wider text-center border-b w-[10%]">Delete User</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -315,6 +377,9 @@ const ManageUser: React.FC = () => {
                                                 </td>
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">
                                                     <div className="h-4 bg-gray-200 rounded"></div>
+                                                </td>                                                
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <div className="w-8 h-8 mx-auto bg-gray-200 rounded-full"></div>
                                                 </td>
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">
                                                     <div className="w-8 h-8 mx-auto bg-gray-200 rounded-full"></div>
@@ -354,7 +419,7 @@ const ManageUser: React.FC = () => {
                                                             }
                                                         </button>
                                                     )}
-                                                </td>
+                                                </td>                                                
                                                 <td className="px-3 py-3 text-center whitespace-nowrap">
                                                     <button
                                                         onClick={() => handleEditPage(row.UserID)}
@@ -363,11 +428,31 @@ const ManageUser: React.FC = () => {
                                                         <FaUserEdit className="text-2xl text-blue-900" />
                                                     </button>
                                                 </td>
+                                                <td className="px-3 py-3 text-center whitespace-nowrap">
+                                                    <button
+                                                        onClick={async () => {
+                                                            const updatedData = data.map(item =>
+                                                                item.UserID === row.UserID ? { ...item, isLoading: true } : item
+                                                            );
+                                                            setData(updatedData);
+                                                            await handleDeleteUser(row.UserID, row.Username);
+                                                        }}
+                                                        disabled={row.deleted}
+                                                        className={`transition-opacity ${
+                                                            row.deleted 
+                                                                ? 'opacity-50 cursor-not-allowed' 
+                                                                : 'hover:opacity-80'
+                                                        }`}
+                                                    >
+                                                        <FaTrash className={`text-2xl ${
+                                                            row.deleted ? 'text-gray-400' : 'text-red-600'
+                                                        }`} />
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={7} className="px-3 py-4 text-center text-gray-500">
+                                    ) : (                                        <tr>
+                                            <td colSpan={8} className="px-3 py-4 text-center text-gray-500">
                                                 No List User available for now
                                             </td>
                                         </tr>
