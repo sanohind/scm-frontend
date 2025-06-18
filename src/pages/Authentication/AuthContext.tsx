@@ -103,10 +103,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         sessionStorage.setItem('login_error', error.response.data.message);
-        setTimeout(() => window.location.reload(), 100);
+        // setTimeout(() => window.location.reload(), 100);
       } else {
         sessionStorage.setItem('login_error', 'An unexpected error occurred');
-        setTimeout(() => window.location.reload(), 100);
+        // setTimeout(() => window.location.reload(), 100);
       }
       return false;
     } finally {
