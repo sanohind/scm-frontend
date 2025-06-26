@@ -5,7 +5,7 @@ import SearchBar from '../../../../components/Table/SearchBar';
 import Pagination from '../../../../components/Table/Pagination';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { 
     API_List_Partner_Admin, 
     API_Transaction_Review_Subcont_Admin } from '../../../../api/api';
