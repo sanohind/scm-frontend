@@ -90,7 +90,7 @@ const AdminTransactionReview = () => {
             } else {
                 setData([]);
                 setFilteredData([]);
-                toast.info(`No transaction found for ${supplierCode}`);
+                // toast.info(`No transaction found for ${supplierCode}`);
                 setLoading(false);
             }
         } catch (error) {
@@ -194,7 +194,7 @@ const AdminTransactionReview = () => {
 
     return (
         <>
-            <ToastContainer position="top-right" />
+            {/* <ToastContainer position="top-right" /> */}
             <Breadcrumb pageName="Transaction Review" />
             <div className="font-poppins bg-white">
                 <div className="p-2 md:p-4 lg:p-6 space-y-6">

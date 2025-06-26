@@ -27,6 +27,7 @@ const AdminTransactionReport = () => {
         actualQtyNg: number;
         actualQtyTotal: number;
         response: string;
+        allowEdit: boolean;
     }
     
     interface Supplier {
@@ -160,6 +161,7 @@ const AdminTransactionReport = () => {
                     actualQtyNg: item.actual_qty_ng,
                     actualQtyTotal: item.actual_qty_total,
                     response: item.response,
+                    allowEdit: item.allow_edit,
                 }));
                 setAllData(logs);
                 setFilteredData(logs);
@@ -329,11 +331,18 @@ const AdminTransactionReport = () => {
     };
 
     const handleEditClick = (row: TransactionLog) => {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        if (!row.allowEdit) {
+            toast.warning('This transaction is not allowed to be edited.');
+            return;
+        }
+
+        // Calculate 7 days minus 1 hour ago (6 days and 23 hours)
+        const editCutoff = new Date();
+        editCutoff.setDate(editCutoff.getDate() - 7);
+        editCutoff.setHours(editCutoff.getHours() + 1); // Add 1 hour to make it 6 days 23 hours ago
     
-        if (new Date(row.timestamp) < oneWeekAgo) {
-            toast.warning('You can only edit transactions from the last week.');
+        if (new Date(row.timestamp) < editCutoff) {
+            toast.warning('You can only edit transactions within 6 days and 23 hours from the transaction time.');
             return;
         }
     
@@ -675,51 +684,65 @@ const AdminTransactionReport = () => {
                                                         onClick={handleCancelEdit}
                                                         className="text-xs text-white bg-red hover:bg-danger-dark rounded"
                                                     />
-
                                                 </div>
                                             ) : (
-                                                !row.deliveryNote?.startsWith('System-') && row.type !== 'Outgoing' && (
-                                                    new Date(row.timestamp) >= new Date(new Date().setDate(new Date().getDate() - 7)) && (
+                                                !row.deliveryNote?.startsWith('System-') && 
+                                                row.type !== 'Outgoing' && 
+                                                (() => {
+                                                    const editCutoff = new Date();
+                                                    editCutoff.setDate(editCutoff.getDate() - 7);
+                                                    editCutoff.setHours(editCutoff.getHours() + 1); // 6 days 23 hours ago
+                                                    const isWithinTimeLimit = new Date(row.timestamp) >= editCutoff;
+                                                    
+                                                    // Show button only if within time limit
+                                                    if (!isWithinTimeLimit) return null;
+                                                    return (
                                                         <Button
                                                             title="Edit"
                                                             icon={FaEdit}
                                                             onClick={() => handleEditClick(row)}
-                                                            className="text-xs text-white bg-primary hover:bg-primary-dark py-1 px-1 rounded"
+                                                            className={`text-xs text-white py-1 px-1 rounded ${
+                                                                row.allowEdit 
+                                                                    ? 'bg-primary hover:bg-primary-dark cursor-pointer' 
+                                                                    : 'bg-gray-400 cursor-not-allowed'
+                                                            }`}
+                                                            disabled={!row.allowEdit}
                                                         />
-                                                    )
-                                                )
+                                                    );
+                                                })()
                                             )}
                                         </td>
                                     </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                    <td colSpan={14} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
+                                        <td colSpan={14} className="px-3 py-4 text-center text-gray-500">No data available. Please Select Date Range</td>
                                     </tr>
                                 )}
                                 </tbody>
                                 <tfoot className="bg-gray-50">
-                                <tr>
-                                    <td colSpan={6} className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">Totals:</td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}</td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}</td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
-                                    </td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + (row.actualQtyOk || 0), 0) || '-'}
-                                    </td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + (row.actualQtyNg || 0), 0) || '-'}
-                                    </td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
-                                        {paginatedData.reduce((sum, row) => sum + ((row.actualQtyOk || 0) + (row.actualQtyNg || 0)), 0) || '-'}
-                                    </td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td>
-                                    <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td> {/* Cell for Actions column in tfoot */}
-                                </tr>
+                                    <tr>
+                                        <td colSpan={6} className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">Totals:</td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + row.qtyOk, 0)}</td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + row.qtyNg, 0)}</td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + row.qtyOk + row.qtyNg, 0)}
+                                        </td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + (row.actualQtyOk || 0), 0) || '-'}
+                                        </td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + (row.actualQtyNg || 0), 0) || '-'}
+                                        </td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center">
+                                            {paginatedData.reduce((sum, row) => sum + ((row.actualQtyOk || 0) + (row.actualQtyNg || 0)), 0) || '-'}
+                                        </td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td>
+                                        <td className="px-3 py-3.5 text-sm font-semibold text-gray-700 text-center"></td>
+                                        {/* Cell for Actions column in tfoot */}
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>

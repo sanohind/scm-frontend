@@ -101,7 +101,7 @@ const CreateForecast = () => {
             } else {
                 setData([]);
                 setFilteredData([]);
-                toast.info('No forecast report available');
+                // toast.info('No forecast report available');
             }
         } catch (error) {
             console.error('Error fetching forecast report:', error);
