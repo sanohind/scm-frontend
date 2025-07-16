@@ -31,6 +31,7 @@ import IndexTransactionsReview from "./pages/Subcon/TransactionsReview/IndexTran
 import TransactionsReviewDetail from "./pages/Subcon/TransactionsReview/Pages/Detail/TransactionsReviewDetail";
 import ManageOrganization from "./pages/ManageUser/Pages/ManageOrganization";
 import ProfileSetting from "./pages/ProfileSetting";
+import ForgotPassword from "./pages/Authentication/Pages/ForgotPassword";
 
 const App: React.FC = () => {
   return (
@@ -39,6 +40,7 @@ const App: React.FC = () => {
         <Routes>
           {/* Public Route */}
           <Route path="/auth/login" element={<SignIn />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
 
           <Route
             path="/print/purchase-order"

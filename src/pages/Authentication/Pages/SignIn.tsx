@@ -113,6 +113,17 @@ const SignIn: React.FC = () => {
                   <div id="login-status" className="sr-only" aria-live="polite">
                     {isLoading ? 'Signing in, please wait...' : 'Ready to sign in'}
                   </div>
+                  
+                  {/* Forgot Password Link */}
+                  <div className=" mt-4">
+                    <button
+                      type="button"
+                      onClick={() => navigate('/auth/forgot-password')}
+                      className="text-sm text-blue-600 hover:text-blue-800 underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </form>
                 <p className="self-center mt-9 text-xs font-medium text-center text-slate-800 w-[259px] max-md:mt-10 max-sm:self-center">
                   <span className="text-slate-600">By Signing in, I accept the company&apos;s</span>
