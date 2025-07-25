@@ -133,10 +133,10 @@ allowedRoles={['5','6','7','8']} // Supplier users only
 ### 1. Clone Repository
 ```bash
 # Clone repository
-git clone https://github.com/mygads/react-scm-sanoh-new.git
+git clone https://github.com/mygads/react-scm-sanoh.git
 
 # Masuk ke direktori project
-cd react-scm-sanoh-new
+cd react-scm-sanoh
 ```
 
 ### 2. Install Dependencies
@@ -221,7 +221,7 @@ npm run preview
 ## 📁 Struktur Proyek
 
 ```
-react-scm-sanoh-new/
+react-scm-sanoh/
 ├── public/                          # Static assets
 │   ├── data.json                   # Data konfigurasi
 │   ├── icon_sanoh.png             # Icon aplikasi
@@ -1406,8 +1406,8 @@ Aplikasi ini dikembangkan khusus untuk PT Sanoh Indonesia dan tunduk pada kebija
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mygads/react-scm-sanoh-new.git
-cd react-scm-sanoh-new
+git clone https://github.com/mygads/react-scm-sanoh.git
+cd react-scm-sanoh
 ```
 
 2. Install dependencies:
