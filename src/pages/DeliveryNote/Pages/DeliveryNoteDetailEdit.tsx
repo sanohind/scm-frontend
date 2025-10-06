@@ -6,7 +6,7 @@ import { FaFileExcel, FaPrint } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import { Dropdown } from 'flowbite-react';
 import * as XLSX from 'xlsx';
-import { API_DN_Detail, API_Update_DN } from '../../../api/api';
+import { API_DN_Detail, API_Update_DN, API_Update_Driver_Info } from '../../../api/api';
 import Button from '../../../components/Forms/Button';
 
 const DeliveryNoteDetailEdit = () => {
@@ -32,6 +32,8 @@ const DeliveryNoteDetailEdit = () => {
     noPO: string;
     planDelivery: string;
     confirmUpdateAt: string;
+    driverName: string;
+    platNumber: string;
     [key: string]: string | undefined;
   }
   
@@ -40,6 +42,8 @@ const DeliveryNoteDetailEdit = () => {
     noPO: '',
     planDelivery: '',
     confirmUpdateAt: '',
+    driverName: '',
+    platNumber: '',
   });
   const [filteredData, setFilteredData] = useState<Detail[]>([]);
   const [confirmMode, setConfirmMode] = useState(false);
@@ -47,6 +51,9 @@ const DeliveryNoteDetailEdit = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
+  const [editDriverMode, setEditDriverMode] = useState(false);
+  const [tempDriverName, setTempDriverName] = useState('');
+  const [tempPlatNumber, setTempPlatNumber] = useState('');
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
   const allQtyDeliveredMatch = filteredData.every(detail => detail.qtyDelivered === detail.qtyRequested);
@@ -79,6 +86,8 @@ const DeliveryNoteDetailEdit = () => {
           noPO: dn.po_no || '',
           planDelivery: dn.plan_delivery_date || '',
           confirmUpdateAt: dn.confirm_update_at,
+          driverName: dn.driver_name || '',
+          platNumber: dn.plat_number || '',
         };
   
         confirmAtKeys.forEach((key, index) => {
@@ -151,6 +160,18 @@ const DeliveryNoteDetailEdit = () => {
   }, [noDN]);
 
   const handleConfirmMode = () => {
+    // Validate driver information
+    if (!dnDetails.driverName || !dnDetails.platNumber) {
+      toast.warning('Please fill in Driver Name and Plat Number before confirming the order');
+      Swal.fire({
+        title: 'Warning',
+        text: 'Driver information is required. Please fill in Driver Name and Plat Number.',
+        icon: 'warning',
+        confirmButtonColor: '#1e3a8a'
+      });
+      return;
+    }
+
     const updatedData = filteredData.map((detail) => ({
       ...detail,
       qtyConfirm: detail.qtyConfirm === '-' ? detail.qtyRequested : detail.qtyConfirm,
@@ -452,6 +473,68 @@ const DeliveryNoteDetailEdit = () => {
     window.open(`/#/print/label/delivery-note?noDN=${noDN}&status=${status}`, '_blank');
   };
 
+
+  const handleEditDriverInfo = () => {
+    setTempDriverName(dnDetails.driverName);
+    setTempPlatNumber(dnDetails.platNumber);
+    setEditDriverMode(true);
+  };
+
+  const handleCancelDriverEdit = () => {
+    setEditDriverMode(false);
+    setTempDriverName('');
+    setTempPlatNumber('');
+  };
+
+  const handleSaveDriverInfo = async () => {
+    const token = localStorage.getItem('access_token');
+    const payload = {
+      no_dn: dnDetails.noDN,
+      driver_name: tempDriverName,
+      plat_number: tempPlatNumber,
+    };
+
+    try {
+      const response = await fetch(`${API_Update_Driver_Info()}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error('Failed to update driver info');
+
+      setDNDetails(prev => ({
+        ...prev,
+        driverName: tempDriverName,
+        platNumber: tempPlatNumber,
+      }));
+      
+      setEditDriverMode(false);
+      toast.success('Driver information updated successfully!');
+      Swal.fire({
+        title: 'Success',
+        text: 'Driver information updated successfully!',
+        icon: 'success',
+        confirmButtonColor: '#1e3a8a'
+      });
+    } catch (error) {
+      console.error('Failed to update driver info:', error);
+      if (error instanceof Error) {
+        toast.error(`Failed to update driver info: ${error.message}`);
+      } else {
+        toast.error('Failed to update driver info');
+      }
+      Swal.fire({
+        title: 'Error',
+        text: 'Failed to update driver information.',
+        icon: 'error',
+        confirmButtonColor: '#1e3a8a'
+      });
+    }
+  };
   return (
     <>
       <ToastContainer position="top-right" />
@@ -558,6 +641,78 @@ const DeliveryNoteDetailEdit = () => {
               </div>
             </div>
           </div>
+
+            {/* Driver Info Section */}
+            <div className="flex flex-col space-y-4 mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-700">Driver Information</h3>
+                {!editDriverMode && !confirmMode && !outstandingMode && (
+                  <Button
+                    title="Edit Driver Info"
+                    onClick={handleEditDriverInfo}
+                    className="text-sm"
+                  />
+                )}
+              </div>
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Driver Name */}
+                <div className="flex flex-col flex-1">
+                  <label className="text-sm font-medium text-gray-700 mb-2">Driver Name:</label>
+                  {loading ? (
+                    <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                  ) : editDriverMode ? (
+                    <input
+                      type="text"
+                      value={tempDriverName}
+                      onChange={(e) => setTempDriverName(e.target.value)}
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter driver name"
+                      maxLength={255}
+                    />
+                  ) : (
+                    <span className="bg-white px-4 py-2 rounded-lg text-sm border border-gray-300">
+                      {dnDetails.driverName || '-'}
+                    </span>
+                  )}
+                </div>
+                {/* Plat Number */}
+                <div className="flex flex-col flex-1">
+                  <label className="text-sm font-medium text-gray-700 mb-2">Plat Number:</label>
+                  {loading ? (
+                    <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                  ) : editDriverMode ? (
+                    <input
+                      type="text"
+                      value={tempPlatNumber}
+                      onChange={(e) => setTempPlatNumber(e.target.value)}
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter plat number"
+                      maxLength={50}
+                    />
+                  ) : (
+                    <span className="bg-white px-4 py-2 rounded-lg text-sm border border-gray-300">
+                      {dnDetails.platNumber || '-'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {editDriverMode && (
+                <div className="flex gap-2">
+                  <Button
+                    title="Save"
+                    onClick={handleSaveDriverInfo}
+                    color="bg-green-600"
+                    className="text-sm"
+                  />
+                  <Button
+                    title="Cancel"
+                    onClick={handleCancelDriverEdit}
+                    color="bg-red-600"
+                    className="text-sm"
+                  />
+                </div>
+              )}
+            </div>
 
           {/* Table */}
           <div className="relative overflow-hidden shadow-md rounded-lg border border-gray-300">
