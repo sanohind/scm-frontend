@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { API_Print_DN, API_Print_DN_Confirm, API_Print_DN_Outstanding } from '../../api/api';
 import logoSanoh from '../../images/logo-sanoh.png';
 import { toast, ToastContainer } from 'react-toastify';
+import QRCode from 'qrcode';
 
 // Register the Poppins font
 Font.register({
@@ -261,6 +262,20 @@ const styles = StyleSheet.create({
         fontSize: 9,
         fontWeight: 'medium',
     },
+    qrCodeContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    qrCode: {
+        width: 100,
+        height: 100,
+    },
+    qrCodeLabel: {
+        marginTop: 5,
+        fontSize: 8,
+        fontWeight: 'medium',
+        textAlign: 'center',
+    },
 });
 
 interface DeliveryNoteData {
@@ -289,7 +304,7 @@ const calculateTotalBoxes = (details: { box_quantity: string }[]) => {
     return details.reduce((total, item) => total + parseFloat(item.box_quantity || '0'), 0);
 };
 
-const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
+const DeliveryNoteDocument = ({ data, qrCodeDataUrl }: { data: DeliveryNoteData; qrCodeDataUrl: string }) => (
     <Document>
         <Page style={styles.page} size="A4">
         {/* Page number section */}
@@ -440,6 +455,12 @@ const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
                         </View>
                     </View>
                 </View>
+                
+                {/* QR Code Section */}
+                <View style={styles.qrCodeContainer}>
+                    <Image src={qrCodeDataUrl} style={styles.qrCode} />
+                    <Text style={styles.qrCodeLabel}>DN: {data.header.dn_number}</Text>
+                </View>
             </View>
             {/* Page download at section */}
             <View style={[styles.downloadAt, { bottom: 10, left: 10 }]} fixed>
@@ -460,6 +481,7 @@ const DeliveryNoteDocument = ({ data }: { data: DeliveryNoteData }) => (
 
 const PrintDN = () => {
     const [dnData, setDNData] = useState<DeliveryNoteData | null>(null);
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const noDN = queryParams.get('noDN');
@@ -468,9 +490,19 @@ const PrintDN = () => {
         if (noDN) {
             // Create loading toast for data fetching
             const fetchPromise = fetchDeliveryNoteData(noDN)
-                .then((data) => {
+                .then(async (data) => {
                 if (data) {
                     setDNData(data);
+                    // Generate QR code
+                    const qrDataUrl = await QRCode.toDataURL(data.header.dn_number, {
+                        width: 200,
+                        margin: 1,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    });
+                    setQrCodeDataUrl(qrDataUrl);
                     return 'Data loaded successfully';
                 }
                 throw new Error('Failed to load data');
@@ -549,8 +581,8 @@ const PrintDN = () => {
         <>
             <ToastContainer position="top-right" />
             <div className="flex flex-col items-center justify-center h-screen text-lg font-medium">
-            {dnData ? (
-                <BlobProvider document={<DeliveryNoteDocument data={dnData} />}>
+            {dnData && qrCodeDataUrl ? (
+                <BlobProvider document={<DeliveryNoteDocument data={dnData} qrCodeDataUrl={qrCodeDataUrl} />}>
                 {({ url, loading, error }) => {
                     if (loading) {
                     const id = toast.loading("Rendering PDF, please wait...");
