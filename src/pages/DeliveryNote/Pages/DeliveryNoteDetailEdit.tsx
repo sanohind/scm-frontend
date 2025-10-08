@@ -159,26 +159,85 @@ const DeliveryNoteDetailEdit = () => {
     }
   }, [noDN]);
 
-  const handleConfirmMode = () => {
-    // Validate driver information
-    if (!dnDetails.driverName || !dnDetails.platNumber) {
-      toast.warning('Please fill in Driver Name and Plat Number before confirming the order');
-      Swal.fire({
-        title: 'Warning',
-        text: 'Driver information is required. Please fill in Driver Name and Plat Number.',
-        icon: 'warning',
-        confirmButtonColor: '#1e3a8a'
-      });
-      return;
-    }
+  const handleConfirmMode = async () => {
+    // Show popup to input driver information
+    const { value: formValues } = await Swal.fire({
+      title: 'Driver Information',
+      html:
+        '<div style="text-align: left;">' +
+        '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Driver Name <span style="color: red;">*</span></label>' +
+        '<input id="swal-input-driver-name" class="swal2-input" placeholder="Enter driver name" style="width: 90%; margin: 0 0 15px 0;" value="' + (dnDetails.driverName || '') + '">' +
+        '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Plat Number <span style="color: red;">*</span></label>' +
+        '<input id="swal-input-plat-number" class="swal2-input" placeholder="Enter plat number" style="width: 90%; margin: 0;" value="' + (dnDetails.platNumber || '') + '">' +
+        '</div>',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Continue',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#1e3a8a',
+      cancelButtonColor: '#dc2626',
+      preConfirm: () => {
+        const driverName = (document.getElementById('swal-input-driver-name') as HTMLInputElement).value;
+        const platNumber = (document.getElementById('swal-input-plat-number') as HTMLInputElement).value;
+        
+        if (!driverName || !platNumber) {
+          Swal.showValidationMessage('Both Driver Name and Plat Number are required');
+          return false;
+        }
+        
+        return { driverName, platNumber };
+      }
+    });
 
-    const updatedData = filteredData.map((detail) => ({
-      ...detail,
-      qtyConfirm: detail.qtyConfirm === '-' ? detail.qtyRequested : detail.qtyConfirm,
-    }));
-    setFilteredData(updatedData);
-    setConfirmMode(true);
-    setIsCheckboxChecked(false);
+    if (formValues) {
+      // Save driver information to backend
+      const token = localStorage.getItem('access_token');
+      const payload = {
+        no_dn: dnDetails.noDN,
+        driver_name: formValues.driverName,
+        plat_number: formValues.platNumber,
+      };
+
+      try {
+        const response = await fetch(`${API_Update_Driver_Info()}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) throw new Error('Failed to update driver info');
+
+        // Update local state
+        setDNDetails(prev => ({
+          ...prev,
+          driverName: formValues.driverName,
+          platNumber: formValues.platNumber,
+        }));
+        
+        toast.success('Driver information saved successfully!');
+
+        // Continue with confirm mode
+        const updatedData = filteredData.map((detail) => ({
+          ...detail,
+          qtyConfirm: detail.qtyConfirm === '-' ? detail.qtyRequested : detail.qtyConfirm,
+        }));
+        setFilteredData(updatedData);
+        setConfirmMode(true);
+        setIsCheckboxChecked(false);
+      } catch (error) {
+        console.error('Failed to update driver info:', error);
+        toast.error('Failed to save driver information');
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save driver information. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#1e3a8a'
+        });
+      }
+    }
   };
 
   const handleAddOutstanding = () => {
@@ -646,13 +705,7 @@ const DeliveryNoteDetailEdit = () => {
             <div className="flex flex-col space-y-4 mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-700">Driver Information</h3>
-                {!editDriverMode && !confirmMode && !outstandingMode && (
-                  <Button
-                    title="Edit Driver Info"
-                    onClick={handleEditDriverInfo}
-                    className="text-sm"
-                  />
-                )}
+                
               </div>
               <div className="flex flex-col md:flex-row gap-4">
                 {/* Driver Name */}

@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     deliveryNote: {
         fontSize: 12,
         fontWeight: 'semibold',
+        marginRight: 6,
         
     },
     details: {
@@ -264,11 +265,11 @@ const styles = StyleSheet.create({
     },
     qrCodeContainer: {
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 0,
     },
     qrCode: {
-        width: 100,
-        height: 100,
+        width: 50,
+        height: 50,
     },
     qrCodeLabel: {
         marginTop: 5,
@@ -286,6 +287,8 @@ interface DeliveryNoteData {
         supplier_code: string;
         planned_receipt_date: string;
         total_box: string;
+        driver_name: string;
+        plat_number: string;
     };
     details: {
         supplier_part_number: string;
@@ -325,6 +328,10 @@ const DeliveryNoteDocument = ({ data, qrCodeDataUrl }: { data: DeliveryNoteData;
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <Text style={{ textAlign: 'right' }}>{data.header.dn_number}</Text>
                         </View>
+                    </View>
+                    {/* QR Code */}
+                    <View style={[styles.qrCodeContainer, { alignSelf: 'flex-end' }]}>
+                        <Image src={qrCodeDataUrl} style={styles.qrCode} />
                     </View>
                 </View>
 
@@ -432,7 +439,12 @@ const DeliveryNoteDocument = ({ data, qrCodeDataUrl }: { data: DeliveryNoteData;
                             <View style={{ width: '34%'}}>
                                 <Text style={ styles.signatureLeftTitle }>Driver</Text>
                                 <Text style={ styles.signatureLeftBox}></Text>
-                                <Text style={ styles.signatureLeftName}>Name :</Text>
+                                <Text style={ styles.signatureLeftName}>
+                                    Name : {data.header.driver_name ? data.header.driver_name : '_______________'}
+                                </Text>
+                                <Text style={ styles.signatureLeftName}>
+                                    Plat NO. : {data.header.plat_number ? data.header.plat_number : '_______________'}
+                                </Text>
                                 <Text style={ styles.signatureLeftDate}>Date :</Text>
                             </View>
                         </View>
@@ -456,11 +468,7 @@ const DeliveryNoteDocument = ({ data, qrCodeDataUrl }: { data: DeliveryNoteData;
                     </View>
                 </View>
                 
-                {/* QR Code Section */}
-                <View style={styles.qrCodeContainer}>
-                    <Image src={qrCodeDataUrl} style={styles.qrCode} />
-                    <Text style={styles.qrCodeLabel}>DN: {data.header.dn_number}</Text>
-                </View>
+                
             </View>
             {/* Page download at section */}
             <View style={[styles.downloadAt, { bottom: 10, left: 10 }]} fixed>
@@ -544,26 +552,45 @@ const PrintDN = () => {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const dnData = await response.json();
-            if (dnData.success && dnData.data && dnData.data.length > 0) {
+            
+            if (dnData.success && dnData.data) {
+                // Handle both API response structures
+                let responseData;
+                
+                // Check if data is an array or object
+                if (Array.isArray(dnData.data)) {
+                    // Old structure: data is array
+                    if (dnData.data.length === 0) {
+                        console.error('No data available:', dnData.message);
+                        return null;
+                    }
+                    responseData = dnData.data[0];
+                } else {
+                    // New structure: data is object
+                    responseData = dnData.data;
+                }
+
                 const header = {
-                    dn_number: dnData.data[0].dn_number,
-                    po_number: dnData.data[0].po_number,
-                    supplier_name: dnData.data[0].supplier_name,
-                    supplier_code: dnData.data[0].supplier_code,
-                    planned_receipt_date: dnData.data[0].planned_receipt_date,
-                    total_box: dnData.data[0].total_box,
+                    dn_number: responseData.dn_number || responseData.no_dn,
+                    po_number: responseData.po_number || responseData.po_no,
+                    supplier_name: responseData.supplier_name,
+                    supplier_code: responseData.supplier_code,
+                    planned_receipt_date: responseData.planned_receipt_date || responseData.plan_delivery_date,
+                    total_box: responseData.total_box,
+                    driver_name: responseData.driver_name || '',
+                    plat_number: responseData.plat_number || '',
                 };
 
-                const details = dnData.data[0].detail.map((item: any) => ({
-                    supplier_part_number: item.supplier_part_number,
-                    internal_part_number: item.internal_part_number,
-                    part_name: item.part_name,
-                    pcs_per_kamban: item.pcs_per_kamban,
+                const details = responseData.detail.map((item: any) => ({
+                    supplier_part_number: item.supplier_part_number || item.part_no,
+                    internal_part_number: item.internal_part_number || item.part_no,
+                    part_name: item.part_name || item.item_desc_a,
+                    pcs_per_kamban: item.pcs_per_kamban || item.dn_snp,
                     qty_confirm: item.qty_confirm || '',
-                    qty_receipt: item.qty_receipt || '',
-                    no_of_kamban: item.no_of_kamban,
-                    total_quantity: item.total_quantity,
-                    box_quantity: item.box_quantity,
+                    qty_receipt: item.qty_receipt || item.receipt_qty || '',
+                    no_of_kamban: item.no_of_kamban || '',
+                    total_quantity: item.total_quantity || item.dn_qty,
+                    box_quantity: item.box_quantity || '',
                 }));
 
                 return { header, details };
