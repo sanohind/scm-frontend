@@ -442,9 +442,7 @@ const DeliveryNoteDocument = ({ data, qrCodeDataUrl }: { data: DeliveryNoteData;
                                 <Text style={ styles.signatureLeftName}>
                                     Name : {data.header.driver_name ? data.header.driver_name : '_______________'}
                                 </Text>
-                                <Text style={ styles.signatureLeftName}>
-                                    Plat NO. : {data.header.plat_number ? data.header.plat_number : '_______________'}
-                                </Text>
+        
                                 <Text style={ styles.signatureLeftDate}>Date :</Text>
                             </View>
                         </View>
