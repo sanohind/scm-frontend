@@ -51,12 +51,97 @@ const DeliveryNoteDetailEdit = () => {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [waveNumbers, setWaveNumbers] = useState<number[]>([]);
-  const [editDriverMode, setEditDriverMode] = useState(false);
-  const [tempDriverName, setTempDriverName] = useState('');
-  const [tempPlatNumber, setTempPlatNumber] = useState('');
   const location = useLocation();
   const noDN = new URLSearchParams(location.search).get('noDN');
   const allQtyDeliveredMatch = filteredData.every(detail => detail.qtyDelivered === detail.qtyRequested);
+
+  // Daftar kode wilayah plat nomor Indonesia yang valid
+  const VALID_REGION_CODES = [
+    // Sumatera
+    'BL', 'BB', 'BN', 'BA', 'BD', 'BE', 'BG', 'BK', 'BM', 'BP', 'BT',
+    // Jawa
+    'A', 'B', 'D', 'E', 'F', 'G', 'H', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'Z', 'AA', 'AB', 'AD', 'AE', 'AG',
+    // Kalimantan
+    'DA', 'KB', 'KH', 'KT', 'KU',
+    // Sulawesi
+    'DB', 'DC', 'DD', 'DE', 'DG', 'DH', 'DL', 'DM', 'DN', 'DR', 'DT',
+    // Bali & Nusa Tenggara
+    'DK', 'DR', 'EA', 'EB', 'ED',
+    // Maluku & Papua
+    'DE', 'DG', 'PA', 'PB'
+  ];
+
+  // Helper function to remove spaces from plat number (untuk output ke backend)
+  const removePlatNumberSpaces = (platNumber: string): string => {
+    return platNumber.replace(/\s/g, '');
+  };
+
+  // Helper function to format license plate for display (dengan spasi)
+  const formatPlatNumberDisplay = (input: string): string => {
+    // Remove all spaces and convert to uppercase
+    const cleaned = input.toUpperCase().replace(/\s/g, '');
+    
+    // Only allow alphanumeric characters, max 12
+    const alphanumeric = cleaned.replace(/[^A-Z0-9]/g, '').substring(0, 12);
+    
+    // Match pattern: letters, then digits, then letters
+    const match = alphanumeric.match(/^([A-Z]{1,2})(\d{0,4})([A-Z]{0,3})$/);
+    
+    if (match) {
+      const [, prefix, numbers, suffix] = match;
+      let formatted = prefix;
+      if (numbers) {
+        formatted += ` ${numbers}`;
+      }
+      if (suffix) {
+        formatted += ` ${suffix}`;
+      }
+      return formatted;
+    }
+    
+    return alphanumeric;
+  };
+
+  // Helper function to validate Indonesian license plate format
+  const validatePlatNumber = (platNumber: string): { isValid: boolean; error: string } => {
+    // Remove spaces for validation
+    const cleaned = platNumber.replace(/\s/g, '').toUpperCase();
+    
+    if (!cleaned) {
+      return { isValid: false, error: 'Plat nomor tidak boleh kosong' };
+    }
+
+    // Check length (min 4, max 12)
+    if (cleaned.length < 4) {
+      return { isValid: false, error: 'Plat nomor terlalu pendek (minimal 4 karakter)' };
+    }
+
+    if (cleaned.length > 12) {
+      return { isValid: false, error: 'Plat nomor terlalu panjang (maksimal 12 karakter)' };
+    }
+
+    // Match format: [1-2 letters] [1-4 digits] [1-3 letters]
+    const platRegex = /^([A-Z]{1,2})(\d{1,4})([A-Z]{1,3})$/;
+    const match = cleaned.match(platRegex);
+
+    if (!match) {
+      return { isValid: false, error: 'Format tidak sesuai. Contoh: B1234AB' };
+    }
+
+    const [, regionCode, numbers, series] = match;
+
+    // Validate region code
+    if (!VALID_REGION_CODES.includes(regionCode)) {
+      return { isValid: false, error: `Kode wilayah '${regionCode}' tidak valid` };
+    }
+
+    // Validate numbers (tidak boleh 0 atau dimulai dengan 0)
+    if (numbers === '0' || numbers.startsWith('0')) {
+      return { isValid: false, error: 'Nomor tidak boleh 0 atau dimulai dengan 0' };
+    }
+
+    return { isValid: true, error: '' };
+  };
 
 
   // Fetch Delivery Note Details
@@ -168,7 +253,10 @@ const DeliveryNoteDetailEdit = () => {
         '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Driver Name <span style="color: red;">*</span></label>' +
         '<input id="swal-input-driver-name" class="swal2-input" placeholder="Enter driver name" style="width: 90%; margin: 0 0 15px 0;" value="' + (dnDetails.driverName || '') + '">' +
         '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Plat Number <span style="color: red;">*</span></label>' +
-        '<input id="swal-input-plat-number" class="swal2-input" placeholder="Enter plat number" style="width: 90%; margin: 0;" value="' + (dnDetails.platNumber || '') + '">' +
+        '<input id="swal-input-plat-number" class="swal2-input" placeholder="B 1234 AB" style="width: 90%; margin: 0 0 5px 0; text-transform: uppercase;" value="' + (dnDetails.platNumber || '') + '" maxlength="14">' +
+        '<div id="plat-error-message" style="color: #dc2626; font-size: 12px; margin-bottom: 5px; min-height: 16px;"></div>' +
+        '<small style="color: #666; font-size: 12px; display: block; margin-bottom: 5px;">Format: B 1234 AB (kode wilayah + nomor + seri)</small>' +
+        '<small style="color: #666; font-size: 11px;">Contoh: B 1234 AB, D 5678 XYZ, AA 999 Z</small>' +
         '</div>',
       focusConfirm: false,
       showCancelButton: true,
@@ -176,16 +264,58 @@ const DeliveryNoteDetailEdit = () => {
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#1e3a8a',
       cancelButtonColor: '#dc2626',
+      didOpen: () => {
+        const platInput = document.getElementById('swal-input-plat-number') as HTMLInputElement;
+        const errorDiv = document.getElementById('plat-error-message') as HTMLDivElement;
+        
+        platInput.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement;
+          // Remove non-alphanumeric, format display with spaces
+          const formatted = formatPlatNumberDisplay(target.value);
+          target.value = formatted;
+          
+          // Real-time validation
+          if (formatted) {
+            const validation = validatePlatNumber(formatted);
+            if (validation.isValid) {
+              target.style.borderColor = '#10b981';
+              target.style.backgroundColor = '#f0fdf4';
+              errorDiv.textContent = '';
+            } else {
+              target.style.borderColor = '#ef4444';
+              target.style.backgroundColor = '#fef2f2';
+              errorDiv.textContent = validation.error;
+            }
+          } else {
+            target.style.borderColor = '';
+            target.style.backgroundColor = '';
+            errorDiv.textContent = '';
+          }
+        });
+      },
       preConfirm: () => {
         const driverName = (document.getElementById('swal-input-driver-name') as HTMLInputElement).value;
         const platNumber = (document.getElementById('swal-input-plat-number') as HTMLInputElement).value;
         
-        if (!driverName || !platNumber) {
-          Swal.showValidationMessage('Both Driver Name and Plat Number are required');
+        if (!driverName) {
+          Swal.showValidationMessage('Driver name is required');
           return false;
         }
         
-        return { driverName, platNumber };
+        if (!platNumber) {
+          Swal.showValidationMessage('Plat number is required');
+          return false;
+        }
+        
+        // Validate the plat number format
+        const validation = validatePlatNumber(platNumber);
+        if (!validation.isValid) {
+          Swal.showValidationMessage(validation.error);
+          return false;
+        }
+        
+        // Return dengan format tanpa spasi untuk backend
+        return { driverName, platNumber: removePlatNumberSpaces(platNumber) };
       }
     });
 
@@ -532,68 +662,6 @@ const DeliveryNoteDetailEdit = () => {
     window.open(`/#/print/label/delivery-note?noDN=${noDN}&status=${status}`, '_blank');
   };
 
-
-  const handleEditDriverInfo = () => {
-    setTempDriverName(dnDetails.driverName);
-    setTempPlatNumber(dnDetails.platNumber);
-    setEditDriverMode(true);
-  };
-
-  const handleCancelDriverEdit = () => {
-    setEditDriverMode(false);
-    setTempDriverName('');
-    setTempPlatNumber('');
-  };
-
-  const handleSaveDriverInfo = async () => {
-    const token = localStorage.getItem('access_token');
-    const payload = {
-      no_dn: dnDetails.noDN,
-      driver_name: tempDriverName,
-      plat_number: tempPlatNumber,
-    };
-
-    try {
-      const response = await fetch(`${API_Update_Driver_Info()}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) throw new Error('Failed to update driver info');
-
-      setDNDetails(prev => ({
-        ...prev,
-        driverName: tempDriverName,
-        platNumber: tempPlatNumber,
-      }));
-      
-      setEditDriverMode(false);
-      toast.success('Driver information updated successfully!');
-      Swal.fire({
-        title: 'Success',
-        text: 'Driver information updated successfully!',
-        icon: 'success',
-        confirmButtonColor: '#1e3a8a'
-      });
-    } catch (error) {
-      console.error('Failed to update driver info:', error);
-      if (error instanceof Error) {
-        toast.error(`Failed to update driver info: ${error.message}`);
-      } else {
-        toast.error('Failed to update driver info');
-      }
-      Swal.fire({
-        title: 'Error',
-        text: 'Failed to update driver information.',
-        icon: 'error',
-        confirmButtonColor: '#1e3a8a'
-      });
-    }
-  };
   return (
     <>
       <ToastContainer position="top-right" />
@@ -705,7 +773,6 @@ const DeliveryNoteDetailEdit = () => {
             <div className="flex flex-col space-y-4 mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-700">Driver Information</h3>
-                
               </div>
               <div className="flex flex-col md:flex-row gap-4">
                 {/* Driver Name */}
@@ -713,15 +780,6 @@ const DeliveryNoteDetailEdit = () => {
                   <label className="text-sm font-medium text-gray-700 mb-2">Driver Name:</label>
                   {loading ? (
                     <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-                  ) : editDriverMode ? (
-                    <input
-                      type="text"
-                      value={tempDriverName}
-                      onChange={(e) => setTempDriverName(e.target.value)}
-                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter driver name"
-                      maxLength={255}
-                    />
                   ) : (
                     <span className="bg-white px-4 py-2 rounded-lg text-sm border border-gray-300">
                       {dnDetails.driverName || '-'}
@@ -733,38 +791,13 @@ const DeliveryNoteDetailEdit = () => {
                   <label className="text-sm font-medium text-gray-700 mb-2">Plat Number:</label>
                   {loading ? (
                     <div className="h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-                  ) : editDriverMode ? (
-                    <input
-                      type="text"
-                      value={tempPlatNumber}
-                      onChange={(e) => setTempPlatNumber(e.target.value)}
-                      className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter plat number"
-                      maxLength={50}
-                    />
                   ) : (
                     <span className="bg-white px-4 py-2 rounded-lg text-sm border border-gray-300">
-                      {dnDetails.platNumber || '-'}
+                      {formatPlatNumberDisplay(dnDetails.platNumber) || '-'}
                     </span>
                   )}
                 </div>
               </div>
-              {editDriverMode && (
-                <div className="flex gap-2">
-                  <Button
-                    title="Save"
-                    onClick={handleSaveDriverInfo}
-                    color="bg-green-600"
-                    className="text-sm"
-                  />
-                  <Button
-                    title="Cancel"
-                    onClick={handleCancelDriverEdit}
-                    color="bg-red-600"
-                    className="text-sm"
-                  />
-                </div>
-              )}
             </div>
 
           {/* Table */}
