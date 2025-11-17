@@ -250,8 +250,14 @@ const DeliveryNoteDetailEdit = () => {
       title: 'Driver Information',
       html:
         '<div style="text-align: left;">' +
+        '<div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px; margin-bottom: 15px; border-radius: 4px;">' +
+        '<p style="margin: 0; font-size: 13px; color: #1e40af; line-height: 1.5;">' +
+        '<strong>Catatan:</strong> Nama driver yang diisikan harus satu orang dan diisi sesuai dengan yang akan datang. Untuk input nama driver tidak boleh memakai simbol.' +
+        '</p>' +
+        '</div>' +
         '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Driver Name <span style="color: red;">*</span></label>' +
-        '<input id="swal-input-driver-name" class="swal2-input" placeholder="Enter driver name" style="width: 90%; margin: 0 0 15px 0;" value="' + (dnDetails.driverName || '') + '">' +
+        '<input id="swal-input-driver-name" class="swal2-input" placeholder="Enter driver name" style="width: 90%; margin: 0 0 5px 0;" value="' + (dnDetails.driverName || '') + '">' +
+        '<div id="driver-error-message" style="color: #dc2626; font-size: 12px; margin-bottom: 10px; min-height: 16px;"></div>' +
         '<label style="display: block; margin-bottom: 5px; font-weight: 600;">Plat Number <span style="color: red;">*</span></label>' +
         '<input id="swal-input-plat-number" class="swal2-input" placeholder="B 1234 AB" style="width: 90%; margin: 0 0 5px 0; text-transform: uppercase;" value="' + (dnDetails.platNumber || '') + '" maxlength="14">' +
         '<div id="plat-error-message" style="color: #dc2626; font-size: 12px; margin-bottom: 5px; min-height: 16px;"></div>' +
@@ -265,9 +271,33 @@ const DeliveryNoteDetailEdit = () => {
       confirmButtonColor: '#1e3a8a',
       cancelButtonColor: '#dc2626',
       didOpen: () => {
+        const driverInput = document.getElementById('swal-input-driver-name') as HTMLInputElement;
+        const driverErrorDiv = document.getElementById('driver-error-message') as HTMLDivElement;
         const platInput = document.getElementById('swal-input-plat-number') as HTMLInputElement;
-        const errorDiv = document.getElementById('plat-error-message') as HTMLDivElement;
+        const platErrorDiv = document.getElementById('plat-error-message') as HTMLDivElement;
         
+        // Driver name validation
+        driverInput.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement;
+          // Remove symbols, only allow letters, numbers, and spaces
+          const cleaned = target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+          target.value = cleaned;
+          
+          // Real-time validation
+          if (cleaned) {
+            if (/^[a-zA-Z0-9\s]+$/.test(cleaned)) {
+              target.style.borderColor = '#10b981';
+              target.style.backgroundColor = '#f0fdf4';
+              driverErrorDiv.textContent = '';
+            }
+          } else {
+            target.style.borderColor = '';
+            target.style.backgroundColor = '';
+            driverErrorDiv.textContent = '';
+          }
+        });
+        
+        // Plat number validation
         platInput.addEventListener('input', (e) => {
           const target = e.target as HTMLInputElement;
           // Remove non-alphanumeric, format display with spaces
@@ -280,25 +310,31 @@ const DeliveryNoteDetailEdit = () => {
             if (validation.isValid) {
               target.style.borderColor = '#10b981';
               target.style.backgroundColor = '#f0fdf4';
-              errorDiv.textContent = '';
+              platErrorDiv.textContent = '';
             } else {
               target.style.borderColor = '#ef4444';
               target.style.backgroundColor = '#fef2f2';
-              errorDiv.textContent = validation.error;
+              platErrorDiv.textContent = validation.error;
             }
           } else {
             target.style.borderColor = '';
             target.style.backgroundColor = '';
-            errorDiv.textContent = '';
+            platErrorDiv.textContent = '';
           }
         });
       },
       preConfirm: () => {
-        const driverName = (document.getElementById('swal-input-driver-name') as HTMLInputElement).value;
+        const driverName = (document.getElementById('swal-input-driver-name') as HTMLInputElement).value.trim();
         const platNumber = (document.getElementById('swal-input-plat-number') as HTMLInputElement).value;
         
         if (!driverName) {
           Swal.showValidationMessage('Driver name is required');
+          return false;
+        }
+        
+        // Validate driver name (no symbols)
+        if (!/^[a-zA-Z0-9\s]+$/.test(driverName)) {
+          Swal.showValidationMessage('Driver name cannot contain symbols');
           return false;
         }
         
